@@ -1,0 +1,8 @@
+{
+  "name": "asteria-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/playlist-player.test.mjs"
+  }
+}
