@@ -47,6 +47,7 @@ export function createPlaylistPlayer({ root, tracks, audio: suppliedAudio, onOpe
   audio.preload = "metadata";
 
   const state = { isOpen: false, trackIndex: 0, hasLoadedTrack: false, hasError: false };
+  let playbackGeneration = 0;
   const track = () => tracks[state.trackIndex];
 
   function render() {
@@ -85,21 +86,26 @@ export function createPlaylistPlayer({ root, tracks, audio: suppliedAudio, onOpe
 
   async function play() {
     if (!state.hasLoadedTrack) loadCurrentTrack();
+    const generation = ++playbackGeneration;
     try {
       await audio.play();
+      if (generation !== playbackGeneration) return;
       state.hasError = false;
       render();
     } catch {
+      if (generation !== playbackGeneration) return;
       markError();
     }
   }
 
   function pause() {
+    playbackGeneration += 1;
     audio.pause();
     render();
   }
 
   async function selectTrack(index, { autoplay = !audio.paused } = {}) {
+    playbackGeneration += 1;
     state.trackIndex = wrapTrackIndex(index, tracks.length);
     state.hasError = false;
     loadCurrentTrack();

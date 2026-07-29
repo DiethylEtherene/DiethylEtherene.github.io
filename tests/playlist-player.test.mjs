@@ -55,6 +55,8 @@ class FakeAudio extends FakeElement {
     this.playCalls = 0;
     this.pauseCalls = 0;
     this.rejectNextPlay = false;
+    this.deferNextPlay = false;
+    this.pendingPlay = null;
   }
 
   play() {
@@ -63,8 +65,26 @@ class FakeAudio extends FakeElement {
       this.rejectNextPlay = false;
       return Promise.reject(new Error("blocked"));
     }
+    if (this.deferNextPlay) {
+      this.deferNextPlay = false;
+      return new Promise((resolve, reject) => {
+        this.pendingPlay = { resolve, reject };
+      });
+    }
     this.paused = false;
     return Promise.resolve();
+  }
+
+  resolvePendingPlay() {
+    const pending = this.pendingPlay;
+    this.pendingPlay = null;
+    pending.resolve();
+  }
+
+  rejectPendingPlay() {
+    const pending = this.pendingPlay;
+    this.pendingPlay = null;
+    pending.reject(new Error("blocked"));
   }
 
   pause() {
@@ -197,4 +217,42 @@ test("play rejection and media errors surface recovery state without disabling n
   await elements[".track-next"].emit("click");
   assert.equal(elements[".music-track-title"].textContent, "Track 02");
   assert.equal(elements[".track-prev"].getAttribute("aria-label"), "Previous: Track 01");
+});
+
+test("a stale rejected play after closing does not replace the paused state with an error", async () => {
+  const { root, elements, audio } = makeFixture();
+  createPlaylistPlayer({ root, tracks, audio });
+  await elements[".music-front"].emit("click");
+  audio.currentTime = 37;
+  audio.deferNextPlay = true;
+  const pendingClick = elements[".play-toggle"].emit("click");
+  await elements[".music-close"].emit("click");
+  audio.rejectPendingPlay();
+  await pendingClick;
+
+  assert.equal(audio.paused, true);
+  assert.equal(audio.currentTime, 37);
+  assert.equal(elements[".music-track-title"].textContent, "Track 01");
+  assert.equal(root.classList.contains("has-error"), false);
+  assert.equal(elements[".music-eyebrow"].textContent, "NOW.PLAYING / HIDDEN SIGNAL");
+  assert.equal(elements[".play-toggle"].getAttribute("aria-label"), "Play Track 01");
+});
+
+test("a stale resolved play does not overwrite the selected track's error state", async () => {
+  const { root, elements, audio } = makeFixture();
+  createPlaylistPlayer({ root, tracks, audio });
+  await elements[".music-front"].emit("click");
+  audio.deferNextPlay = true;
+  const pendingClick = elements[".play-toggle"].emit("click");
+  await elements[".track-next"].emit("click");
+  await audio.emit("error");
+  audio.resolvePendingPlay();
+  await pendingClick;
+
+  assert.equal(elements[".music-track-title"].textContent, "Track 02");
+  assert.equal(audio.src, tracks[1].src);
+  assert.equal(audio.paused, true);
+  assert.equal(root.classList.contains("has-error"), true);
+  assert.equal(elements[".music-eyebrow"].textContent, "SIGNAL LOST / SELECT ANOTHER");
+  assert.equal(elements[".play-toggle"].getAttribute("aria-label"), "Play Track 02");
 });
