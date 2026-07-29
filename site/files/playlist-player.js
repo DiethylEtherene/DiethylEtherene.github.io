@@ -64,7 +64,7 @@ export function createPlaylistPlayer({ root, tracks, audio: suppliedAudio, onOpe
     elements[".music-track-artist"].textContent = current.artist;
     elements[".track-progress i"].style.width = `${progress}%`;
     elements[".track-time"].textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
-    elements[".play-toggle"].textContent = isPlaying ? "❚❚" : "▶";
+    elements[".play-toggle"].textContent = isPlaying ? "\u275A\u275A" : "\u25B6";
     elements[".play-toggle"].setAttribute("aria-label", `${isPlaying ? "Pause" : "Play"} ${current.title}`);
     elements[".track-prev"].setAttribute("aria-label", `Previous: ${previous.title}`);
     elements[".track-next"].setAttribute("aria-label", `Next: ${next.title}`);

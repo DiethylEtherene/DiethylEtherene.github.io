@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 
 import {
   createPlaylistPlayer,
@@ -53,15 +54,14 @@ class FakeAudio extends FakeElement {
     this.paused = true;
     this.playCalls = 0;
     this.pauseCalls = 0;
-    this.nextPlayError = null;
+    this.rejectNextPlay = false;
   }
 
   play() {
     this.playCalls += 1;
-    if (this.nextPlayError) {
-      const error = this.nextPlayError;
-      this.nextPlayError = null;
-      return Promise.reject(error);
+    if (this.rejectNextPlay) {
+      this.rejectNextPlay = false;
+      return Promise.reject(new Error("blocked"));
     }
     this.paused = false;
     return Promise.resolve();
@@ -92,12 +92,15 @@ function makeFixture() {
   return { root, elements, audio: new FakeAudio() };
 }
 
-test("wraps indexes and formats safe clock values", () => {
+test("wraps indexes, formats safe clock values, and keeps icon source escaped", async () => {
   assert.equal(wrapTrackIndex(-1, 2), 1);
   assert.equal(wrapTrackIndex(2, 2), 0);
   assert.equal(formatTime(65.9), "01:05");
   assert.equal(formatTime(Number.NaN), "00:00");
   assert.equal(formatTime(-1), "00:00");
+  const source = await readFile(new URL("../site/files/playlist-player.js", import.meta.url), "utf8");
+  assert.equal(source.includes('"\\u275A\\u275A"'), true);
+  assert.equal(source.includes('"\\u25B6"'), true);
 });
 
 test("opening loads the first track without autoplay", async () => {
@@ -177,14 +180,20 @@ test("play rejection and media errors surface recovery state without disabling n
   const { root, elements, audio } = makeFixture();
   createPlaylistPlayer({ root, tracks, audio });
   await elements[".music-front"].emit("click");
-  audio.nextPlayError = new Error("blocked");
+  audio.rejectNextPlay = true;
   await elements[".play-toggle"].emit("click");
-  await audio.emit("error");
 
   assert.equal(audio.paused, true);
   assert.equal(root.classList.contains("has-error"), true);
   assert.equal(elements[".music-eyebrow"].textContent, "SIGNAL LOST / SELECT ANOTHER");
   assert.equal(elements[".play-toggle"].getAttribute("aria-label"), "Play Track 01");
+  assert.equal(elements[".track-next"].getAttribute("aria-label"), "Next: Track 02");
+  await audio.emit("error");
+  assert.equal(audio.paused, true);
+  assert.equal(root.classList.contains("has-error"), true);
+  assert.equal(elements[".music-eyebrow"].textContent, "SIGNAL LOST / SELECT ANOTHER");
+  assert.equal(elements[".play-toggle"].getAttribute("aria-label"), "Play Track 01");
+  assert.equal(elements[".track-next"].getAttribute("aria-label"), "Next: Track 02");
   await elements[".track-next"].emit("click");
   assert.equal(elements[".music-track-title"].textContent, "Track 02");
   assert.equal(elements[".track-prev"].getAttribute("aria-label"), "Previous: Track 01");
