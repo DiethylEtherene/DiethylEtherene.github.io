@@ -67,15 +67,23 @@ foreach ($requiredMarkup in @(
   Assert-SiteCondition ($index.Contains($requiredMarkup)) "index.html is missing playlist markup: $requiredMarkup"
 }
 
-Assert-SiteCondition ($index.Contains('<button type="button" class="music-face music-front" aria-label="Reveal hidden playlist" aria-hidden="false">')) "The closed player front must be exposed to assistive technology."
-Assert-SiteCondition ($index.Contains('<section class="music-face music-back" aria-label="Hidden signal playlist" inert aria-hidden="true">')) "The closed player back must be inert and hidden from assistive technology."
+$frontPattern = '(?is)<button\b(?=[^>]*\btype\s*=\s*"button")(?=[^>]*\bclass\s*=\s*"[^"]*\bmusic-face\b[^"]*")(?=[^>]*\bclass\s*=\s*"[^"]*\bmusic-front\b[^"]*")(?=[^>]*\baria-label\s*=\s*"Reveal hidden playlist")(?=[^>]*\baria-hidden\s*=\s*"false")[^>]*>'
+Assert-SiteCondition ($index -match $frontPattern) "The closed player front must be exposed to assistive technology."
 
-foreach ($controlClass in @("track-prev", "play-toggle", "track-next")) {
-  $controlPattern = '<button\s+type="button"\s+class="' + $controlClass + '"[^>]*>.*?</button>'
-  Assert-SiteCondition ($index -match $controlPattern) "The $controlClass playlist control must be a button."
+$backPattern = '(?is)<section\b(?=[^>]*\bclass\s*=\s*"[^"]*\bmusic-face\b[^"]*")(?=[^>]*\bclass\s*=\s*"[^"]*\bmusic-back\b[^"]*")(?=[^>]*\baria-label\s*=\s*"Hidden signal playlist")(?=[^>]*\sinert(?=\s|=|>))(?=[^>]*\baria-hidden\s*=\s*"true")[^>]*>'
+Assert-SiteCondition ($index -match $backPattern) "The closed player back must be inert and hidden from assistive technology."
+
+foreach ($controlSpec in @(
+  @{ Class = "track-prev"; Label = "Previous track" },
+  @{ Class = "play-toggle"; Label = "Play Track 01" },
+  @{ Class = "track-next"; Label = "Next track" }
+)) {
+  $controlPattern = '(?is)<button\b(?=[^>]*\btype\s*=\s*"button")(?=[^>]*\bclass\s*=\s*"[^"]*\b' + $controlSpec.Class + '\b[^"]*")(?=[^>]*\baria-label\s*=\s*"' + [regex]::Escape($controlSpec.Label) + '")[^>]*>.*?</button>'
+  Assert-SiteCondition ($index -match $controlPattern) "The $($controlSpec.Class) playlist control must be a labeled button."
 }
 
-Assert-SiteCondition ($index -match '<audio\s+class="playlist-audio"\s+preload="metadata"\s+hidden></audio>') "The playlist audio element must be hidden and preload metadata."
+$audioPattern = '(?is)<audio\b(?=[^>]*\bclass\s*=\s*"[^"]*\bplaylist-audio\b[^"]*")(?=[^>]*\bpreload\s*=\s*"metadata")(?=[^>]*\shidden(?=\s|=|>))[^>]*>\s*</audio>'
+Assert-SiteCondition ($index -match $audioPattern) "The playlist audio element must be hidden and preload metadata."
 
 foreach ($track in @(
   '{ title: "Track 01", artist: "Ether", src: "/files/audio/track-01.mp3" }',
@@ -90,7 +98,8 @@ Assert-SiteCondition ($playlistModule.Contains("export function createPlaylistPl
 foreach ($forbiddenMarkup in @("YOUR SONG", "03:24", "finalFakeProgress")) {
   Assert-SiteCondition (-not $index.Contains($forbiddenMarkup)) "index.html contains stale fake-player content: $forbiddenMarkup"
 }
-Assert-SiteCondition (-not ($index -match '<a href="#" onclick="event\.preventDefault\(\)">Open\b')) "index.html contains the obsolete placeholder Open link."
+$placeholderLinkPattern = '(?is)<a\b(?=[^>]*\bhref\s*=\s*"#")(?=[^>]*\bonclick\s*=\s*"[^"]*event\.preventDefault\(\)[^"]*")[^>]*>\s*Open\b.*?</a>'
+Assert-SiteCondition (-not ($index -match $placeholderLinkPattern)) "index.html contains the obsolete placeholder Open link."
 
 foreach ($audioSpec in @(
   @{ File = "track-01.mp3"; Length = 2882504; Hash = "793EF78631C44F3DCAE95B05DD0D8E91EAFB44C548DA4839BBD60FA8C95FB082" },
