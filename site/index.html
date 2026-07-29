@@ -135,23 +135,28 @@
     music.className = "music-easter";
     music.innerHTML = `
       <div class="music-inner">
-        <button type="button" class="music-face music-front" aria-label="Reveal hidden song">
+        <button type="button" class="music-face music-front" aria-label="Reveal hidden playlist">
           <span class="mini-disc"><i></i></span>
           <span class="music-question mono">signal_?</span>
         </button>
-        <section class="music-face music-back" aria-label="Now playing">
-          <button type="button" class="music-close" aria-label="Close player">×</button>
+        <section class="music-face music-back" aria-label="Hidden signal playlist">
+          <button type="button" class="music-close" aria-label="Close player">&times;</button>
           <div class="album-chip"><span class="album-orbit"></span></div>
           <div class="track-data">
-            <span class="mono pink">Now.playing / hidden signal</span>
-            <strong>YOUR SONG — ARTIST</strong>
-            <div class="track-progress"><i></i></div>
+            <span class="music-eyebrow mono pink">NOW.PLAYING / HIDDEN SIGNAL</span>
+            <div class="track-heading" aria-live="polite" aria-atomic="true">
+              <span class="music-track-position mono">01 / 02</span>
+              <strong><span class="music-track-title">Track 01</span> &mdash; <span class="music-track-artist">Ether</span></strong>
+            </div>
+            <div class="track-progress" aria-hidden="true"><i></i></div>
             <div class="track-controls">
-              <button type="button" class="play-toggle" aria-label="Play preview">▶</button>
-              <span class="mono">00:00 / 03:24</span>
-              <a href="#" onclick="event.preventDefault()">Open ↗</a>
+              <button type="button" class="track-prev" aria-label="Previous track">←</button>
+              <button type="button" class="play-toggle" aria-label="Play Track 01">▶</button>
+              <button type="button" class="track-next" aria-label="Next track">→</button>
+              <span class="track-time mono">00:00 / 00:00</span>
             </div>
           </div>
+          <audio class="playlist-audio" preload="metadata" hidden></audio>
         </section>
       </div>
     `;
@@ -650,19 +655,33 @@
         border-radius: 50%;
       }
       #portfolio-consolidated .track-data {
-        min-width: 0;
         display: flex;
         flex-direction: column;
+        min-width: 0;
         justify-content: center;
-        gap: 5px;
+        gap: 4px;
       }
-      #portfolio-consolidated .track-data > .mono {
+      #portfolio-consolidated .music-eyebrow {
+        overflow: hidden;
         padding-right: 18px;
         font-size: 6px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
-      #portfolio-consolidated .track-data strong {
+      #portfolio-consolidated .track-heading {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 6px;
+        align-items: baseline;
+        padding-right: 18px;
+      }
+      #portfolio-consolidated .music-track-position {
+        color: #687583;
+        font-size: 6px;
+      }
+      #portfolio-consolidated .track-heading strong {
         overflow: hidden;
-        font-size: 10px;
+        font-size: 9px;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
@@ -673,36 +692,48 @@
       }
       #portfolio-consolidated .track-progress i {
         display: block;
-        width: 18%;
+        width: 0;
         height: 100%;
         background: var(--pink);
-      }
-      #portfolio-consolidated .track-progress.active i {
-        animation: finalFakeProgress 12s linear forwards;
+        transition: width 120ms linear;
       }
       #portfolio-consolidated .track-controls {
         display: grid;
-        grid-template-columns: 22px 1fr auto;
-        gap: 6px;
+        grid-template-columns: 22px 22px 22px minmax(0, 1fr);
+        gap: 5px;
         align-items: center;
       }
       #portfolio-consolidated .track-controls button {
         width: 22px;
         height: 19px;
+        padding: 0;
         border: 1px solid var(--ink);
+        color: var(--ink);
         background: var(--mint);
         cursor: pointer;
         font-size: 8px;
       }
-      #portfolio-consolidated .track-controls .mono {
+      #portfolio-consolidated .track-controls button:hover {
+        transform: translateY(-2px);
+        background: var(--blue);
+      }
+      #portfolio-consolidated .track-controls button:active {
+        transform: translateY(1px) scale(.94);
+      }
+      #portfolio-consolidated .track-time {
         color: #687583;
         font-size: 6px;
+        text-align: right;
+        white-space: nowrap;
       }
-      #portfolio-consolidated .track-controls a {
+      #portfolio-consolidated .music-front:focus-visible,
+      #portfolio-consolidated .music-close:focus-visible,
+      #portfolio-consolidated .track-controls button:focus-visible {
+        outline: 2px solid var(--pink);
+        outline-offset: 2px;
+      }
+      #portfolio-consolidated .music-easter.has-error .music-eyebrow {
         color: var(--pink);
-        font: 700 7px/1 "Courier New", monospace;
-        text-decoration: none;
-        text-transform: uppercase;
       }
       #portfolio-consolidated .desktop-v2.dark-theme {
         --ink: #dffbf1;
@@ -755,8 +786,9 @@
       }
       #portfolio-consolidated .dark-theme .intro-body p,
       #portfolio-consolidated .dark-theme .profile-row .mono,
-      #portfolio-consolidated .dark-theme .track-controls .mono {
-        color: #9fb7bd;
+      #portfolio-consolidated .dark-theme .music-track-position,
+      #portfolio-consolidated .dark-theme .track-time {
+        color: #9fcbe0;
       }
       #portfolio-consolidated .dark-theme .profile-row a,
       #portfolio-consolidated .dark-theme .profile-row strong,
@@ -903,7 +935,6 @@
         box-shadow: 0 0 8px rgba(89,223,255,.7);
       }
       @keyframes finalMiniSpin { to { transform: rotate(360deg); } }
-      @keyframes finalFakeProgress { from { width: 18%; } to { width: 86%; } }
       @keyframes asciiSignalSweep {
         0%, 68% { left: -30%; opacity: 0; }
         72% { opacity: .12; }
@@ -1467,20 +1498,18 @@
     paintModel();
     requestAnimationFrame(animateModel);
 
-    const musicFront = music.querySelector(".music-front");
-    const musicClose = music.querySelector(".music-close");
-    const playToggle = music.querySelector(".play-toggle");
-    const trackProgress = music.querySelector(".track-progress");
     const setMusicOpen = (open) => {
       music.classList.toggle("open", open);
       desktop.classList.toggle("music-player-open", open);
     };
-    musicFront.addEventListener("click", () => setMusicOpen(true));
-    musicClose.addEventListener("click", () => setMusicOpen(false));
-    playToggle.addEventListener("click", () => {
-      const playing = music.classList.toggle("playing");
-      playToggle.textContent = playing ? "Ⅱ" : "▶";
-      trackProgress.classList.toggle("active", playing);
+    const { createPlaylistPlayer } = await import("/files/playlist-player.js");
+    createPlaylistPlayer({
+      root: music,
+      onOpenChange: setMusicOpen,
+      tracks: [
+        { title: "Track 01", artist: "Ether", src: "/files/audio/track-01.mp3" },
+        { title: "Track 02", artist: "Ether", src: "/files/audio/track-02.mp3" }
+      ]
     });
   }, { once: true });
 </script>
