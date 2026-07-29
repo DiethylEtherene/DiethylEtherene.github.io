@@ -1,0 +1,1488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Asteria Wang — Design Engineering student exploring design, technology, research, and illustration.">
+  <title>Asteria — Portfolio</title>
+  <link rel="icon" href="data:,">
+  <style>
+    html,
+    body {
+      min-height: 100%;
+      margin: 0;
+    }
+    body {
+      padding: 8px;
+      overflow-x: hidden;
+      background: #ffffff;
+      box-sizing: border-box;
+    }
+    #portfolio-consolidated .composition-wrap > .desktop-v2 {
+      min-height: max(720px, calc(100vh - 16px));
+      margin-top: 0;
+    }
+    @media (max-width: 860px) {
+      #portfolio-consolidated .composition-wrap > .desktop-v2 {
+        min-height: max(980px, calc(100vh - 16px));
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="portfolio-consolidated">
+  <div style="display:flex;align-items:center;justify-content:center;min-height:60vh">
+    <p class="subtitle">Loading the consolidated portfolio preview…</p>
+  </div>
+</div>
+
+<script>
+  window.addEventListener("load", async () => {
+    const host = document.querySelector("#portfolio-consolidated");
+    const response = await fetch("/files/desktop-composition-v2.html");
+    host.innerHTML = await response.text();
+    host.querySelectorAll("script").forEach((script) => script.remove());
+
+    const desktop = host.querySelector(".desktop-v2");
+    const introColumn = host.querySelector(".intro-column");
+    const introCopy = host.querySelector(".intro-body p");
+    const nowNote = host.querySelector(".now-note");
+    const dock = host.querySelector(".utility-dock");
+    const cubePlaceholder = host.querySelector("#artifact-cube");
+    const artifactZone = host.querySelector("#artifact-zone");
+    const artifactMeta = host.querySelector(".artifact-meta");
+    const composition = host.querySelector(".composition-wrap");
+
+    const asciiLayer = document.createElement("div");
+    asciiLayer.className = "ascii-portrait-layer";
+    asciiLayer.dataset.asciiReady = "false";
+    asciiLayer.setAttribute("aria-hidden", "true");
+    asciiLayer.innerHTML = `
+      <div class="ascii-central-field">
+        <canvas class="ascii-portrait-canvas" aria-hidden="true"></canvas>
+        <i class="ascii-scan" aria-hidden="true"></i>
+      </div>
+      <canvas class="ascii-creature-canvas ascii-manta-canvas" data-creature="manta" aria-hidden="true"></canvas>
+      <canvas class="ascii-creature-canvas ascii-jellyfish-canvas" data-creature="jellyfish" aria-hidden="true"></canvas>
+    `;
+    desktop.prepend(asciiLayer);
+
+    introCopy.textContent = "Design Engineering student at Imperial College London, exploring ideas through design, technology, research, and illustration.";
+    nowNote.remove();
+
+    const themePicker = document.createElement("div");
+    themePicker.className = "final-theme-picker";
+    themePicker.innerHTML = `
+      <button type="button" class="theme-toggle" aria-label="Switch to dark theme" aria-pressed="false">
+        <span class="theme-toggle-icon" aria-hidden="true"><i></i></span>
+        <span class="theme-toggle-label">Theme // light</span>
+      </button>
+    `;
+    desktop.appendChild(themePicker);
+
+    const infoCard = document.createElement("section");
+    infoCard.className = "profile-card info-card";
+    infoCard.innerHTML = `
+      <div class="profile-head mono">
+        <span>info.card</span>
+        <span class="pink">student / 01</span>
+      </div>
+      <div class="profile-row"><span class="mono">School</span><strong>Imperial College London</strong></div>
+      <div class="profile-row"><span class="mono">Course</span><strong>Design Engineering</strong></div>
+      <div class="profile-row"><span class="mono">Stage</span><strong>First year</strong></div>
+      <div class="profile-row"><span class="mono">Timezone</span><strong>UTC+8</strong></div>
+      <div class="profile-row"><span class="mono">Available</span><strong>Open to internships</strong></div>
+      <div class="profile-row"><span class="mono">Focus</span><strong>Design · Tech · Research · Art</strong></div>
+    `;
+
+    const contactCard = document.createElement("section");
+    contactCard.className = "profile-card contact-card-final";
+    contactCard.innerHTML = `
+      <div class="profile-head mono">
+        <span>contact.card</span>
+        <span class="pink">● online</span>
+      </div>
+      <div class="profile-row">
+        <span class="mono">Email</span>
+        <a href="mailto:Asteria0526@gmail.com">Asteria0526@gmail.com <b>↗</b></a>
+      </div>
+      <div class="profile-row"><span class="mono">微信</span><strong>IthinkitsAsu</strong></div>
+      <div class="profile-row">
+        <span class="mono">GitHub</span>
+        <a href="https://github.com/DiethylEtherene" target="_blank" rel="noreferrer">@DiethylEtherene <b>↗</b></a>
+      </div>
+    `;
+    introColumn.append(infoCard, contactCard);
+
+    dock.innerHTML = `
+      <button type="button">ABOUT</button>
+      <button type="button">CV</button>
+      <button type="button">SOCIALS</button>
+      <button type="button">SETTINGS</button>
+    `;
+
+    artifactMeta.innerHTML = `
+      Desk_tidy.stl<br>Auto-rotate / drag<br><span class="pink">Open project ↗</span>
+      <span class="artifact-mode">
+        <button type="button" class="active" data-model-mode="auto">Auto</button>
+        <button type="button" data-model-mode="solid">Solid</button>
+        <button type="button" data-model-mode="wire">Wire</button>
+      </span>
+    `;
+
+    const music = document.createElement("div");
+    music.className = "music-easter";
+    music.innerHTML = `
+      <div class="music-inner">
+        <button type="button" class="music-face music-front" aria-label="Reveal hidden song">
+          <span class="mini-disc"><i></i></span>
+          <span class="music-question mono">signal_?</span>
+        </button>
+        <section class="music-face music-back" aria-label="Now playing">
+          <button type="button" class="music-close" aria-label="Close player">×</button>
+          <div class="album-chip"><span class="album-orbit"></span></div>
+          <div class="track-data">
+            <span class="mono pink">Now.playing / hidden signal</span>
+            <strong>YOUR SONG — ARTIST</strong>
+            <div class="track-progress"><i></i></div>
+            <div class="track-controls">
+              <button type="button" class="play-toggle" aria-label="Play preview">▶</button>
+              <span class="mono">00:00 / 03:24</span>
+              <a href="#" onclick="event.preventDefault()">Open ↗</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    `;
+    desktop.appendChild(music);
+
+    const finalStyle = document.createElement("style");
+    finalStyle.textContent = `
+      #portfolio-consolidated .desktop-v2 {
+        --ink: #202936;
+        --mint: #c5f2e3;
+        --blue: #c8e6ff;
+        --pink: #ff2b8d;
+        --clean-shadow: rgba(59,76,91,.16);
+        --ascii-base: #355a70;
+        --ascii-edge: #3c718f;
+        --ascii-scan: rgba(53,90,112,.18);
+        --ascii-base-alpha: .2;
+        --ascii-edge-alpha: .38;
+        --ascii-creature-base: #2f718f;
+        --ascii-creature-edge: #145e82;
+        --ascii-manta-opacity: .74;
+        --ascii-jelly-opacity: .66;
+        --ascii-panel-surface: #fff;
+        min-height: 720px;
+        isolation: isolate;
+        background:
+          radial-gradient(circle at 1px 1px, rgba(32,41,54,.13) 1px, transparent 1.15px),
+          #e1edf5;
+        background-size: 19px 19px;
+        transition: background-color 320ms ease, color 320ms ease, border-color 320ms ease;
+      }
+      #portfolio-consolidated .ascii-portrait-layer {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        overflow: hidden;
+        pointer-events: none;
+        user-select: none;
+        contain: layout paint style;
+        transform: translateZ(0);
+      }
+      #portfolio-consolidated .ascii-central-field {
+        position: absolute;
+        left: 27%;
+        right: 220px;
+        top: 42px;
+        bottom: 48px;
+        overflow: hidden;
+      }
+      #portfolio-consolidated .ascii-portrait-canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #portfolio-consolidated .ascii-creature-canvas {
+        position: absolute;
+        display: block;
+        pointer-events: none;
+      }
+      #portfolio-consolidated .ascii-manta-canvas {
+        left: clamp(120px, 14vw, 230px);
+        bottom: -70px;
+        width: 560px;
+        height: 375px;
+        opacity: var(--ascii-manta-opacity);
+        -webkit-mask: linear-gradient(to right, #000 0%, #000 48%, transparent 82%);
+        mask: linear-gradient(to right, #000 0%, #000 48%, transparent 82%);
+        transform: rotate(-4deg);
+        transform-origin: center;
+      }
+      #portfolio-consolidated .ascii-jellyfish-canvas {
+        right: clamp(70px, 7vw, 115px);
+        top: -42px;
+        width: 320px;
+        height: 750px;
+        opacity: var(--ascii-jelly-opacity);
+        -webkit-mask: linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
+        mask: linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
+        transform: rotate(2deg);
+        transform-origin: center;
+      }
+      #portfolio-consolidated .ascii-scan {
+        position: absolute;
+        width: 16%;
+        height: 140%;
+        left: -30%;
+        top: -20%;
+        opacity: 0;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          color-mix(in srgb, var(--ascii-scan) 72%, transparent),
+          transparent
+        );
+        transform: skewX(-11deg);
+        animation: asciiSignalSweep 12s ease-in-out infinite;
+      }
+      #portfolio-consolidated .artifact-zone {
+        z-index: 3;
+      }
+      #portfolio-consolidated .intro-column,
+      #portfolio-consolidated .folder-column {
+        z-index: 10;
+      }
+      #portfolio-consolidated .utility-dock {
+        z-index: 30;
+      }
+      #portfolio-consolidated .final-theme-picker {
+        position: absolute;
+        right: 24px;
+        bottom: 16px;
+        z-index: 40;
+      }
+      #portfolio-consolidated .final-theme-picker button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        min-width: 138px;
+        height: 34px;
+        border: 1.25px solid #202936;
+        padding: 0 12px;
+        color: #202936;
+        background: rgba(255,255,255,.92);
+        box-shadow: 4px 4px 0 rgba(59,76,91,.14);
+        cursor: pointer;
+        font: 700 8px/1 "Courier New", monospace;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+        transition:
+          color 220ms ease,
+          background-color 220ms ease,
+          border-color 220ms ease,
+          box-shadow 240ms ease,
+          transform 240ms cubic-bezier(.16,1.3,.36,1);
+      }
+      #portfolio-consolidated .final-theme-picker button:hover {
+        transform: translate(-2px,-2px);
+        box-shadow: 6px 6px 0 rgba(59,76,91,.16);
+      }
+      #portfolio-consolidated .final-theme-picker button:active {
+        transform: translate(1px,1px) scale(.98);
+        box-shadow: 2px 2px 0 rgba(59,76,91,.14);
+      }
+      #portfolio-consolidated .theme-toggle-icon {
+        width: 24px;
+        height: 12px;
+        position: relative;
+        border: 1px solid #202936;
+        border-radius: 10px;
+        background: #e1edf5;
+        transition: border-color 220ms ease, background-color 220ms ease;
+      }
+      #portfolio-consolidated .theme-toggle-icon i {
+        width: 8px;
+        height: 8px;
+        position: absolute;
+        left: 1px;
+        top: 1px;
+        border-radius: 50%;
+        background: #202936;
+        transition:
+          left 280ms cubic-bezier(.16,1.3,.36,1),
+          background-color 220ms ease,
+          box-shadow 220ms ease;
+      }
+      #portfolio-consolidated .intro-column {
+        top: 58px;
+        bottom: 34px;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+        transition: transform 520ms cubic-bezier(.16,1,.3,1);
+      }
+      #portfolio-consolidated .os-window,
+      #portfolio-consolidated .profile-card,
+      #portfolio-consolidated .folder,
+      #portfolio-consolidated .music-face,
+      #portfolio-consolidated .utility-dock {
+        box-shadow: 5px 5px 0 var(--clean-shadow);
+      }
+      #portfolio-consolidated .os-window,
+      #portfolio-consolidated .profile-card,
+      #portfolio-consolidated .utility-dock {
+        background-color: var(--ascii-panel-surface);
+      }
+      #portfolio-consolidated .os-window {
+        flex: 0 0 auto;
+        border-width: 1.5px;
+      }
+      #portfolio-consolidated .window-bar {
+        border-bottom-width: 1.5px;
+      }
+      #portfolio-consolidated .window-bar > .mono,
+      #portfolio-consolidated .folder > .mono:first-child {
+        font-size: 11px;
+        line-height: 1.2;
+        letter-spacing: .095em;
+      }
+      #portfolio-consolidated .intro-body p {
+        font-size: 12px;
+        line-height: 1.5;
+      }
+      #portfolio-consolidated .profile-card {
+        flex: 0 0 auto;
+        border: 1.25px solid var(--ink);
+        background: var(--ascii-panel-surface);
+      }
+      #portfolio-consolidated .profile-head {
+        min-height: 28px;
+        padding: 0 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1.25px solid var(--ink);
+        background: var(--blue);
+      }
+      #portfolio-consolidated .contact-card-final .profile-head {
+        background: var(--mint);
+      }
+      #portfolio-consolidated .profile-row {
+        min-height: 27px;
+        display: grid;
+        grid-template-columns: 72px 1fr;
+        align-items: center;
+        gap: 8px;
+        padding: 0 10px;
+        border-bottom: 1px solid rgba(32,41,54,.22);
+      }
+      #portfolio-consolidated .contact-card-final .profile-row {
+        min-height: 31px;
+        grid-template-columns: 58px 1fr;
+      }
+      #portfolio-consolidated .profile-row:last-child {
+        border-bottom: 0;
+      }
+      #portfolio-consolidated .profile-row .mono {
+        font-size: 8px;
+        color: #667383;
+      }
+      #portfolio-consolidated .profile-row strong,
+      #portfolio-consolidated .profile-row a {
+        min-width: 0;
+        overflow: hidden;
+        color: var(--ink);
+        font-size: 9px;
+        font-weight: 700;
+        text-decoration: none;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #portfolio-consolidated .profile-row a b,
+      #portfolio-consolidated .profile-row a:hover {
+        color: var(--pink);
+      }
+      #portfolio-consolidated .artifact-zone {
+        left: 30%;
+        right: 265px;
+      }
+      #portfolio-consolidated .folder-column {
+        right: 34px;
+        top: 78px;
+        bottom: 72px;
+        width: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0;
+      }
+      #portfolio-consolidated .folder {
+        --tilt: 0deg;
+        flex: 0 0 auto;
+        width: 205px;
+        height: 124px;
+        border-width: 1.25px;
+        transform: rotate(var(--tilt));
+      }
+      #portfolio-consolidated .folder:before {
+        left: -1.25px;
+        top: -13px;
+        height: 13px;
+        border-width: 1.25px;
+        border-bottom-width: 0;
+      }
+      #portfolio-consolidated .folder:nth-child(1) { --tilt: 1.8deg; background: #c5f2e3; }
+      #portfolio-consolidated .folder:nth-child(2) { --tilt: -1.45deg; background: #c5eee9; }
+      #portfolio-consolidated .folder:nth-child(3) { --tilt: 1.2deg; background: #c6eaf3; }
+      #portfolio-consolidated .folder:nth-child(4) { --tilt: -1.9deg; background: #c8e6ff; }
+      #portfolio-consolidated .folder:hover {
+        transform: translate(-7px,-4px) rotate(var(--tilt)) scale(1.025);
+        box-shadow: 9px 9px 0 rgba(255,43,141,.12);
+      }
+      #portfolio-consolidated .folder:active {
+        transform: translate(2px,2px) rotate(var(--tilt)) scale(.98);
+      }
+      #portfolio-consolidated .artifact-mode {
+        display: flex;
+        justify-content: flex-end;
+        gap: 5px;
+        margin-top: 8px;
+      }
+      #portfolio-consolidated .artifact-mode button {
+        border: 1px solid var(--ink);
+        padding: 5px 7px;
+        background: white;
+        color: var(--ink);
+        cursor: pointer;
+        font: 700 7px/1 "Courier New", monospace;
+        text-transform: uppercase;
+        letter-spacing: .1em;
+      }
+      #portfolio-consolidated .artifact-mode button.active {
+        color: white;
+        background: var(--pink);
+        border-color: var(--pink);
+      }
+      #portfolio-consolidated .stl-model-shell {
+        width: min(29vw, 360px);
+        height: min(29vw, 360px);
+        position: relative;
+        z-index: 4;
+        display: grid;
+        place-items: center;
+      }
+      #portfolio-consolidated .stl-model-shell canvas {
+        width: 100%;
+        height: 100%;
+        display: block;
+        filter: drop-shadow(0 16px 18px rgba(32,41,54,.13));
+        transition: filter 320ms ease;
+      }
+      #portfolio-consolidated .stl-model-shell[data-phase="wire"] canvas {
+        filter:
+          drop-shadow(0 0 .8px rgba(255,43,141,.88))
+          drop-shadow(0 0 2.4px rgba(255,43,141,.3))
+          drop-shadow(0 16px 18px rgba(32,41,54,.13));
+      }
+      #portfolio-consolidated .stl-model-status {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        padding: 7px 9px;
+        border: 1px solid var(--ink);
+        color: var(--ink);
+        background: rgba(255,255,255,.82);
+        font: 700 7px/1 "Courier New", monospace;
+        letter-spacing: .1em;
+        text-transform: uppercase;
+        transform: translate(-50%,-50%);
+      }
+      #portfolio-consolidated .cube .cube-face {
+        background-image:
+          linear-gradient(rgba(32,41,54,.11) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(32,41,54,.11) 1px, transparent 1px);
+        background-color: rgba(197,242,227,.72);
+        transition:
+          background-color 1800ms cubic-bezier(.4,0,.2,1),
+          border-color 1800ms cubic-bezier(.4,0,.2,1),
+          box-shadow 1800ms cubic-bezier(.4,0,.2,1);
+      }
+      #portfolio-consolidated .cube .right,
+      #portfolio-consolidated .cube .left {
+        background-color: rgba(200,230,255,.76);
+      }
+      #portfolio-consolidated .cube.wireframe .cube-face {
+        background-image:
+          linear-gradient(rgba(255,43,141,.12) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,43,141,.12) 1px, transparent 1px);
+        background-color: rgba(255,255,255,.035);
+        border-color: var(--pink);
+        box-shadow: inset 0 0 22px rgba(255,43,141,.06);
+      }
+      #portfolio-consolidated .utility-dock {
+        bottom: 16px;
+      }
+      #portfolio-consolidated .utility-dock button {
+        width: auto;
+        min-width: 64px;
+        padding: 0 12px;
+        white-space: nowrap;
+      }
+      #portfolio-consolidated .music-easter {
+        position: absolute;
+        left: 24px;
+        bottom: 16px;
+        width: 60px;
+        height: 60px;
+        z-index: 35;
+        perspective: 900px;
+        transition:
+          width 520ms cubic-bezier(.16,1,.3,1),
+          height 520ms cubic-bezier(.16,1,.3,1);
+      }
+      #portfolio-consolidated .music-easter.open {
+        width: clamp(250px, 27vw, 315px);
+        height: 94px;
+      }
+      @media (min-width: 861px) {
+        #portfolio-consolidated .desktop-v2.music-player-open .intro-column {
+          transform: translateY(-26px);
+        }
+      }
+      #portfolio-consolidated .music-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 640ms cubic-bezier(.16,1,.3,1);
+      }
+      #portfolio-consolidated .music-easter.open .music-inner {
+        transform: rotateY(180deg);
+      }
+      #portfolio-consolidated .music-face {
+        position: absolute;
+        inset: 0;
+        border: 1.25px solid var(--ink);
+        color: var(--ink);
+        background: white;
+        backface-visibility: hidden;
+      }
+      #portfolio-consolidated .music-front {
+        display: grid;
+        place-items: center;
+        padding: 0;
+        background: var(--mint);
+        cursor: pointer;
+      }
+      #portfolio-consolidated .music-front:hover {
+        transform: rotate(-4deg) translateY(-4px);
+      }
+      #portfolio-consolidated .mini-disc {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--ink);
+        border-radius: 50%;
+        background:
+          repeating-radial-gradient(circle, transparent 0 3px, rgba(32,41,54,.22) 3px 4px),
+          var(--blue);
+        animation: finalMiniSpin 7s linear infinite;
+      }
+      #portfolio-consolidated .mini-disc i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--pink);
+      }
+      #portfolio-consolidated .music-question {
+        position: absolute;
+        left: 6px;
+        bottom: 5px;
+        font-size: 6px;
+      }
+      #portfolio-consolidated .music-back {
+        transform: rotateY(180deg);
+        display: grid;
+        grid-template-columns: 69px 1fr;
+        gap: 10px;
+        padding: 10px;
+        background:
+          linear-gradient(115deg, rgba(200,230,255,.55), transparent 58%),
+          white;
+      }
+      #portfolio-consolidated .music-close {
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        width: 19px;
+        height: 19px;
+        border: 1px solid var(--ink);
+        background: white;
+        cursor: pointer;
+      }
+      #portfolio-consolidated .album-chip {
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--ink);
+        background: var(--blue);
+        clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+      }
+      #portfolio-consolidated .album-orbit {
+        width: 42px;
+        height: 42px;
+        position: relative;
+        border: 1px solid var(--ink);
+        border-radius: 50%;
+        animation: finalMiniSpin 9s linear infinite reverse;
+      }
+      #portfolio-consolidated .album-orbit:after {
+        content: "";
+        position: absolute;
+        inset: 11px;
+        border: 2px dotted var(--pink);
+        border-radius: 50%;
+      }
+      #portfolio-consolidated .track-data {
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+      }
+      #portfolio-consolidated .track-data > .mono {
+        padding-right: 18px;
+        font-size: 6px;
+      }
+      #portfolio-consolidated .track-data strong {
+        overflow: hidden;
+        font-size: 10px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      #portfolio-consolidated .track-progress {
+        height: 5px;
+        overflow: hidden;
+        border: 1px solid var(--ink);
+      }
+      #portfolio-consolidated .track-progress i {
+        display: block;
+        width: 18%;
+        height: 100%;
+        background: var(--pink);
+      }
+      #portfolio-consolidated .track-progress.active i {
+        animation: finalFakeProgress 12s linear forwards;
+      }
+      #portfolio-consolidated .track-controls {
+        display: grid;
+        grid-template-columns: 22px 1fr auto;
+        gap: 6px;
+        align-items: center;
+      }
+      #portfolio-consolidated .track-controls button {
+        width: 22px;
+        height: 19px;
+        border: 1px solid var(--ink);
+        background: var(--mint);
+        cursor: pointer;
+        font-size: 8px;
+      }
+      #portfolio-consolidated .track-controls .mono {
+        color: #687583;
+        font-size: 6px;
+      }
+      #portfolio-consolidated .track-controls a {
+        color: var(--pink);
+        font: 700 7px/1 "Courier New", monospace;
+        text-decoration: none;
+        text-transform: uppercase;
+      }
+      #portfolio-consolidated .desktop-v2.dark-theme {
+        --ink: #dffbf1;
+        --mint: #67f5c6;
+        --blue: #61c8ff;
+        --pink: #ff3c9f;
+        --clean-shadow: rgba(0,0,0,.46);
+        --ascii-base: #38a8a5;
+        --ascii-edge: #62dfff;
+        --ascii-scan: rgba(109,255,208,.34);
+        --ascii-base-alpha: .28;
+        --ascii-edge-alpha: .5;
+        --ascii-creature-base: #42d8cb;
+        --ascii-creature-edge: #7aeaff;
+        --ascii-manta-opacity: .68;
+        --ascii-jelly-opacity: .61;
+        --ascii-panel-surface: #111d28;
+        color: #eaf9f6;
+        background:
+          radial-gradient(circle at 1px 1px, rgba(185,245,227,.14) 1px, transparent 1.15px),
+          #0d1520;
+        background-size: 19px 19px;
+        border-color: #8ce8cf;
+      }
+      #portfolio-consolidated .dark-theme .desktop-top,
+      #portfolio-consolidated .dark-theme .mono {
+        color: #dffbf1;
+      }
+      #portfolio-consolidated .dark-theme .os-window,
+      #portfolio-consolidated .dark-theme .profile-card,
+      #portfolio-consolidated .dark-theme .music-face,
+      #portfolio-consolidated .dark-theme .utility-dock {
+        color: #eaf9f6;
+        background-color: #14202c;
+        border-color: #a4f3dc;
+      }
+      #portfolio-consolidated .dark-theme .window-bar,
+      #portfolio-consolidated .dark-theme .contact-card-final .profile-head {
+        color: #eaf9f6;
+        background-color: #173c3a;
+        border-color: #a4f3dc;
+      }
+      #portfolio-consolidated .dark-theme .info-card .profile-head {
+        color: #eaf9f6;
+        background-color: #172d3e;
+        border-color: #a4f3dc;
+      }
+      #portfolio-consolidated .dark-theme .profile-row {
+        border-color: rgba(164,243,220,.23);
+      }
+      #portfolio-consolidated .dark-theme .intro-body p,
+      #portfolio-consolidated .dark-theme .profile-row .mono,
+      #portfolio-consolidated .dark-theme .track-controls .mono {
+        color: #9fb7bd;
+      }
+      #portfolio-consolidated .dark-theme .profile-row a,
+      #portfolio-consolidated .dark-theme .profile-row strong,
+      #portfolio-consolidated .dark-theme .track-data strong {
+        color: #eaf9f6;
+      }
+      #portfolio-consolidated .dark-theme .folder:nth-child(1) {
+        --folder-edge: #6dffd0;
+        --folder-glow: rgba(109,255,208,.28);
+        background: #12372f;
+      }
+      #portfolio-consolidated .dark-theme .folder:nth-child(2) {
+        --folder-edge: #58f5df;
+        --folder-glow: rgba(88,245,223,.27);
+        background: #12343a;
+      }
+      #portfolio-consolidated .dark-theme .folder:nth-child(3) {
+        --folder-edge: #52dcff;
+        --folder-glow: rgba(82,220,255,.27);
+        background: #142f43;
+      }
+      #portfolio-consolidated .dark-theme .folder:nth-child(4) {
+        --folder-edge: #62aaff;
+        --folder-glow: rgba(98,170,255,.29);
+        background: #172a4d;
+      }
+      #portfolio-consolidated .dark-theme .folder {
+        border-color: var(--folder-edge);
+        box-shadow: 5px 5px 0 rgba(0,0,0,.34);
+      }
+      #portfolio-consolidated .dark-theme .folder:before {
+        border-color: var(--folder-edge);
+      }
+      #portfolio-consolidated .dark-theme .folder:hover {
+        border-color: var(--folder-edge);
+        box-shadow:
+          0 0 0 1px var(--folder-edge),
+          0 0 20px var(--folder-glow),
+          9px 9px 0 rgba(0,0,0,.34);
+      }
+      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .cube-face {
+        border-color: #64eadf;
+        background-image:
+          linear-gradient(rgba(82,220,255,.17) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(82,220,255,.17) 1px, transparent 1px);
+        background-color: rgba(13,46,54,.88);
+        box-shadow:
+          inset 0 0 26px rgba(88,245,223,.08),
+          0 0 12px rgba(82,220,255,.06);
+      }
+      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .right,
+      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .left {
+        border-color: #55cfff;
+        background-color: rgba(14,36,65,.9);
+      }
+      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .top,
+      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .bottom {
+        border-color: #6dffd0;
+        background-color: rgba(19,67,58,.86);
+      }
+      #portfolio-consolidated .dark-theme .stl-model-shell canvas {
+        filter:
+          drop-shadow(0 0 13px rgba(82,220,255,.18))
+          drop-shadow(0 18px 20px rgba(0,0,0,.38));
+      }
+      #portfolio-consolidated .dark-theme .stl-model-shell[data-phase="wire"] canvas {
+        filter:
+          drop-shadow(0 0 .9px rgba(82,220,255,.96))
+          drop-shadow(0 0 2.8px rgba(82,220,255,.42))
+          drop-shadow(0 18px 20px rgba(0,0,0,.38));
+      }
+      #portfolio-consolidated .dark-theme .stl-model-status {
+        color: #dffbf1;
+        background: rgba(13,21,32,.82);
+        border-color: #52dcff;
+      }
+      #portfolio-consolidated .dark-theme .orbit-a {
+        border-color: rgba(82,220,255,.64);
+        box-shadow:
+          0 0 18px rgba(82,220,255,.1),
+          inset 0 0 18px rgba(82,220,255,.045);
+      }
+      #portfolio-consolidated .dark-theme .orbit-a:before {
+        background: #6dffd0;
+        box-shadow: 0 0 10px rgba(109,255,208,.68);
+      }
+      #portfolio-consolidated .dark-theme .artifact-label {
+        color: #dffbf1;
+        background: rgba(13,21,32,.78);
+      }
+      #portfolio-consolidated .dark-theme .artifact-meta {
+        color: #9fb7bd;
+      }
+      #portfolio-consolidated .dark-theme .artifact-mode button,
+      #portfolio-consolidated .dark-theme .utility-dock button,
+      #portfolio-consolidated .dark-theme .music-close {
+        color: #dffbf1;
+        background: #111c27;
+        border-color: #a4f3dc;
+      }
+      #portfolio-consolidated .dark-theme .artifact-mode button.active {
+        color: white;
+        background: var(--pink);
+        border-color: var(--pink);
+      }
+      #portfolio-consolidated .dark-theme .music-front {
+        background: #183c38;
+      }
+      #portfolio-consolidated .dark-theme .music-back {
+        background:
+          linear-gradient(115deg, rgba(97,200,255,.12), transparent 58%),
+          #14202c;
+      }
+      #portfolio-consolidated .dark-theme .album-chip {
+        background: #172f43;
+        border-color: #a4f3dc;
+      }
+      #portfolio-consolidated .dark-theme .track-progress {
+        border-color: #a4f3dc;
+      }
+      #portfolio-consolidated .dark-theme .utility-dock button:hover {
+        color: #0d1520;
+        background: var(--mint);
+      }
+      #portfolio-consolidated .dark-theme .final-theme-picker button {
+        color: #dffbf1;
+        background: rgba(17,28,39,.94);
+        border-color: #59dfff;
+        box-shadow: 4px 4px 0 rgba(0,0,0,.4);
+      }
+      #portfolio-consolidated .dark-theme .final-theme-picker button:hover {
+        box-shadow:
+          0 0 0 1px #59dfff,
+          0 0 16px rgba(89,223,255,.25),
+          6px 6px 0 rgba(0,0,0,.4);
+      }
+      #portfolio-consolidated .dark-theme .theme-toggle-icon {
+        border-color: #6dffd0;
+        background: #132d34;
+      }
+      #portfolio-consolidated .dark-theme .theme-toggle-icon i {
+        left: 13px;
+        background: #59dfff;
+        box-shadow: 0 0 8px rgba(89,223,255,.7);
+      }
+      @keyframes finalMiniSpin { to { transform: rotate(360deg); } }
+      @keyframes finalFakeProgress { from { width: 18%; } to { width: 86%; } }
+      @keyframes asciiSignalSweep {
+        0%, 68% { left: -30%; opacity: 0; }
+        72% { opacity: .12; }
+        84% { opacity: .2; }
+        96%, 100% { left: 116%; opacity: 0; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #portfolio-consolidated .mini-disc,
+        #portfolio-consolidated .album-orbit,
+        #portfolio-consolidated .orbit-a,
+        #portfolio-consolidated .orbit-b {
+          animation: none;
+        }
+        #portfolio-consolidated .ascii-scan {
+          animation: none;
+        }
+      }
+      @media (max-width: 860px) {
+        #portfolio-consolidated .desktop-v2 { min-height: 1180px; }
+        #portfolio-consolidated .intro-column {
+          right: 24px;
+          bottom: auto;
+        }
+        #portfolio-consolidated .artifact-zone {
+          left: 8%;
+          right: 8%;
+          top: 645px;
+          bottom: 300px;
+        }
+        #portfolio-consolidated .ascii-central-field {
+          left: 8%;
+          right: 8%;
+          top: 610px;
+          bottom: auto;
+          height: 370px;
+          opacity: .48;
+        }
+        #portfolio-consolidated .ascii-manta-canvas {
+          left: -84px;
+          bottom: 238px;
+          width: 420px;
+          height: 281px;
+          opacity: calc(var(--ascii-manta-opacity) * .52);
+        }
+        #portfolio-consolidated .ascii-jellyfish-canvas {
+          display: none;
+        }
+        #portfolio-consolidated .ascii-scan {
+          display: none;
+        }
+        #portfolio-consolidated .stl-model-shell {
+          width: 300px;
+          height: 300px;
+        }
+        #portfolio-consolidated .folder-column {
+          left: 50%;
+          right: auto;
+          top: auto;
+          bottom: 78px;
+          width: 440px;
+          height: 280px;
+          transform: translateX(-50%);
+          display: grid;
+          grid-template-columns: 205px 205px;
+          gap: 24px 30px;
+        }
+      }
+      @media (forced-colors: active) {
+        #portfolio-consolidated .ascii-portrait-layer {
+          display: none;
+        }
+      }
+    `;
+    host.appendChild(finalStyle);
+
+    let asciiController = {
+      setTheme() {},
+      destroy() {}
+    };
+    try {
+      const { createAsciiPortraitRenderer } = await import("/files/ascii-portrait-renderer.js");
+      asciiController = createAsciiPortraitRenderer({
+        desktop,
+        layer: asciiLayer,
+        canvas: asciiLayer.querySelector(".ascii-portrait-canvas"),
+        creatureCanvases: {
+          manta: asciiLayer.querySelector(".ascii-manta-canvas"),
+          jellyfish: asciiLayer.querySelector(".ascii-jellyfish-canvas")
+        }
+      });
+    } catch (error) {
+      asciiLayer.dataset.asciiReady = "unavailable";
+      asciiLayer.hidden = true;
+      console.warn("ASCII background unavailable", error);
+    }
+
+    const modelShell = document.createElement("div");
+    modelShell.className = "stl-model-shell";
+    modelShell.dataset.mode = "auto";
+    modelShell.dataset.ready = "loading";
+    modelShell.setAttribute("role", "img");
+    modelShell.setAttribute("aria-label", "Interactive 3D model of Asu's desk tidy");
+    modelShell.innerHTML = `
+      <canvas aria-hidden="true"></canvas>
+      <span class="stl-model-status">Loading desk_tidy / 0%</span>
+    `;
+    cubePlaceholder.replaceWith(modelShell);
+
+    const modelCanvas = modelShell.querySelector("canvas");
+    const modelStatus = modelShell.querySelector(".stl-model-status");
+    let THREE = null;
+    let modelRenderer = null;
+    let modelScene = null;
+    let modelCamera = null;
+    let modelRoot = null;
+    let solidMaterial = null;
+    let wireMaterial = null;
+    let silhouetteMaterial = null;
+    let curveMaterial = null;
+    let solidMesh = null;
+    let wireMesh = null;
+    let silhouetteMesh = null;
+    let curveMesh = null;
+    let wireMix = 0;
+    let wireTarget = 0;
+    let wireMaxOpacity = .52;
+    let silhouetteMaxOpacity = .66;
+    let curveMaxOpacity = .46;
+    let modelWorldRadius = 0;
+    let modelFitPoints = null;
+    const modelCameraDistance = 4;
+    const modelViewportTarget = .94;
+    const modelOutlineScale = 1.012;
+    const modelCameraMargin = 1 / modelViewportTarget;
+
+    const fitModelCamera = () => {
+      if (!THREE || !modelCamera || !modelWorldRadius) return;
+      const aspect = modelCamera.aspect || 1;
+      const safeRadius = modelWorldRadius * modelOutlineScale;
+      const verticalHalfExtent =
+        safeRadius / modelViewportTarget / Math.min(1, aspect);
+      const horizontalHalfExtent = verticalHalfExtent * aspect;
+      modelCamera.left = -horizontalHalfExtent;
+      modelCamera.right = horizontalHalfExtent;
+      modelCamera.top = verticalHalfExtent;
+      modelCamera.bottom = -verticalHalfExtent;
+      modelCamera.position.z = modelCameraDistance;
+      modelCamera.updateProjectionMatrix();
+
+      let viewportFill = 0;
+      if (modelFitPoints && modelRoot) {
+        modelRoot.updateMatrix();
+        const matrix = modelRoot.matrix.elements;
+        for (let point = 0; point < modelFitPoints.length; point += 3) {
+          const x = (
+            matrix[0] * modelFitPoints[point] +
+            matrix[4] * modelFitPoints[point + 1] +
+            matrix[8] * modelFitPoints[point + 2]
+          ) * modelOutlineScale;
+          const y = (
+            matrix[1] * modelFitPoints[point] +
+            matrix[5] * modelFitPoints[point + 1] +
+            matrix[9] * modelFitPoints[point + 2]
+          ) * modelOutlineScale;
+          viewportFill = Math.max(
+            viewportFill,
+            Math.abs(x) / horizontalHalfExtent,
+            Math.abs(y) / verticalHalfExtent
+          );
+        }
+      }
+
+      modelShell.dataset.cameraFitMargin = modelCameraMargin.toFixed(2);
+      modelShell.dataset.cameraFitStrategy = "fixed-orthographic";
+      modelShell.dataset.cameraProjection = "orthographic";
+      modelShell.dataset.cameraDistance = modelCameraDistance.toFixed(3);
+      modelShell.dataset.orthographicSpan = (verticalHalfExtent * 2).toFixed(3);
+      modelShell.dataset.viewportFill = viewportFill.toFixed(3);
+    };
+
+    const updateModelTheme = () => {
+      if (
+        !solidMaterial ||
+        !wireMaterial ||
+        !silhouetteMaterial ||
+        !curveMaterial ||
+        !modelRenderer
+      ) return;
+      const dark = desktop.classList.contains("dark-theme");
+      solidMaterial.color.setHex(dark ? 0x0a3c49 : 0xaeead9);
+      solidMaterial.emissive.setHex(dark ? 0x062932 : 0x0c241e);
+      solidMaterial.emissiveIntensity = dark ? .34 : .08;
+      solidMaterial.metalness = dark ? .28 : .12;
+      solidMaterial.roughness = dark ? .42 : .58;
+      wireMaterial.color.setHex(dark ? 0x52dcff : 0xff2b8d);
+      silhouetteMaterial.color.setHex(dark ? 0x52dcff : 0xff2b8d);
+      curveMaterial.uniforms.outlineColor.value.setHex(dark ? 0x52dcff : 0xff2b8d);
+      wireMaxOpacity = dark ? 1 : .94;
+      silhouetteMaxOpacity = dark ? .96 : .84;
+      curveMaxOpacity = dark ? .9 : .78;
+      modelRenderer.toneMappingExposure = dark ? 1.18 : 1;
+    };
+
+    try {
+      const [threeModule, loaderModule] = await Promise.all([
+        import("/files/three.module.min.js"),
+        import("/files/STLLoader.js")
+      ]);
+      THREE = threeModule;
+
+      modelRenderer = new THREE.WebGLRenderer({
+        canvas: modelCanvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: "high-performance"
+      });
+      modelRenderer.setClearColor(0x000000, 0);
+      modelRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      modelRenderer.outputColorSpace = THREE.SRGBColorSpace;
+      modelRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+      modelScene = new THREE.Scene();
+      modelCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 20);
+      modelCamera.aspect = 1;
+      modelCamera.position.set(0, 0, modelCameraDistance);
+
+      const hemisphere = new THREE.HemisphereLight(0xdffbf1, 0x0b1423, 2.25);
+      const keyLight = new THREE.DirectionalLight(0x8affdf, 3.1);
+      const rimLight = new THREE.DirectionalLight(0x5eaaff, 1.65);
+      keyLight.position.set(3, 4, 5);
+      rimLight.position.set(-4, 1, 2);
+      modelScene.add(hemisphere, keyLight, rimLight);
+
+      const resizeModel = () => {
+        if (!modelRenderer || !modelCamera) return;
+        const bounds = modelShell.getBoundingClientRect();
+        const width = Math.max(1, Math.round(bounds.width));
+        const height = Math.max(1, Math.round(bounds.height));
+        modelRenderer.setSize(width, height, false);
+        modelCamera.aspect = width / height;
+        modelCamera.updateProjectionMatrix();
+        fitModelCamera();
+      };
+      new ResizeObserver(resizeModel).observe(modelShell);
+      resizeModel();
+
+      const loader = new loaderModule.STLLoader();
+      const geometry = await loader.loadAsync(
+        "/files/asu-desk-tidy.stl",
+        (progress) => {
+          if (!progress.total) return;
+          const percent = Math.min(99, Math.round(progress.loaded / progress.total * 100));
+          modelStatus.textContent = `Loading desk_tidy / ${percent}%`;
+        }
+      );
+      geometry.rotateX(-Math.PI / 2);
+      geometry.center();
+      geometry.computeVertexNormals();
+      geometry.computeBoundingSphere();
+
+      const positions = geometry.getAttribute("position");
+      const normals = geometry.getAttribute("normal");
+      const surfaceVertices = new Map();
+      for (let vertex = 0; vertex < positions.count; vertex += 1) {
+        const x = positions.getX(vertex);
+        const y = positions.getY(vertex);
+        const z = positions.getZ(vertex);
+        const key = `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(z * 1e4)}`;
+        let surface = surfaceVertices.get(key);
+        if (!surface) {
+          surface = {
+            x,
+            y,
+            z,
+            nx: 0,
+            ny: 0,
+            nz: 0
+          };
+          surfaceVertices.set(key, surface);
+        }
+        surface.nx += normals.getX(vertex);
+        surface.ny += normals.getY(vertex);
+        surface.nz += normals.getZ(vertex);
+      }
+      modelFitPoints = new Float32Array(surfaceVertices.size * 3);
+      const smoothedNormalByPosition = new Map();
+      let fitPoint = 0;
+      surfaceVertices.forEach((surface, key) => {
+        modelFitPoints[fitPoint] = surface.x;
+        modelFitPoints[fitPoint + 1] = surface.y;
+        modelFitPoints[fitPoint + 2] = surface.z;
+        fitPoint += 3;
+        const length = Math.hypot(surface.nx, surface.ny, surface.nz) || 1;
+        smoothedNormalByPosition.set(key, [
+          surface.nx / length,
+          surface.ny / length,
+          surface.nz / length
+        ]);
+      });
+
+      const curveGeometry = geometry.clone();
+      const smoothedNormals = new Float32Array(positions.count * 3);
+      for (let vertex = 0; vertex < positions.count; vertex += 1) {
+        const x = positions.getX(vertex);
+        const y = positions.getY(vertex);
+        const z = positions.getZ(vertex);
+        const key = `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(z * 1e4)}`;
+        const normal = smoothedNormalByPosition.get(key);
+        smoothedNormals[vertex * 3] = normal[0];
+        smoothedNormals[vertex * 3 + 1] = normal[1];
+        smoothedNormals[vertex * 3 + 2] = normal[2];
+      }
+      curveGeometry.setAttribute(
+        "normal",
+        new THREE.Float32BufferAttribute(smoothedNormals, 3)
+      );
+
+      solidMaterial = new THREE.MeshStandardMaterial({
+        color: 0xaeead9,
+        emissive: 0x0c241e,
+        emissiveIntensity: .08,
+        metalness: .12,
+        roughness: .58,
+        transparent: true,
+        opacity: .96,
+        side: THREE.DoubleSide,
+        polygonOffset: true,
+        polygonOffsetFactor: 1,
+        polygonOffsetUnits: 1
+      });
+      wireMaterial = new THREE.LineBasicMaterial({
+        color: 0xff2b8d,
+        transparent: true,
+        opacity: 0,
+        depthTest: true,
+        depthWrite: false,
+        toneMapped: false
+      });
+      silhouetteMaterial = new THREE.MeshBasicMaterial({
+        color: 0xff2b8d,
+        side: THREE.BackSide,
+        transparent: true,
+        opacity: 0,
+        depthTest: true,
+        depthWrite: false,
+        toneMapped: false
+      });
+      curveMaterial = new THREE.ShaderMaterial({
+        uniforms: {
+          outlineColor: { value: new THREE.Color(0xff2b8d) },
+          outlineOpacity: { value: 0 }
+        },
+        vertexShader: `
+          varying float rimAmount;
+          void main() {
+            vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+            vec3 viewNormal = normalize(normalMatrix * normal);
+            vec3 viewDirection = normalize(-viewPosition.xyz);
+            rimAmount = 1.0 - max(dot(viewNormal, viewDirection), 0.0);
+            gl_Position = projectionMatrix * viewPosition;
+          }
+        `,
+        fragmentShader: `
+          uniform vec3 outlineColor;
+          uniform float outlineOpacity;
+          varying float rimAmount;
+          void main() {
+            float curveLine = smoothstep(0.68, 0.93, rimAmount);
+            float alpha = curveLine * outlineOpacity;
+            if (alpha < 0.01) discard;
+            gl_FragColor = vec4(outlineColor, alpha);
+          }
+        `,
+        side: THREE.FrontSide,
+        transparent: true,
+        depthTest: true,
+        depthWrite: false,
+        toneMapped: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -1,
+        polygonOffsetUnits: -1
+      });
+
+      solidMesh = new THREE.Mesh(geometry, solidMaterial);
+      const detectedEdges = new THREE.EdgesGeometry(geometry, 24);
+      const detectedPositions = detectedEdges.getAttribute("position").array;
+      const retainedPositions = [];
+      const minimumStructuralLength = 3.6;
+      const minimumSemanticLength = .8;
+      const semanticRegionFloor = 8;
+      let semanticSegmentCount = 0;
+      for (let edge = 0; edge < detectedPositions.length; edge += 6) {
+        const dx = detectedPositions[edge + 3] - detectedPositions[edge];
+        const dy = detectedPositions[edge + 4] - detectedPositions[edge + 1];
+        const dz = detectedPositions[edge + 5] - detectedPositions[edge + 2];
+        const length = Math.hypot(dx, dy, dz);
+        const midpointY = (detectedPositions[edge + 1] + detectedPositions[edge + 4]) * .5;
+        const structuralEdge = length >= minimumStructuralLength;
+        const semanticCurve =
+          midpointY >= semanticRegionFloor &&
+          length >= minimumSemanticLength;
+        if (!structuralEdge && !semanticCurve) continue;
+        if (!structuralEdge && semanticCurve) semanticSegmentCount += 1;
+        retainedPositions.push(
+          detectedPositions[edge],
+          detectedPositions[edge + 1],
+          detectedPositions[edge + 2],
+          detectedPositions[edge + 3],
+          detectedPositions[edge + 4],
+          detectedPositions[edge + 5]
+        );
+      }
+      detectedEdges.dispose();
+      const featureEdges = new THREE.BufferGeometry();
+      featureEdges.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(retainedPositions, 3)
+      );
+      wireMesh = new THREE.LineSegments(featureEdges, wireMaterial);
+      silhouetteMesh = new THREE.Mesh(geometry, silhouetteMaterial);
+      curveMesh = new THREE.Mesh(curveGeometry, curveMaterial);
+      silhouetteMesh.scale.setScalar(1.01);
+      wireMesh.visible = false;
+      silhouetteMesh.visible = false;
+      curveMesh.visible = false;
+      solidMesh.renderOrder = 1;
+      silhouetteMesh.renderOrder = 2;
+      curveMesh.renderOrder = 3;
+      wireMesh.renderOrder = 4;
+
+      modelRoot = new THREE.Group();
+      const fittedScale = 1.104 / Math.max(geometry.boundingSphere.radius, .001);
+      modelRoot.scale.setScalar(fittedScale);
+      modelWorldRadius = geometry.boundingSphere.radius * fittedScale;
+      fitModelCamera();
+      modelRoot.add(solidMesh, silhouetteMesh, curveMesh, wireMesh);
+      modelScene.add(modelRoot);
+      modelShell.dataset.outline = "hybrid";
+      modelShell.dataset.curveOutline = "fresnel";
+      modelShell.dataset.edgeVisibility = "visible-only";
+      modelShell.dataset.lineDepthBias = "surface-offset";
+      modelShell.dataset.outlineToneMapping = "disabled";
+      modelShell.dataset.lineWeight = "reinforced-halo";
+      modelShell.dataset.semanticRegionFloor = String(semanticRegionFloor);
+      modelShell.dataset.edgeSegments = String(featureEdges.getAttribute("position").count / 2);
+      modelShell.dataset.semanticSegments = String(semanticSegmentCount);
+      modelStatus.remove();
+      modelShell.dataset.ready = "true";
+      updateModelTheme();
+    } catch (error) {
+      modelShell.dataset.ready = "error";
+      modelStatus.textContent = "Model load error";
+      console.error("Desk tidy viewer failed to load", error);
+    }
+
+    const themeButton = themePicker.querySelector(".theme-toggle");
+    const themeLabel = themePicker.querySelector(".theme-toggle-label");
+    const applyTheme = (dark) => {
+      desktop.classList.toggle("dark-theme", dark);
+      themeButton.setAttribute("aria-pressed", String(dark));
+      themeButton.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+      themeLabel.textContent = dark ? "Theme // dark" : "Theme // light";
+      asciiController.setTheme(dark ? "dark" : "light");
+      updateModelTheme();
+    };
+    themeButton.addEventListener("click", () => applyTheme(!desktop.classList.contains("dark-theme")));
+
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    let rx = -18;
+    let ry = 32;
+    let lastFrame = performance.now();
+    let automaticMorph = true;
+    let wireState = false;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const modelButtons = [...artifactMeta.querySelectorAll("[data-model-mode]")];
+
+    const paintModel = () => {
+      if (!modelRoot || !THREE) return;
+      modelRoot.rotation.x = THREE.MathUtils.degToRad(rx);
+      modelRoot.rotation.y = THREE.MathUtils.degToRad(ry);
+      fitModelCamera();
+      modelShell.dataset.rotation = `${rx.toFixed(2)},${ry.toFixed(2)}`;
+    };
+    const animateModel = (time) => {
+      const delta = Math.min(time - lastFrame, 32);
+      if (!dragging && !reducedMotion) {
+        ry += delta * .012;
+        paintModel();
+      }
+      if (
+        solidMaterial &&
+        wireMaterial &&
+        silhouetteMaterial &&
+        curveMaterial &&
+        solidMesh &&
+        wireMesh &&
+        silhouetteMesh &&
+        curveMesh
+      ) {
+        wireMix += (wireTarget - wireMix) * Math.min(1, delta * .0024);
+        const surfaceFade = 1 - wireMix;
+        solidMaterial.opacity = .02 + .94 * surfaceFade * surfaceFade;
+        solidMaterial.depthWrite = true;
+        wireMaterial.opacity = wireMix * wireMaxOpacity;
+        silhouetteMaterial.opacity = wireMix * silhouetteMaxOpacity;
+        curveMaterial.uniforms.outlineOpacity.value = wireMix * curveMaxOpacity;
+        wireMesh.visible = wireMix > .008;
+        silhouetteMesh.visible = wireMix > .008;
+        curveMesh.visible = wireMix > .008;
+        modelShell.dataset.lineOpacity = wireMaterial.opacity.toFixed(3);
+        modelShell.dataset.surfaceOpacity = solidMaterial.opacity.toFixed(3);
+        modelShell.dataset.phase = wireMix >= .5 ? "wire" : "solid";
+      }
+      lastFrame = time;
+      if (modelRenderer && modelScene && modelCamera) {
+        modelRenderer.render(modelScene, modelCamera);
+      }
+      requestAnimationFrame(animateModel);
+    };
+    artifactZone.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button")) return;
+      dragging = true;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      artifactZone.setPointerCapture(event.pointerId);
+    });
+    artifactZone.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      ry -= (event.clientX - lastX) * .65;
+      rx += (event.clientY - lastY) * .65;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      paintModel();
+    });
+    artifactZone.addEventListener("pointerup", () => { dragging = false; });
+    artifactZone.addEventListener("pointercancel", () => { dragging = false; });
+    modelButtons.forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const mode = button.dataset.modelMode;
+        automaticMorph = mode === "auto";
+        modelShell.dataset.mode = mode;
+        if (mode === "solid") {
+          wireState = false;
+          wireTarget = 0;
+        }
+        if (mode === "wire") {
+          wireState = true;
+          wireTarget = 1;
+        }
+        modelButtons.forEach((item) => item.classList.toggle("active", item === button));
+      });
+    });
+    window.setInterval(() => {
+      if (!automaticMorph) return;
+      wireState = !wireState;
+      wireTarget = wireState ? 1 : 0;
+    }, 6200);
+    paintModel();
+    requestAnimationFrame(animateModel);
+
+    const musicFront = music.querySelector(".music-front");
+    const musicClose = music.querySelector(".music-close");
+    const playToggle = music.querySelector(".play-toggle");
+    const trackProgress = music.querySelector(".track-progress");
+    const setMusicOpen = (open) => {
+      music.classList.toggle("open", open);
+      desktop.classList.toggle("music-player-open", open);
+    };
+    musicFront.addEventListener("click", () => setMusicOpen(true));
+    musicClose.addEventListener("click", () => setMusicOpen(false));
+    playToggle.addEventListener("click", () => {
+      const playing = music.classList.toggle("playing");
+      playToggle.textContent = playing ? "Ⅱ" : "▶";
+      trackProgress.classList.toggle("active", playing);
+    });
+  }, { once: true });
+</script>
+</body>
+</html>
