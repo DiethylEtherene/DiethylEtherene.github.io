@@ -135,11 +135,11 @@
     music.className = "music-easter";
     music.innerHTML = `
       <div class="music-inner">
-        <button type="button" class="music-face music-front" aria-label="Reveal hidden playlist">
+        <button type="button" class="music-face music-front" aria-label="Reveal hidden playlist" aria-hidden="false">
           <span class="mini-disc"><i></i></span>
           <span class="music-question mono">signal_?</span>
         </button>
-        <section class="music-face music-back" aria-label="Hidden signal playlist">
+        <section class="music-face music-back" aria-label="Hidden signal playlist" inert aria-hidden="true">
           <button type="button" class="music-close" aria-label="Close player">&times;</button>
           <div class="album-chip"><span class="album-orbit"></span></div>
           <div class="track-data">
@@ -951,6 +951,11 @@
         #portfolio-consolidated .ascii-scan {
           animation: none;
         }
+        #portfolio-consolidated .music-easter,
+        #portfolio-consolidated .music-inner,
+        #portfolio-consolidated .track-progress i {
+          transition: none;
+        }
       }
       @media (max-width: 860px) {
         #portfolio-consolidated .desktop-v2 { min-height: 1180px; }
@@ -1498,9 +1503,24 @@
     paintModel();
     requestAnimationFrame(animateModel);
 
+    const musicFront = music.querySelector(".music-front");
+    const musicBack = music.querySelector(".music-back");
+    const musicClose = music.querySelector(".music-close");
+    const focusMusicControl = (element) => {
+      try {
+        element.focus({ preventScroll: true });
+      } catch {
+        element.focus();
+      }
+    };
     const setMusicOpen = (open) => {
       music.classList.toggle("open", open);
       desktop.classList.toggle("music-player-open", open);
+      musicFront.inert = open;
+      musicFront.setAttribute("aria-hidden", String(open));
+      musicBack.inert = !open;
+      musicBack.setAttribute("aria-hidden", String(!open));
+      focusMusicControl(open ? musicClose : musicFront);
     };
     const { createPlaylistPlayer } = await import("/files/playlist-player.js");
     createPlaylistPlayer({
