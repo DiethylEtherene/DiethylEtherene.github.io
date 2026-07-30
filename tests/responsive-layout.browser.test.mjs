@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 import { createReadStream } from "node:fs";
-import { stat } from "node:fs/promises";
-import { createServer, get as httpGet } from "node:http";
+import { realpath, stat } from "node:fs/promises";
+import { createServer, request as httpRequest } from "node:http";
 import { dirname, extname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import { chromium } from "playwright";
 
-const SITE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../site");
+const SITE_ROOT = await realpath(resolve(dirname(fileURLToPath(import.meta.url)), "../site"));
 const VIEWPORTS = [
   { width: 375, height: 812 },
   { width: 480, height: 900 },
@@ -44,6 +44,13 @@ const MIME_TYPES = new Map([
 ]);
 const PIXEL_TOLERANCE = 0.5;
 const FOLDER_ASPECT_RATIO = 205 / 124;
+const REQUIRED_RESOURCE_PATHS = ["/", "/files/desktop-composition-v2.html"];
+
+function isWithinRoot(root, candidate) {
+  const fromRoot = relative(root, candidate);
+  return fromRoot === ""
+    || (fromRoot !== ".." && !fromRoot.startsWith(`..${sep}`) && !isAbsolute(fromRoot));
+}
 
 function requestPathToFile(rawUrl) {
   const rawPath = rawUrl.split("?", 1)[0].split("#", 1)[0];
@@ -61,8 +68,7 @@ function requestPathToFile(rawUrl) {
 
   const relativePath = pathSegments.filter(Boolean).join("/") || "index.html";
   const filePath = resolve(SITE_ROOT, relativePath);
-  const fromRoot = relative(SITE_ROOT, filePath);
-  if (fromRoot === ".." || fromRoot.startsWith(`..${sep}`) || isAbsolute(fromRoot)) {
+  if (!isWithinRoot(SITE_ROOT, filePath)) {
     return { status: 403, message: "Path traversal rejected" };
   }
   return { filePath };
@@ -70,6 +76,16 @@ function requestPathToFile(rawUrl) {
 
 async function startStaticServer() {
   const server = createServer(async (request, response) => {
+    const method = request.method ?? "GET";
+    if (method !== "GET" && method !== "HEAD") {
+      response.writeHead(405, {
+        Allow: "GET, HEAD",
+        "content-type": "text/plain; charset=utf-8",
+      });
+      response.end("Method not allowed");
+      return;
+    }
+
     const result = requestPathToFile(request.url ?? "/");
     if (!result.filePath) {
       response.writeHead(result.status, { "content-type": "text/plain; charset=utf-8" });
@@ -78,18 +94,33 @@ async function startStaticServer() {
     }
 
     try {
-      const fileStats = await stat(result.filePath);
+      const canonicalFilePath = await realpath(result.filePath);
+      if (!isWithinRoot(SITE_ROOT, canonicalFilePath)) {
+        response.writeHead(403, { "content-type": "text/plain; charset=utf-8" });
+        response.end("Path traversal rejected");
+        return;
+      }
+
+      const fileStats = await stat(canonicalFilePath);
       if (!fileStats.isFile()) throw new Error("Not a file");
       response.writeHead(200, {
         "content-length": fileStats.size,
-        "content-type": MIME_TYPES.get(extname(result.filePath).toLowerCase()) ?? "application/octet-stream",
+        "content-type": MIME_TYPES.get(extname(canonicalFilePath).toLowerCase()) ?? "application/octet-stream",
       });
-      createReadStream(result.filePath)
+      if (method === "HEAD") {
+        response.end();
+        return;
+      }
+      createReadStream(canonicalFilePath)
         .on("error", () => response.destroy())
         .pipe(response);
-    } catch {
-      response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
-      response.end("Not found");
+    } catch (error) {
+      if (!response.headersSent) {
+        response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
+        response.end("Not found");
+      } else {
+        response.destroy(error);
+      }
     }
   });
 
@@ -107,18 +138,25 @@ async function startStaticServer() {
   };
 }
 
-function rawStatus(baseURL, path) {
+function rawResponse(baseURL, path, method = "GET") {
   const url = new URL(baseURL);
-  return new Promise((resolveStatus, rejectStatus) => {
-    const request = httpGet({
+  return new Promise((resolveResponse, rejectResponse) => {
+    const request = httpRequest({
       hostname: url.hostname,
+      method,
       port: url.port,
       path,
     }, (response) => {
-      response.resume();
-      response.once("end", () => resolveStatus(response.statusCode));
+      const chunks = [];
+      response.on("data", (chunk) => chunks.push(chunk));
+      response.once("end", () => resolveResponse({
+        body: Buffer.concat(chunks),
+        headers: response.headers,
+        status: response.statusCode,
+      }));
     });
-    request.once("error", rejectStatus);
+    request.once("error", rejectResponse);
+    request.end();
   });
 }
 
@@ -168,6 +206,31 @@ async function readGeometry(page) {
       if (!element) throw new Error(`Required component missing: ${selector}`);
       return element;
     };
+    const isVisible = (element, rect) => {
+      if (rect.width <= 0 || rect.height <= 0 || element.getClientRects().length === 0) {
+        return false;
+      }
+      if (typeof element.checkVisibility === "function") {
+        return element.checkVisibility({
+          checkOpacity: true,
+          checkVisibilityCSS: true,
+          contentVisibilityAuto: true,
+        });
+      }
+      for (let current = element; current; current = current.parentElement) {
+        const style = getComputedStyle(current);
+        if (
+          style.display === "none"
+          || style.visibility === "hidden"
+          || style.visibility === "collapse"
+          || style.contentVisibility === "hidden"
+          || Number(style.opacity) === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
     const desktop = required(".desktop-v2");
     const shell = required(".stl-model-shell");
     const canvas = required(".stl-model-shell canvas");
@@ -176,11 +239,11 @@ async function readGeometry(page) {
     const folder = required(".folder");
     const foreground = foregroundSelectors.map((selector) => {
       const element = required(selector);
-      const style = getComputedStyle(element);
+      const rect = box(element);
       return {
         selector,
-        visible: style.display !== "none" && style.visibility !== "hidden" && Number(style.opacity) !== 0,
-        ...box(element),
+        visible: isVisible(element, rect),
+        ...rect,
       };
     });
 
@@ -237,13 +300,24 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
   let context;
   let page;
   let externallyOwned = false;
+  let pageErrorListener;
+  let requestFailedListener;
+  let responseListener;
 
   try {
+    const traversalResponse = await rawResponse(staticServer.baseURL, "/%2e%2e%2fpackage.json");
     assert.equal(
-      await rawStatus(staticServer.baseURL, "/%2e%2e%2fpackage.json"),
+      traversalResponse.status,
       403,
       "Static server must reject traversal after URL decoding",
     );
+    const postResponse = await rawResponse(staticServer.baseURL, "/", "POST");
+    assert.equal(postResponse.status, 405, "Static server must reject methods other than GET and HEAD");
+    assert.equal(postResponse.headers.allow, "GET, HEAD", "405 response must advertise allowed methods");
+    const headResponse = await rawResponse(staticServer.baseURL, "/", "HEAD");
+    assert.equal(headResponse.status, 200, "Static server must serve HEAD requests");
+    assert.equal(headResponse.body.length, 0, "HEAD response must not contain a body");
+    assert.ok(Number(headResponse.headers["content-length"]) > 0, "HEAD response must include file length");
 
     ({ browser, externallyOwned } = await openBrowser());
     context = await browser.newContext({
@@ -256,20 +330,25 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
 
     const pageErrors = [];
     const resourceErrors = [];
-    page.on("pageerror", (error) => pageErrors.push(error.message));
-    page.on("requestfailed", (request) => {
+    const successfulResources = new Set();
+    pageErrorListener = (error) => pageErrors.push(error.message);
+    requestFailedListener = (request) => {
       const failure = request.failure()?.errorText ?? "unknown failure";
-      // A deliberate next-viewport navigation cancels any optional STL/render
-      // work still in flight from the prior page. Other local failures matter.
-      if (request.url().startsWith(staticServer.baseURL) && failure !== "net::ERR_ABORTED") {
+      if (request.url().startsWith(staticServer.baseURL)) {
         resourceErrors.push(`${request.method()} ${request.url()}: ${failure}`);
       }
-    });
-    page.on("response", (response) => {
-      if (response.url().startsWith(staticServer.baseURL) && response.status() >= 400) {
-        resourceErrors.push(`${response.status()} ${response.url()}`);
+    };
+    responseListener = (localResponse) => {
+      if (!localResponse.url().startsWith(staticServer.baseURL)) return;
+      if (localResponse.status() >= 200 && localResponse.status() < 400) {
+        successfulResources.add(new URL(localResponse.url()).pathname);
+      } else {
+        resourceErrors.push(`${localResponse.status()} ${localResponse.url()}`);
       }
-    });
+    };
+    page.on("pageerror", pageErrorListener);
+    page.on("requestfailed", requestFailedListener);
+    page.on("response", responseListener);
 
     let response;
     try {
@@ -285,6 +364,12 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
     assert.ok(response?.ok(), `Index request failed with ${response?.status() ?? "no response"}`);
     assert.deepEqual(pageErrors, [], "Uncaught page/component errors during initial load");
     assert.deepEqual(resourceErrors, [], "Local component resources failed during initial load");
+    for (const requiredPath of REQUIRED_RESOURCE_PATHS) {
+      assert.ok(
+        successfulResources.has(requiredPath),
+        `Required component resource did not complete successfully: ${requiredPath}`,
+      );
+    }
 
     for (const viewport of ACTIVE_VIEWPORTS) {
       await t.test(`${viewport.width}x${viewport.height}`, { timeout: 10_000 }, async () => {
@@ -351,6 +436,8 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         await page.locator(".music-front").click();
         await page.locator(".music-easter.open").waitFor({ state: "visible" });
         await page.waitForTimeout(60);
+        assert.deepEqual(pageErrors, [], `${label}: uncaught page/component errors after music interaction`);
+        assert.deepEqual(resourceErrors, [], `${label}: local resources failed after music interaction`);
         const after = await snapshotRegions(page);
         for (const selector of SNAPSHOT_SELECTORS) {
           for (const property of ["x", "y", "width", "height"]) {
@@ -364,6 +451,11 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
       });
     }
   } finally {
+    if (page) {
+      if (pageErrorListener) page.off("pageerror", pageErrorListener);
+      if (requestFailedListener) page.off("requestfailed", requestFailedListener);
+      if (responseListener) page.off("response", responseListener);
+    }
     await page?.close().catch(() => {});
     await context?.close().catch(() => {});
     // For connectOverCDP, close() releases this Playwright connection after its
