@@ -251,7 +251,8 @@ async function waitForPortfolioReady(page, label) {
   }
 }
 
-async function waitForPlaylistResourceReady(page, label) {
+async function waitForPlaylistResourceReady(page, label, runtimeMetrics) {
+  runtimeMetrics.playlistReadinessProbes += 1;
   await page.locator(".playlist-audio").evaluate((audio) => {
     if (audio.error) {
       throw new Error(`playlist audio failed with media error ${audio.error.code}`);
@@ -462,6 +463,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
   let pageErrorListener;
   let requestFailedListener;
   let responseListener;
+  let frameNavigatedListener;
 
   try {
     const traversalResponse = await rawResponse(staticServer.baseURL, "/%2e%2e%2fpackage.json");
@@ -503,6 +505,10 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
     const pageErrors = [];
     const resourceErrors = [];
     const successfulResources = new Set();
+    const runtimeMetrics = {
+      topLevelDocumentCommits: 0,
+      playlistReadinessProbes: 0,
+    };
     pageErrorListener = (error) => pageErrors.push(error.message);
     requestFailedListener = (request) => {
       const failure = request.failure()?.errorText ?? "unknown failure";
@@ -521,9 +527,18 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         resourceErrors.push(`${localResponse.status()} ${localResponse.url()}`);
       }
     };
+    frameNavigatedListener = (frame) => {
+      if (
+        frame === page.mainFrame()
+        && frame.url().startsWith(staticServer.baseURL)
+      ) {
+        runtimeMetrics.topLevelDocumentCommits += 1;
+      }
+    };
     page.on("pageerror", pageErrorListener);
     page.on("requestfailed", requestFailedListener);
     page.on("response", responseListener);
+    page.on("framenavigated", frameNavigatedListener);
 
     let response;
     try {
@@ -549,6 +564,15 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
     }
 
     const tabletSnapshots = new Map();
+    const setupMetrics = { ...runtimeMetrics };
+    assert.deepEqual(
+      setupMetrics,
+      {
+        topLevelDocumentCommits: 1,
+        playlistReadinessProbes: 1,
+      },
+      `Responsive setup must commit one document and run one readiness probe; observed ${JSON.stringify(setupMetrics)}`,
+    );
     for (const viewport of ACTIVE_VIEWPORTS) {
       await t.test(`${viewport.width}x${viewport.height}`, { timeout: 10_000 }, async () => {
         await waitForPortfolioReady(page, `${viewport.width}x${viewport.height} pre-reload`);
@@ -660,7 +684,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         });
         await page.locator(".music-front").click();
         await page.locator(".music-easter.open").waitFor({ state: "visible" });
-        await waitForPlaylistResourceReady(page, label);
+        await waitForPlaylistResourceReady(page, label, runtimeMetrics);
         await page.waitForTimeout(60);
         assert.deepEqual(pageErrors, [], `${label}: uncaught page/component errors after music interaction`);
         assert.deepEqual(resourceErrors, [], `${label}: local resources failed after music interaction`);
@@ -681,6 +705,11 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         }
       });
     }
+    assert.deepEqual(
+      runtimeMetrics,
+      setupMetrics,
+      `Viewport matrix must not add document commits or readiness probes; setup=${JSON.stringify(setupMetrics)} observed=${JSON.stringify(runtimeMetrics)}`,
+    );
     for (const [firstWidth, secondWidth] of SEAM_PAIRS) {
       if (!tabletSnapshots.has(firstWidth) || !tabletSnapshots.has(secondWidth)) continue;
       const first = tabletSnapshots.get(firstWidth);
@@ -700,6 +729,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
       if (pageErrorListener) page.off("pageerror", pageErrorListener);
       if (requestFailedListener) page.off("requestfailed", requestFailedListener);
       if (responseListener) page.off("response", responseListener);
+      if (frameNavigatedListener) page.off("framenavigated", frameNavigatedListener);
     }
     await page?.close().catch(() => {});
     await context?.close().catch(() => {});
