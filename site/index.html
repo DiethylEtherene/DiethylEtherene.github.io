@@ -207,6 +207,77 @@
         bottom: 48px;
         overflow: hidden;
       }
+      /* The percentages above are tuned for the base (sub-1024px) layout,
+         where .artifact-zone is also positioned with plain percentages
+         against the same box. At the desktop grid breakpoint,
+         .artifact-zone instead sits in the grid's middle column, whose
+         bounds depend on --intro-track/--folder-track (which can differ
+         from each other) rather than a fixed percentage. Without this
+         override the ASCII field drifts out of alignment with the model,
+         orbit rings, and artifact zone it's meant to sit behind. Reuse the
+         same grid variables so it always matches exactly. */
+      @media (min-width: 1024px) {
+        #portfolio-consolidated .desktop-v2 {
+          /* The intro column reads visually heavier than the folder
+             column (three stacked cards vs. spaced-out folders), so the
+             centered field is nudged right by narrowing it in from the
+             left only; the right edge stays exactly at the artifact
+             zone's boundary so it can never drift into the folder
+             column. Tune this one value if the balance needs revisiting. */
+          --ascii-field-shift: 40px;
+        }
+        #portfolio-consolidated .ascii-central-field {
+          left: calc(
+            max(var(--layout-gutter), (100vw - 2200px) / 2 + var(--layout-gutter))
+            + var(--intro-track) + var(--layout-gap) + var(--ascii-field-shift)
+          );
+          right: calc(
+            max(var(--layout-gutter), (100vw - 2200px) / 2 + var(--layout-gutter))
+            + var(--folder-track) + var(--layout-gap)
+          );
+          top: 58px;
+          bottom: 126px;
+        }
+        /* The jellyfish creature's fixed 320px width was tuned against the
+           old absolute-positioned artifact zone. At the desktop grid
+           breakpoint it now needs to stay clear of the folder column
+           instead, or it visually overlaps/peeks out from behind the
+           folder cards. Anchor it to the same artifact-zone right edge
+           (plus a little inset) so it never crosses into the folders. */
+        #portfolio-consolidated .ascii-jellyfish-canvas {
+          right: calc(
+            max(var(--layout-gutter), (100vw - 2200px) / 2 + var(--layout-gutter))
+            + var(--folder-track) + var(--layout-gap) + 40px
+          );
+        }
+      }
+      /* Folder cards, the intro bio, and the profile rows were sized for
+         the old, narrower cards. Now that the desktop grid gives folders
+         and columns much more room, those same font sizes read as too
+         small for the space they sit in. Scale them up at the desktop
+         breakpoint only; the tighter mobile/tablet cards keep their
+         original sizes. */
+      @media (min-width: 1024px) {
+        #portfolio-consolidated .folder > .mono:first-child {
+          font-size: 13px;
+        }
+        #portfolio-consolidated .folder strong {
+          font-size: 26px;
+        }
+        #portfolio-consolidated .folder .count {
+          font-size: 12px;
+        }
+        #portfolio-consolidated .intro-body p {
+          font-size: 14px;
+        }
+        #portfolio-consolidated .profile-row .mono {
+          font-size: 9px;
+        }
+        #portfolio-consolidated .profile-row strong,
+        #portfolio-consolidated .profile-row a {
+          font-size: 10.5px;
+        }
+      }
       #portfolio-consolidated .ascii-portrait-canvas {
         width: 100%;
         height: 100%;
