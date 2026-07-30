@@ -218,25 +218,26 @@
          same grid variables so it always matches exactly. */
       @media (min-width: 1024px) {
         #portfolio-consolidated .desktop-v2 {
-          /* The intro column reads visually heavier than the folder
-             column (three stacked cards vs. spaced-out folders), so the
-             centered field is nudged right by narrowing it in from the
-             left only; the right edge stays exactly at the artifact
-             zone's boundary so it can never drift into the folder
-             column. Tune this one value if the balance needs revisiting. */
-          --ascii-field-shift: 40px;
+          /* Fine-tuning offsets for the centered ASCII field: negative
+             shift-x nudges it left of dead-center, positive shift-y lifts
+             it up. Both edges move together (rather than resizing the
+             box), and stay well inside the ~34px clearance to the intro
+             and folder columns on either side. Tune these two values if
+             the balance needs revisiting. */
+          --ascii-field-shift-x: -16px;
+          --ascii-field-shift-y: 28px;
         }
         #portfolio-consolidated .ascii-central-field {
           left: calc(
             max(var(--layout-gutter), (100vw - 2200px) / 2 + var(--layout-gutter))
-            + var(--intro-track) + var(--layout-gap) + var(--ascii-field-shift)
+            + var(--intro-track) + var(--layout-gap) + var(--ascii-field-shift-x)
           );
           right: calc(
             max(var(--layout-gutter), (100vw - 2200px) / 2 + var(--layout-gutter))
-            + var(--folder-track) + var(--layout-gap)
+            + var(--folder-track) + var(--layout-gap) - var(--ascii-field-shift-x)
           );
-          top: 58px;
-          bottom: 126px;
+          top: calc(58px - var(--ascii-field-shift-y));
+          bottom: calc(126px + var(--ascii-field-shift-y));
         }
         /* The jellyfish creature's fixed 320px width was tuned against the
            old absolute-positioned artifact zone. At the desktop grid
