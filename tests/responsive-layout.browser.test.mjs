@@ -492,6 +492,39 @@ async function snapshotRegions(page) {
   })), SNAPSHOT_SELECTORS);
 }
 
+const INTERACTION_SETTLE_TIMEOUT_MS = 1_500;
+const INTERACTION_SETTLE_POLL_INTERVAL_MS = 25;
+const INTERACTION_STABLE_SAMPLE_COUNT = 2;
+
+// Toggling the music player can trigger a ResizeObserver-driven re-layout
+// (the 3D model shell observes its own box) on top of the class/style change
+// that opened it. That settles within a frame or two in every browser we've
+// checked, but a fixed short wait can occasionally sample mid-settle and see
+// a sub-pixel difference in unrelated regions. Poll until two consecutive
+// reads agree, the same strategy already used for viewport resizes above.
+async function settleSnapshotRegions(page) {
+  const deadline = Date.now() + INTERACTION_SETTLE_TIMEOUT_MS;
+  let previous = await snapshotRegions(page);
+  let stableSampleCount = 0;
+
+  while (Date.now() <= deadline) {
+    await new Promise((resolvePoll) => {
+      setTimeout(resolvePoll, INTERACTION_SETTLE_POLL_INTERVAL_MS);
+    });
+    const current = await snapshotRegions(page);
+    const stable = SNAPSHOT_SELECTORS.every((selector) => (
+      ["x", "y", "width", "height"].every((property) => (
+        Math.abs(current[selector][property] - previous[selector][property]) <= PIXEL_TOLERANCE
+      ))
+    ));
+    stableSampleCount = stable ? stableSampleCount + 1 : 0;
+    previous = current;
+    if (stableSampleCount >= INTERACTION_STABLE_SAMPLE_COUNT) return current;
+  }
+
+  return previous;
+}
+
 function assertSquare(label, geometry, viewport) {
   assert.ok(
     Math.abs(geometry.layoutWidth - geometry.layoutHeight) <= PIXEL_TOLERANCE,
@@ -814,10 +847,9 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         try {
           await page.locator(".music-front").click();
           await page.locator(".music-easter.open").waitFor({ state: "visible" });
-          await page.waitForTimeout(60);
+          const after = await settleSnapshotRegions(page);
           assert.deepEqual(pageErrors, [], `${label}: uncaught page/component errors after music interaction`);
           assert.deepEqual(resourceErrors, [], `${label}: local resources failed after music interaction`);
-          const after = await snapshotRegions(page);
           const openGeometry = await readGeometry(page);
           assertContained(".music-easter.open", openGeometry.music, openGeometry.desktop, label);
           assertDisjoint("open music player and theme control", openGeometry.music, openGeometry.theme, label);
