@@ -4,7 +4,7 @@
 
 **Goal:** Deploy the already-implemented responsive portfolio redesign by removing redundant heavy work from its browser gate while preserving every geometry and no-shift assertion.
 
-**Architecture:** Instrument the real browser suite with runtime counters for committed top-level navigations and playlist-readiness probes. Require setup to finish with exactly one main-frame document commit and one readiness probe before any timed viewport subtest begins, snapshot that baseline, and require the full viewport matrix to leave it unchanged. Keep one browser page and one loaded STL scene for the full matrix, resize that live page for each geometry pass, and exercise the music-player layout at every size because media transport is independent of viewport geometry. Retain GitHub Pages upload/deploy behind all existing checks.
+**Architecture:** Instrument the real browser suite with runtime counters for committed top-level navigations and playlist-readiness probes. Require setup to finish with exactly one main-frame document commit and one readiness probe before any timed viewport subtest begins, snapshot that baseline, and require the full viewport matrix to leave it unchanged. Keep one browser page and one loaded STL scene for the full matrix, resize that live page for each geometry pass, and exercise the music-player layout at every size because media transport is independent of viewport geometry. After each resize, poll requested viewport and fixed-control style sentinels on animation frames before retaining the existing two-frame layout settle; this prevents a live-page 480-to-768 resize from being measured while 480px media-query offsets are still computed. Retain GitHub Pages upload/deploy behind all existing checks.
 
 **Tech Stack:** Node.js test runner, Playwright Chromium, HTML/CSS, GitHub Actions, GitHub Pages.
 
@@ -12,7 +12,7 @@
 
 ## File Map
 
-- Modify `tests/responsive-layout.browser.test.mjs`: measure committed main-frame navigations and real media-readiness probes, enforce their setup placement, then reuse the loaded page, settle resize-driven layout, close the player between viewport passes, and keep one media readiness probe.
+- Modify `tests/responsive-layout.browser.test.mjs`: measure committed main-frame navigations and real media-readiness probes, enforce their setup placement, then reuse the loaded page, condition-settle resize-driven styles, close the player between viewport passes, and keep one media readiness probe.
 - Modify `docs/superpowers/plans/2026-07-30-ci-safe-responsive-deploy.md`: document the runtime regression and deployment workflow.
 - Leave `package.json` unchanged; its existing responsive command already runs the instrumented browser suite.
 
@@ -55,15 +55,19 @@ Expected: FAIL before the timed viewport subtest because setup observed one comm
 
 After the initial page is ready, set the audio element to `preload="auto"`, open the player, wait for readiness once, close the player, and wait for the closed state.
 
-- [ ] **Step 2: Replace per-viewport reloads with resize settling**
+- [ ] **Step 2: Replace per-viewport reloads with condition-based resize settling**
 
-Inside the viewport loop, call `page.setViewportSize(viewport)` and wait for two animation frames. Keep all geometry, containment, breakpoint, model/orbit, folder, and player no-shift assertions.
+Inside the viewport loop, call `page.setViewportSize(viewport)`, then poll on animation frames until `innerWidth`/`innerHeight` and the fixed music/theme offsets match the requested breakpoint. Use side inset `clamp(16px, 4vw, 32px)` through 1023px and 24px above it; theme bottoms 88px/70px/16px and music bottoms 150px/70px/16px across phone/tablet/desktop. Keep a bounded timeout, retain two animation frames after the condition matches, and keep all geometry, containment, breakpoint, model/orbit, folder, and player no-shift assertions.
 
-- [ ] **Step 3: Reset the player after every viewport**
+- [ ] **Step 3: Assert the responsive sentinels after every settle**
+
+Read the same viewport and computed-style sentinels immediately after settling and assert them within a 0.02px tolerance. The full ordered viewport matrix is the regression for the intermittent 480-to-768 stale-style transition; do not replace it with a fixed sleep or a wider tolerance.
+
+- [ ] **Step 4: Reset the player after every viewport**
 
 After the open-player assertions, click the close control and wait for `.music-easter` to lose the `open` class so each pass starts from the same state.
 
-- [ ] **Step 4: Run the browser suite**
+- [ ] **Step 5: Run the browser suite**
 
 Run:
 
@@ -92,6 +96,8 @@ git diff --check
 ```
 
 Expected: playlist 9/9, static verifier PASS, responsive 14/14 including the runtime contract, and no whitespace errors.
+
+Repeat the full responsive CDP matrix at least ten consecutive times after the sentinel fix. All runs must retain the 10-second viewport and 90-second parent budgets with zero stale-style failures.
 
 - [ ] **Step 2: Commit and push**
 

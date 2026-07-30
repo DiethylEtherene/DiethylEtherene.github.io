@@ -53,6 +53,7 @@ const MIME_TYPES = new Map([
   [".mp3", "audio/mpeg"],
 ]);
 const PIXEL_TOLERANCE = 0.5;
+const RESPONSIVE_SENTINEL_TOLERANCE = 0.02;
 const FOLDER_ASPECT_RATIO = 205 / 124;
 const REQUIRED_RESOURCE_PATHS = ["/", "/files/desktop-composition-v2.html"];
 
@@ -285,12 +286,95 @@ async function waitForPlaylistResourceReady(page, label, runtimeMetrics) {
   });
 }
 
-async function settleResponsiveResize(page) {
+async function settleResponsiveResize(page, viewport) {
+  const expected = expectedResponsiveSentinels(viewport);
+  try {
+    await page.waitForFunction(
+      ({ expectedSentinels, tolerance }) => {
+        const theme = document.querySelector(".final-theme-picker");
+        const music = document.querySelector(".music-easter");
+        if (!theme || !music) return false;
+        const themeStyle = getComputedStyle(theme);
+        const musicStyle = getComputedStyle(music);
+        const observed = {
+          innerWidth,
+          innerHeight,
+          themeRight: Number.parseFloat(themeStyle.right),
+          themeBottom: Number.parseFloat(themeStyle.bottom),
+          musicLeft: Number.parseFloat(musicStyle.left),
+          musicBottom: Number.parseFloat(musicStyle.bottom),
+        };
+        return Object.entries(expectedSentinels).every(
+          ([name, value]) => Math.abs(observed[name] - value) <= tolerance,
+        );
+      },
+      {
+        expectedSentinels: expected,
+        tolerance: RESPONSIVE_SENTINEL_TOLERANCE,
+      },
+      {
+        polling: "raf",
+        timeout: 2_500,
+      },
+    );
+  } catch (error) {
+    const observed = await readResponsiveSentinels(page);
+    throw new Error(
+      `${viewport.width}x${viewport.height}: responsive sentinels did not settle; expected=${JSON.stringify(expected)} observed=${JSON.stringify(observed)}`,
+      { cause: error },
+    );
+  }
   await page.evaluate(() => new Promise((resolveSettled) => {
     requestAnimationFrame(() => {
       requestAnimationFrame(resolveSettled);
     });
   }));
+}
+
+function expectedResponsiveSentinels(viewport) {
+  const sideInset = viewport.width <= 1023
+    ? Math.min(32, Math.max(16, viewport.width * 0.04))
+    : 24;
+  return {
+    innerWidth: viewport.width,
+    innerHeight: viewport.height,
+    themeRight: sideInset,
+    themeBottom: viewport.width <= 699 ? 88 : viewport.width <= 1023 ? 70 : 16,
+    musicLeft: sideInset,
+    musicBottom: viewport.width <= 699 ? 150 : viewport.width <= 1023 ? 70 : 16,
+  };
+}
+
+async function readResponsiveSentinels(page) {
+  return page.evaluate(() => {
+    const required = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) throw new Error(`Responsive sentinel missing: ${selector}`);
+      return element;
+    };
+    const themeStyle = getComputedStyle(required(".final-theme-picker"));
+    const musicStyle = getComputedStyle(required(".music-easter"));
+    return {
+      innerWidth,
+      innerHeight,
+      themeRight: Number.parseFloat(themeStyle.right),
+      themeBottom: Number.parseFloat(themeStyle.bottom),
+      musicLeft: Number.parseFloat(musicStyle.left),
+      musicBottom: Number.parseFloat(musicStyle.bottom),
+    };
+  });
+}
+
+function assertResponsiveSentinels(viewport, observed) {
+  const expected = expectedResponsiveSentinels(viewport);
+  const mismatches = Object.entries(expected)
+    .filter(([name, value]) => Math.abs(observed[name] - value) > RESPONSIVE_SENTINEL_TOLERANCE)
+    .map(([name, value]) => `${name}=${observed[name]} (expected ${value})`);
+  assert.equal(
+    mismatches.length,
+    0,
+    `${viewport.width}x${viewport.height}: responsive sentinel mismatch: ${mismatches.join(", ")}`,
+  );
 }
 
 async function readGeometry(page) {
@@ -594,7 +678,9 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
       await t.test(`${viewport.width}x${viewport.height}`, { timeout: 10_000 }, async () => {
         await waitForPortfolioReady(page, `${viewport.width}x${viewport.height} pre-resize`);
         await page.setViewportSize(viewport);
-        await settleResponsiveResize(page);
+        await settleResponsiveResize(page, viewport);
+        const responsiveSentinels = await readResponsiveSentinels(page);
+        assertResponsiveSentinels(viewport, responsiveSentinels);
         assert.deepEqual(pageErrors, [], `${viewport.width}x${viewport.height}: uncaught page/component errors`);
         assert.deepEqual(resourceErrors, [], `${viewport.width}x${viewport.height}: local component resources failed`);
 
