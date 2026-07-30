@@ -84,3 +84,153 @@
     }
   }
 }
+
+@media (max-width: 1023px) {
+  #portfolio-consolidated .composition-wrap > .desktop-v2 {
+    box-sizing: border-box;
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: clamp(36px, 6vw, 56px);
+    min-height: max(720px, calc(100dvh - 16px));
+    padding: 58px clamp(16px, 4vw, 32px) 170px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .intro-column {
+    position: relative;
+    inset: auto;
+    width: min(100%, 360px);
+    max-width: 360px;
+    flex: 0 0 auto;
+    transform: none;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .artifact-zone {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: clamp(420px, 60cqw, 560px);
+    flex: 0 0 auto;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .folder-column {
+    position: relative;
+    inset: auto;
+    width: min(100%, 520px);
+    height: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 24px;
+    flex: 0 0 auto;
+    transform: none;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .folder {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 205 / 124;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .stl-model-shell {
+    width: clamp(320px, min(52cqw, 50dvh), 460px);
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-a {
+    width: clamp(380px, min(64cqw, 64dvh), 560px);
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-b {
+    width: clamp(320px, min(54cqw, 54dvh), 480px);
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .music-easter {
+    left: clamp(16px, 4vw, 32px);
+    bottom: 70px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .final-theme-picker {
+    right: clamp(16px, 4vw, 32px);
+    bottom: 70px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .ascii-central-field {
+    inset: 0;
+    width: auto;
+    height: auto;
+    opacity: .38;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .ascii-manta-canvas {
+    left: -84px;
+    bottom: 190px;
+    width: min(420px, 72cqw);
+    height: auto;
+    aspect-ratio: 420 / 281;
+    opacity: calc(var(--ascii-manta-opacity) * .42);
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .ascii-jellyfish-canvas,
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .ascii-scan {
+    display: none;
+  }
+}
+
+@media (max-width: 699px) {
+  #portfolio-consolidated .composition-wrap > .desktop-v2 {
+    padding-bottom: 250px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .music-easter {
+    bottom: 150px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .final-theme-picker {
+    bottom: 88px;
+  }
+}
+
+@media (max-width: 479px) {
+  #portfolio-consolidated .composition-wrap > .desktop-v2 {
+    gap: 34px;
+    padding: 58px 16px 250px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .intro-column {
+    width: 100%;
+    max-width: none;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .artifact-zone {
+    height: 360px;
+    padding-bottom: 48px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .folder-column {
+    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .stl-model-shell {
+    width: clamp(240px, min(70cqw, 42dvh), 290px);
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-a {
+    width: min(calc(100cqw - 48px), 340px);
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-b {
+    width: min(calc(100cqw - 88px), 290px);
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .music-easter.open {
+    width: min(calc(100cqw - 32px), 360px);
+  }
+}

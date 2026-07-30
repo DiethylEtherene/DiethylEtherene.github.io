@@ -255,16 +255,36 @@ async function readGeometry(page) {
       desktop: box(desktop),
       desktopLayout: {
         display: getComputedStyle(desktop).display,
+        flexDirection: getComputedStyle(desktop).flexDirection,
         introPosition: getComputedStyle(required(".intro-column")).position,
         artifactPosition: getComputedStyle(required(".artifact-zone")).position,
         foldersPosition: getComputedStyle(required(".folder-column")).position,
       },
+      artifact: box(required(".artifact-zone")),
       shell: { ...box(shell), layoutWidth: shell.offsetWidth, layoutHeight: shell.offsetHeight },
       canvas: box(canvas),
       outerOrbit: { ...box(outerOrbit), layoutWidth: outerOrbit.offsetWidth, layoutHeight: outerOrbit.offsetHeight },
       innerOrbit: { ...box(innerOrbit), layoutWidth: innerOrbit.offsetWidth, layoutHeight: innerOrbit.offsetHeight },
       folder: { ...box(folder), layoutWidth: folder.offsetWidth, layoutHeight: folder.offsetHeight },
+      folders: Array.from(document.querySelectorAll(".folder"), (element) => ({
+        ...box(element),
+        layoutX: element.offsetLeft,
+        layoutY: element.offsetTop,
+      })),
+      folderColumn: {
+        ...box(required(".folder-column")),
+        display: getComputedStyle(required(".folder-column")).display,
+      },
       intro: box(required(".intro-column")),
+      music: box(required(".music-easter")),
+      dock: box(required(".utility-dock")),
+      theme: box(required(".final-theme-picker")),
+      ascii: {
+        field: box(required(".ascii-central-field")),
+        mantaOpacity: Number(getComputedStyle(required(".ascii-manta-canvas")).opacity),
+        jellyDisplay: getComputedStyle(required(".ascii-jellyfish-canvas")).display,
+        scanDisplay: getComputedStyle(required(".ascii-scan")).display,
+      },
       foreground,
     };
   }, { foregroundSelectors: SNAPSHOT_SELECTORS });
@@ -275,7 +295,12 @@ async function snapshotRegions(page) {
     const element = document.querySelector(selector);
     if (!element) throw new Error(`Cannot snapshot missing component: ${selector}`);
     const { x, y, width, height } = element.getBoundingClientRect();
-    return [selector, { x, y, width, height }];
+    return [selector, {
+      x: x + window.scrollX,
+      y: y + window.scrollY,
+      width,
+      height,
+    }];
   })), SNAPSHOT_SELECTORS);
 }
 
@@ -293,6 +318,17 @@ function assertContained(label, child, parent, viewport) {
       && child.right <= parent.right + PIXEL_TOLERANCE
       && child.bottom <= parent.bottom + PIXEL_TOLERANCE,
     `${viewport}: visible ${label} must stay inside .desktop-v2; child=${JSON.stringify(child)} desktop=${JSON.stringify(parent)}`,
+  );
+}
+
+function assertDisjoint(label, first, second, viewport) {
+  const disjoint = first.right <= second.x + PIXEL_TOLERANCE
+    || second.right <= first.x + PIXEL_TOLERANCE
+    || first.bottom <= second.y + PIXEL_TOLERANCE
+    || second.bottom <= first.y + PIXEL_TOLERANCE;
+  assert.ok(
+    disjoint,
+    `${viewport}: ${label} must not overlap; first=${JSON.stringify(first)} second=${JSON.stringify(second)}`,
   );
 }
 
@@ -374,6 +410,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
       response = await page.goto(`${staticServer.baseURL}/`, { waitUntil: "load" });
       await page.locator(".desktop-v2").waitFor({ state: "visible" });
       await page.locator(".stl-model-shell").waitFor({ state: "visible" });
+      await page.waitForLoadState("networkidle");
     } catch (error) {
       throw new Error(
         `Portfolio components did not load. pageErrors=${JSON.stringify(pageErrors)} resourceErrors=${JSON.stringify(resourceErrors)}`,
@@ -390,6 +427,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
       );
     }
 
+    const tabletSnapshots = new Map();
     for (const viewport of ACTIVE_VIEWPORTS) {
       await t.test(`${viewport.width}x${viewport.height}`, { timeout: 10_000 }, async () => {
         await page.setViewportSize(viewport);
@@ -397,6 +435,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         assert.ok(viewportResponse?.ok(), `${viewport.width}x${viewport.height}: viewport reload failed`);
         await page.locator(".desktop-v2").waitFor({ state: "visible" });
         await page.locator(".stl-model-shell").waitFor({ state: "visible" });
+        await page.waitForLoadState("networkidle");
         assert.deepEqual(pageErrors, [], `${viewport.width}x${viewport.height}: uncaught page/component errors`);
         assert.deepEqual(resourceErrors, [], `${viewport.width}x${viewport.height}: local component resources failed`);
 
@@ -428,6 +467,45 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
           Math.abs((geometry.folder.layoutWidth / geometry.folder.layoutHeight) - FOLDER_ASPECT_RATIO) <= 0.01,
           `${label}: folder aspect ratio must be 205/124; measured ${geometry.folder.layoutWidth}/${geometry.folder.layoutHeight}`,
         );
+        if (viewport.width <= 1023) {
+          assert.equal(geometry.desktopLayout.display, "flex", `${label}: tablet surface must use flex flow`);
+          assert.equal(geometry.desktopLayout.flexDirection, "column", `${label}: tablet flow must be a column`);
+          assert.equal(geometry.desktopLayout.introPosition, "relative", `${label}: intro must be in normal flow`);
+          assert.equal(geometry.desktopLayout.artifactPosition, "relative", `${label}: artifact must be in normal flow`);
+          assert.equal(geometry.desktopLayout.foldersPosition, "relative", `${label}: folders must be in normal flow`);
+          assert.equal(geometry.folderColumn.display, "grid", `${label}: tablet folders must use a grid`);
+          assert.equal(geometry.ascii.jellyDisplay, "none", `${label}: tablet jellyfish must be hidden`);
+          assert.equal(geometry.ascii.scanDisplay, "none", `${label}: tablet scan must be hidden`);
+          assert.ok(geometry.ascii.mantaOpacity <= 0.5, `${label}: tablet manta must remain low-opacity`);
+          assert.ok(
+            geometry.ascii.field.x <= geometry.artifact.x + PIXEL_TOLERANCE
+              && geometry.ascii.field.right >= geometry.artifact.right - PIXEL_TOLERANCE,
+            `${label}: tablet ASCII field must span behind the artifact`,
+          );
+          tabletSnapshots.set(viewport.width, await snapshotRegions(page));
+
+          if (viewport.width <= 479) {
+            for (let index = 1; index < geometry.folders.length; index += 1) {
+              assert.ok(
+                geometry.folders[index].layoutY > geometry.folders[index - 1].layoutY + PIXEL_TOLERANCE,
+                `${label}: phone folders must form one column`,
+              );
+            }
+          } else {
+            assert.ok(
+              Math.abs(geometry.folders[0].layoutY - geometry.folders[1].layoutY) <= PIXEL_TOLERANCE,
+              `${label}: tablet folders 1 and 2 must share the first row`,
+            );
+            assert.ok(
+              Math.abs(geometry.folders[2].layoutY - geometry.folders[3].layoutY) <= PIXEL_TOLERANCE,
+              `${label}: tablet folders 3 and 4 must share the second row`,
+            );
+            assert.ok(
+              geometry.folders[1].layoutX > geometry.folders[0].layoutX + PIXEL_TOLERANCE,
+              `${label}: tablet folders must form two columns`,
+            );
+          }
+        }
         if (viewport.width >= 1024) {
           assert.equal(geometry.desktopLayout.display, "grid", `${label}: desktop surface must use a grid layout`);
           assert.equal(geometry.desktopLayout.introPosition, "relative", `${label}: intro must be a grid item`);
@@ -460,6 +538,11 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         assert.deepEqual(pageErrors, [], `${label}: uncaught page/component errors after music interaction`);
         assert.deepEqual(resourceErrors, [], `${label}: local resources failed after music interaction`);
         const after = await snapshotRegions(page);
+        const openGeometry = await readGeometry(page);
+        assertContained(".music-easter.open", openGeometry.music, openGeometry.desktop, label);
+        assertDisjoint("open music player and theme control", openGeometry.music, openGeometry.theme, label);
+        assertDisjoint("open music player and utility dock", openGeometry.music, openGeometry.dock, label);
+        assertDisjoint("theme control and utility dock", openGeometry.theme, openGeometry.dock, label);
         for (const selector of SNAPSHOT_SELECTORS) {
           for (const property of ["x", "y", "width", "height"]) {
             const delta = Math.abs(after[selector][property] - before[selector][property]);
@@ -470,6 +553,20 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
           }
         }
       });
+    }
+    for (const [firstWidth, secondWidth] of [[860, 861], [879, 880]]) {
+      if (!tabletSnapshots.has(firstWidth) || !tabletSnapshots.has(secondWidth)) continue;
+      const first = tabletSnapshots.get(firstWidth);
+      const second = tabletSnapshots.get(secondWidth);
+      for (const selector of [".intro-column", ".artifact-zone", ".folder-column"]) {
+        for (const property of ["x", "y", "width", "height"]) {
+          const delta = Math.abs(second[selector][property] - first[selector][property]);
+          assert.ok(
+            delta <= 2,
+            `${firstWidth}/${secondWidth} seam: ${selector} ${property} changed by ${delta}px`,
+          );
+        }
+      }
     }
   } finally {
     if (page) {
