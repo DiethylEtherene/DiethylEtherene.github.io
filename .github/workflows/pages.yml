@@ -45,9 +45,6 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run responsive layout tests
-        env:
-          DEBUG: pw:api
-          RESPONSIVE_VIEWPORT: 375x812
         run: npm run test:responsive
 
       - name: Configure Pages

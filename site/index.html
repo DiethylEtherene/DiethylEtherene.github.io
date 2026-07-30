@@ -1081,6 +1081,10 @@
     const modelViewportTarget = .94;
     const modelOutlineScale = 1.012;
     const modelCameraMargin = 1 / modelViewportTarget;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let requestModelRender = () => {};
+    modelShell.dataset.motion = reducedMotion ? "reduced" : "full";
+    modelShell.dataset.renderLoop = reducedMotion ? "on-demand" : "continuous";
 
     const fitModelCamera = () => {
       if (!THREE || !modelCamera || !modelWorldRadius) return;
@@ -1148,6 +1152,7 @@
       silhouetteMaxOpacity = dark ? .96 : .84;
       curveMaxOpacity = dark ? .9 : .78;
       modelRenderer.toneMappingExposure = dark ? 1.18 : 1;
+      requestModelRender();
     };
 
     try {
@@ -1189,6 +1194,7 @@
         modelCamera.aspect = width / height;
         modelCamera.updateProjectionMatrix();
         fitModelCamera();
+        requestModelRender();
       };
       new ResizeObserver(resizeModel).observe(modelShell);
       resizeModel();
@@ -1422,7 +1428,6 @@
     let lastFrame = performance.now();
     let automaticMorph = true;
     let wireState = false;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const modelButtons = [...artifactMeta.querySelectorAll("[data-model-mode]")];
 
     const paintModel = () => {
@@ -1431,6 +1436,7 @@
       modelRoot.rotation.y = THREE.MathUtils.degToRad(ry);
       fitModelCamera();
       modelShell.dataset.rotation = `${rx.toFixed(2)},${ry.toFixed(2)}`;
+      requestModelRender();
     };
     const animateModel = (time) => {
       const delta = Math.min(time - lastFrame, 32);
@@ -1466,7 +1472,10 @@
       if (modelRenderer && modelScene && modelCamera) {
         modelRenderer.render(modelScene, modelCamera);
       }
-      requestAnimationFrame(animateModel);
+      if (!reducedMotion) requestAnimationFrame(animateModel);
+    };
+    requestModelRender = () => {
+      if (reducedMotion) requestAnimationFrame(animateModel);
     };
     artifactZone.addEventListener("pointerdown", (event) => {
       if (event.target.closest("button")) return;
@@ -1489,7 +1498,7 @@
       button.addEventListener("click", (event) => {
         event.stopPropagation();
         const mode = button.dataset.modelMode;
-        automaticMorph = mode === "auto";
+        automaticMorph = !reducedMotion && mode === "auto";
         modelShell.dataset.mode = mode;
         if (mode === "solid") {
           wireState = false;
@@ -1499,14 +1508,21 @@
           wireState = true;
           wireTarget = 1;
         }
+        if (reducedMotion) wireMix = wireTarget;
         modelButtons.forEach((item) => item.classList.toggle("active", item === button));
+        requestModelRender();
       });
     });
-    window.setInterval(() => {
-      if (!automaticMorph) return;
-      wireState = !wireState;
-      wireTarget = wireState ? 1 : 0;
-    }, 6200);
+    if (reducedMotion) {
+      automaticMorph = false;
+      modelShell.dataset.mode = "solid";
+    } else {
+      window.setInterval(() => {
+        if (!automaticMorph) return;
+        wireState = !wireState;
+        wireTarget = wireState ? 1 : 0;
+      }, 6200);
+    }
     paintModel();
     requestAnimationFrame(animateModel);
 

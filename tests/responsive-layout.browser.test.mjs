@@ -448,6 +448,8 @@ async function readGeometry(page) {
       },
       artifact: box(required(".artifact-zone")),
       shell: { ...box(shell), layoutWidth: shell.offsetWidth, layoutHeight: shell.offsetHeight },
+      modelMotion: shell.dataset.motion,
+      modelRenderLoop: shell.dataset.renderLoop,
       canvas: box(canvas),
       outerOrbit: { ...box(outerOrbit), layoutWidth: outerOrbit.offsetWidth, layoutHeight: outerOrbit.offsetHeight },
       innerOrbit: { ...box(innerOrbit), layoutWidth: innerOrbit.offsetWidth, layoutHeight: innerOrbit.offsetHeight },
@@ -554,7 +556,7 @@ test("responsive settling ignores stale breakpoint samples without animation fra
   );
 });
 
-test("responsive portfolio geometry remains balanced and interaction-stable", { timeout: 90_000 }, async (t) => {
+test("responsive portfolio geometry remains balanced and interaction-stable", { timeout: 180_000 }, async (t) => {
   assert.ok(
     ACTIVE_VIEWPORTS.length > 0,
     `RESPONSIVE_VIEWPORT must match a configured viewport; received ${REQUESTED_VIEWPORT}`,
@@ -695,7 +697,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
       `Responsive setup must commit one document and run one readiness probe; observed ${JSON.stringify(setupMetrics)}`,
     );
     for (const viewport of ACTIVE_VIEWPORTS) {
-      await t.test(`${viewport.width}x${viewport.height}`, { timeout: 10_000 }, async () => {
+      await t.test(`${viewport.width}x${viewport.height}`, { timeout: 15_000 }, async () => {
         await waitForPortfolioReady(page, `${viewport.width}x${viewport.height} pre-resize`);
         await page.setViewportSize(viewport);
         await settleResponsiveResize(page, viewport);
@@ -714,6 +716,16 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
           assertContained(region.selector, region, geometry.desktop, label);
         }
         assertSquare("model shell", geometry.shell, label);
+        assert.equal(
+          geometry.modelMotion,
+          "reduced",
+          `${label}: reduced-motion browser context must put the model in reduced-motion mode`,
+        );
+        assert.equal(
+          geometry.modelRenderLoop,
+          "on-demand",
+          `${label}: reduced-motion mode must not keep a continuous WebGL render loop running`,
+        );
         assert.ok(
           Math.abs(geometry.canvas.width - geometry.canvas.height) <= PIXEL_TOLERANCE,
           `${label}: model canvas must be square; measured ${geometry.canvas.width}x${geometry.canvas.height}`,
