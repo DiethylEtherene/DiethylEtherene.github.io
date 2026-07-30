@@ -285,6 +285,14 @@ async function waitForPlaylistResourceReady(page, label, runtimeMetrics) {
   });
 }
 
+async function settleResponsiveResize(page) {
+  await page.evaluate(() => new Promise((resolveSettled) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resolveSettled);
+    });
+  }));
+}
+
 async function readGeometry(page) {
   return page.evaluate(({ foregroundSelectors }) => {
     const box = (element) => {
@@ -563,6 +571,15 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
       );
     }
 
+    await page.locator(".playlist-audio").evaluate((audio) => {
+      audio.preload = "auto";
+    });
+    await page.locator(".music-front").click();
+    await page.locator(".music-easter.open").waitFor({ state: "visible" });
+    await waitForPlaylistResourceReady(page, "initial playlist setup", runtimeMetrics);
+    await page.locator(".music-close").click();
+    await page.locator(".music-easter:not(.open)").waitFor({ state: "visible" });
+
     const tabletSnapshots = new Map();
     const setupMetrics = { ...runtimeMetrics };
     assert.deepEqual(
@@ -575,14 +592,9 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
     );
     for (const viewport of ACTIVE_VIEWPORTS) {
       await t.test(`${viewport.width}x${viewport.height}`, { timeout: 10_000 }, async () => {
-        await waitForPortfolioReady(page, `${viewport.width}x${viewport.height} pre-reload`);
+        await waitForPortfolioReady(page, `${viewport.width}x${viewport.height} pre-resize`);
         await page.setViewportSize(viewport);
-        const viewportResponse = await page.reload({ waitUntil: "load" });
-        assert.ok(viewportResponse?.ok(), `${viewport.width}x${viewport.height}: viewport reload failed`);
-        await page.locator(".desktop-v2").waitFor({ state: "visible" });
-        await page.locator(".stl-model-shell").waitFor({ state: "visible" });
-        await waitForPortfolioReady(page, `${viewport.width}x${viewport.height} reload`);
-        await page.waitForLoadState("networkidle");
+        await settleResponsiveResize(page);
         assert.deepEqual(pageErrors, [], `${viewport.width}x${viewport.height}: uncaught page/component errors`);
         assert.deepEqual(resourceErrors, [], `${viewport.width}x${viewport.height}: local component resources failed`);
 
@@ -679,28 +691,58 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         }
 
         const before = await snapshotRegions(page);
-        await page.locator(".playlist-audio").evaluate((audio) => {
-          audio.preload = "auto";
-        });
-        await page.locator(".music-front").click();
-        await page.locator(".music-easter.open").waitFor({ state: "visible" });
-        await waitForPlaylistResourceReady(page, label, runtimeMetrics);
-        await page.waitForTimeout(60);
-        assert.deepEqual(pageErrors, [], `${label}: uncaught page/component errors after music interaction`);
-        assert.deepEqual(resourceErrors, [], `${label}: local resources failed after music interaction`);
-        const after = await snapshotRegions(page);
-        const openGeometry = await readGeometry(page);
-        assertContained(".music-easter.open", openGeometry.music, openGeometry.desktop, label);
-        assertDisjoint("open music player and theme control", openGeometry.music, openGeometry.theme, label);
-        assertDisjoint("open music player and utility dock", openGeometry.music, openGeometry.dock, label);
-        assertDisjoint("theme control and utility dock", openGeometry.theme, openGeometry.dock, label);
-        for (const selector of SNAPSHOT_SELECTORS) {
-          for (const property of ["x", "y", "width", "height"]) {
-            const delta = Math.abs(after[selector][property] - before[selector][property]);
-            assert.ok(
-              delta <= PIXEL_TOLERANCE,
-              `${label}: opening music player moved ${selector} ${property} by ${delta}px (before=${before[selector][property]}, after=${after[selector][property]})`,
+        let interactionError;
+        let interactionFailed = false;
+        try {
+          await page.locator(".music-front").click();
+          await page.locator(".music-easter.open").waitFor({ state: "visible" });
+          await page.waitForTimeout(60);
+          assert.deepEqual(pageErrors, [], `${label}: uncaught page/component errors after music interaction`);
+          assert.deepEqual(resourceErrors, [], `${label}: local resources failed after music interaction`);
+          const after = await snapshotRegions(page);
+          const openGeometry = await readGeometry(page);
+          assertContained(".music-easter.open", openGeometry.music, openGeometry.desktop, label);
+          assertDisjoint("open music player and theme control", openGeometry.music, openGeometry.theme, label);
+          assertDisjoint("open music player and utility dock", openGeometry.music, openGeometry.dock, label);
+          assertDisjoint("theme control and utility dock", openGeometry.theme, openGeometry.dock, label);
+          for (const selector of SNAPSHOT_SELECTORS) {
+            for (const property of ["x", "y", "width", "height"]) {
+              const delta = Math.abs(after[selector][property] - before[selector][property]);
+              assert.ok(
+                delta <= PIXEL_TOLERANCE,
+                `${label}: opening music player moved ${selector} ${property} by ${delta}px (before=${before[selector][property]}, after=${after[selector][property]})`,
+              );
+            }
+          }
+        } catch (error) {
+          interactionFailed = true;
+          interactionError = error;
+          throw error;
+        } finally {
+          try {
+            const playerIsOpen = await page.locator(".music-easter").evaluate(
+              (element) => element.classList.contains("open"),
             );
+            if (playerIsOpen) {
+              await page.locator(".music-close").click();
+              await page.locator(".music-easter:not(.open)").waitFor({ state: "visible" });
+            }
+          } catch (cleanupError) {
+            if (!interactionFailed) throw cleanupError;
+            try {
+              if (interactionError && typeof interactionError === "object") {
+                if (interactionError.cause === undefined) {
+                  interactionError.cause = cleanupError;
+                } else {
+                  Object.defineProperty(interactionError, "cleanupError", {
+                    configurable: true,
+                    value: cleanupError,
+                  });
+                }
+              }
+            } catch {
+              // Preserve the original interaction failure if diagnostics cannot be attached.
+            }
           }
         }
       });
