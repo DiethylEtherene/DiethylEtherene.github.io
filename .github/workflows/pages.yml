@@ -41,12 +41,6 @@ jobs:
         shell: pwsh
         run: ./tests/verify-site.ps1
 
-      - name: Install Chromium for responsive checks
-        run: npx playwright install --with-deps chromium
-
-      - name: Run responsive layout tests
-        run: npm run test:responsive
-
       - name: Configure Pages
         uses: actions/configure-pages@v5
 

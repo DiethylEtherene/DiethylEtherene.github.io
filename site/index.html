@@ -1,1636 +1,837 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Asteria Wang — Design Engineering student exploring design, technology, research, and illustration.">
-  <title>Asteria — Portfolio</title>
-  <link rel="icon" href="data:,">
-  <style>
-    html,
-    body {
-      min-height: 100%;
-      margin: 0;
-    }
-    body {
-      padding: 8px;
-      overflow-x: hidden;
-      background: #ffffff;
-      box-sizing: border-box;
-    }
-    #portfolio-consolidated .composition-wrap > .desktop-v2 {
-      min-height: max(720px, calc(100vh - 16px));
-      margin-top: 0;
-    }
-    @media (max-width: 860px) {
-      #portfolio-consolidated .composition-wrap > .desktop-v2 {
-        min-height: max(980px, calc(100vh - 16px));
-      }
-    }
-  </style>
-  <link rel="stylesheet" href="/files/responsive-layout.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Asteria Wang — Design Engineering student at Imperial College London. Design, technology, research and illustration.">
+<meta name="theme-color" content="#e8eef1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060d14" media="(prefers-color-scheme: dark)">
+<title>Asteria Wang — Design Engineering</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
+.mono{font-family:"JetBrains Mono",ui-monospace,"Courier New",monospace}
+
+.desk{
+  --bg:#e8eef1;--ink:#0f1a22;--muted:#5a6a76;
+  --line:rgba(13,110,140,.26);--rule:rgba(13,110,140,.42);
+  --cyan:#0d7ea6;--mint:#0d8f78;--pink:#ff2b8d;
+  --grid:rgba(13,110,140,.06);--wash:rgba(13,126,166,.12);
+  --scan:transparent;--scan-step:4px;--vignette:0 0 0 rgba(0,0,0,0);
+  --panel:transparent;--hint-bg:rgba(232,238,241,.9);--slot:rgba(255,255,255,.66);--btn:rgba(255,255,255,.62);
+  --ascii-base:#2a5468;--ascii-edge:#0c3d55;--ascii-scan:transparent;
+  --ascii-base-alpha:.58;--ascii-edge-alpha:1;--ascii-accent:#ff2b8d;
+  --rail:76px;--gutter:40px;--model-shift:-64px;
+  position:relative;width:100%;height:100dvh;min-height:640px;overflow:hidden;
+  display:flex;flex-direction:column;color:var(--ink);
+  background:
+    radial-gradient(circle at 58% 46%,var(--wash),transparent 60%),
+    linear-gradient(var(--grid) 1px,transparent 1px),
+    linear-gradient(90deg,var(--grid) 1px,transparent 1px),
+    var(--bg);
+  background-size:auto,48px 48px,48px 48px,auto;
+  transition:background-color .32s ease,color .32s ease;
+}
+.desk.dark{
+  --bg:#060d14;--ink:#e9f8f4;--muted:#7f9fb2;
+  --line:rgba(120,230,240,.22);--rule:rgba(120,230,240,.22);
+  --cyan:#52dcff;--mint:#6dffd0;--pink:#ff3c9f;
+  --grid:rgba(120,230,240,.05);--wash:rgba(24,74,92,.6);
+  --scan:transparent;--scan-step:3px;
+  --slot:rgba(8,24,34,.7);--btn:transparent;--hint-bg:rgba(6,13,20,.86);
+  --ascii-base:#2f9fa8;--ascii-edge:#8bf0ff;--ascii-scan:transparent;
+  --ascii-base-alpha:.6;--ascii-edge-alpha:1;--ascii-accent:#ff3c9f;
+}
+.desk a{color:var(--ink);text-decoration:none}
+.desk a:hover{color:var(--pink)}
+
+/* ascii artwork + overlays */
+.ascii-layer{position:absolute;top:-34px;right:-40px;bottom:8px;left:-80px;overflow:hidden;pointer-events:none;z-index:0}
+.ascii-layer canvas{display:block;width:100%;height:100%}
+.scanlines{position:absolute;inset:0;pointer-events:none;z-index:2;
+  background:repeating-linear-gradient(var(--scan) 0 1px,transparent 1px var(--scan-step))}
+.vignette{position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:none}
+.desk.dark .vignette{box-shadow:inset 0 0 160px rgba(0,0,0,.75)}
+
+.deco{position:absolute;inset:0;pointer-events:none;z-index:2}
+.deco i.corner{position:absolute;width:13px;height:13px;opacity:.7}
+.deco i.tl{left:14px;top:14px;border-left:1px solid var(--cyan);border-top:1px solid var(--cyan)}
+.deco i.tr{right:14px;top:14px;border-right:1px solid var(--cyan);border-top:1px solid var(--cyan)}
+.deco i.bl{left:14px;bottom:14px;border-left:1px solid var(--cyan);border-bottom:1px solid var(--cyan)}
+.deco i.br{right:14px;bottom:14px;border-right:1px solid var(--cyan);border-bottom:1px solid var(--cyan)}
+.deco span.mark{position:absolute;font-size:9px;letter-spacing:.2em;color:var(--muted);opacity:.6}
+.deco .hatch{position:absolute;right:352px;top:78px;font-size:9px;letter-spacing:.2em;color:var(--muted);opacity:.8}
+.deco .ticks{position:absolute;right:346px;bottom:96px;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
+.deco .ticks i{display:block;height:1px;background:var(--line)}
+.deco .ticks i:nth-child(1){width:26px}
+.deco .ticks i:nth-child(2){width:16px;background:var(--pink);opacity:.7}
+.deco .ticks i:nth-child(3){width:34px}
+
+/* header */
+.top{position:relative;z-index:3;flex:0 0 56px;display:flex;align-items:center;justify-content:space-between;
+  gap:24px;padding:0 0 0 var(--rail);border-bottom:1px solid var(--rule);font-size:11px;letter-spacing:.16em}
+.desk.dark .top{border-bottom-color:var(--line)}
+.top .who{display:flex;align-items:baseline;gap:14px;white-space:nowrap}
+.top .who b{color:var(--ink);font-weight:700}
+.desk.dark .top .who b{color:var(--cyan)}
+.top .who span{color:var(--muted)}
+.readouts{display:flex;align-items:stretch;height:100%;white-space:nowrap}
+.readouts>*{display:flex;align-items:center;padding:0 16px;border-left:1px solid var(--line);color:var(--muted)}
+.readouts>*:last-child{padding-right:24px}
+.status{gap:8px;color:var(--ink)}
+.status i{width:7px;height:7px;border-radius:50%;background:var(--mint);animation:blink 4s linear infinite}
+.desk.dark .status i{box-shadow:0 0 10px var(--mint)}
+.desk:not(.dark) .status i{box-shadow:0 0 0 4px rgba(13,143,120,.16)}
+.theme-toggle{display:flex;align-items:center;gap:9px;padding:0 24px 0 16px;border:0;border-left:1px solid var(--line);
+  background:none;color:var(--cyan);font:inherit;font-family:"JetBrains Mono",ui-monospace,monospace;
+  letter-spacing:.16em;cursor:pointer}
+.theme-toggle i{position:relative;display:block;width:22px;height:11px;border:1px solid var(--cyan);border-radius:8px}
+.theme-toggle i b{position:absolute;left:1px;top:1px;display:block;width:7px;height:7px;border-radius:50%;
+  background:var(--cyan);transition:left .28s cubic-bezier(.16,1.3,.36,1)}
+.desk.dark .theme-toggle i b{left:auto;right:1px;box-shadow:0 0 8px var(--cyan)}
+
+/* body */
+.body{position:relative;z-index:3;flex:1 1 auto;display:flex;min-height:0}
+.side{flex:0 0 var(--rail);border-right:1px solid var(--rule);display:flex;flex-direction:column;
+  align-items:center;justify-content:space-between;padding:22px 0}
+.desk.dark .side{border-right-color:var(--line)}
+.side .build{font-size:9.5px;letter-spacing:.24em;color:var(--muted);writing-mode:vertical-rl;transform:rotate(180deg)}
+.side .geo{font-size:9.5px;letter-spacing:.24em;color:var(--cyan);writing-mode:vertical-rl}
+.side .marks{display:flex;flex-direction:column;gap:7px;align-items:center}
+.side .marks i{display:block;height:1px;width:14px;background:var(--line)}
+.side .marks i:nth-child(2){width:22px;background:var(--cyan)}
+
+.cols{flex:1 1 auto;display:grid;grid-template-columns:500px minmax(0,1fr) 330px;min-width:0}
+
+.intro{display:flex;flex-direction:column;gap:40px;padding:60px var(--gutter) 268px}
+.eyebrow{font-size:9.5px;letter-spacing:.24em;color:var(--pink);margin-bottom:18px}
+.name{position:relative;margin:0;font-size:clamp(64px,7.6vw,110px);line-height:.82;letter-spacing:-.055em}
+.name .ghost{position:absolute;top:0;left:0;pointer-events:none}
+.name .g1{color:var(--pink);opacity:.28;transform:translate(-3px,2px)}
+.name .g2{color:var(--cyan);opacity:.26;transform:translate(3px,-2px)}
+.desk.dark .name .g1{opacity:.5}
+.desk.dark .name .g2{opacity:.45}
+.name span.real{position:relative}
+.lede{margin:32px 0 0;max-width:400px;font-size:18px;line-height:1.55;color:var(--muted);text-wrap:pretty}
+.desk.dark .lede{color:#c4dbe6}
+.transmit{font-size:11px;letter-spacing:.13em}
+.transmit .rule{display:flex;align-items:center;gap:10px;color:var(--muted);margin-bottom:14px}
+.transmit .rule i{flex:1 1 auto;height:1px;background:var(--line)}
+.transmit .links{display:flex;flex-direction:column;gap:12px}
+.transmit .links span{color:var(--muted)}
+
+/* artifact */
+.stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:22px;padding:36px 20px 48px;touch-action:none;cursor:grab}
+.stage:active{cursor:grabbing}
+.stage>*:not(.ascii-layer){position:relative;z-index:1}
+.stage .caption{display:flex;gap:14px;align-items:center;font-size:9.5px;letter-spacing:.2em;color:var(--cyan);
+  transform:translate(var(--model-shift),-20px)}
+.stage .caption i{display:block;width:26px;height:1px;background:var(--cyan)}
+.reticle{position:relative;display:grid;place-items:center;width:430px;height:430px;max-width:100%;transform:translateX(var(--model-shift))}
+.reticle .ring{position:absolute;width:430px;height:430px;border-radius:50%;
+  border:1px dashed rgba(13,126,166,.42);animation:spin 26s linear infinite}
+.desk.dark .reticle .ring{border-color:rgba(82,220,255,.35)}
+.reticle .ring b{position:absolute;left:calc(50% - 4px);top:-4px;display:block;width:8px;height:8px;border-radius:50%;background:var(--pink)}
+.desk.dark .reticle .ring b{background:var(--mint);box-shadow:0 0 10px var(--mint)}
+.reticle .ring2{position:absolute;width:372px;height:372px;border-radius:50%;
+  border:1px dotted rgba(255,43,141,.4);animation:spin 17s linear infinite reverse}
+.reticle .ring2 b{position:absolute;left:calc(50% - 3px);top:-3px;display:block;width:6px;height:6px;
+  border-radius:50%;background:var(--cyan)}
+.desk.dark .reticle .ring2 b{box-shadow:0 0 8px var(--cyan)}
+.reticle .cx{position:absolute;left:0;right:0;top:50%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(13,126,166,.42),transparent)}
+.reticle .cy{position:absolute;top:0;bottom:0;left:50%;width:1px;
+  background:linear-gradient(rgba(13,126,166,.42),transparent 70%)}
+.desk.dark .reticle .cx{background:linear-gradient(90deg,transparent,rgba(82,220,255,.5),transparent)}
+.desk.dark .reticle .cy{background:linear-gradient(rgba(82,220,255,.5),transparent 70%)}
+.slot{position:relative;width:320px;height:320px;max-width:78vw;max-height:78vw;
+  border:1px solid var(--cyan);background:var(--slot);display:grid;place-items:center}
+.desk.dark .slot{box-shadow:0 0 34px rgba(82,220,255,.18),inset 0 0 44px rgba(82,220,255,.09)}
+.slot canvas{display:block;width:100%;height:100%}
+.slot .bracket{position:absolute;width:20px;height:20px}
+.slot .b1{left:-1px;top:-1px;border-left:2px solid var(--mint);border-top:2px solid var(--mint)}
+.slot .b2{right:-1px;top:-1px;border-right:2px solid var(--mint);border-top:2px solid var(--mint)}
+.slot .b3{left:-1px;bottom:-1px;border-left:2px solid var(--mint);border-bottom:2px solid var(--mint)}
+.slot .b4{right:-1px;bottom:-1px;border-right:2px solid var(--mint);border-bottom:2px solid var(--mint)}
+.slot .dim{position:absolute;left:0;top:-22px;font-size:9px;letter-spacing:.18em;color:var(--muted)}
+.slot .scale{position:absolute;right:-52px;top:50%;transform:translateY(-50%);font-size:9px;letter-spacing:.18em;color:var(--muted)}
+.slot .drag-hint{position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);display:flex;align-items:center;
+  gap:8px;padding:5px 10px;border:1px solid var(--line);background:var(--hint-bg);backdrop-filter:blur(3px);
+  font-size:9px;letter-spacing:.2em;color:var(--pink);white-space:nowrap;pointer-events:none}
+.slot .drag-hint i{display:block;width:16px;height:1px;background:var(--pink);opacity:.6}
+.stage:active .slot .drag-hint{opacity:.4}
+.model-status{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);padding:7px 9px;
+  border:1px solid var(--line);color:var(--muted);font-size:9px;letter-spacing:.14em;text-transform:uppercase;white-space:nowrap}
+.modes{display:flex;gap:8px;transform:translateX(var(--model-shift))}
+.modes button{padding:7px 13px;border:1px solid var(--line);background:var(--btn);color:var(--ink);
+  font:700 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;
+  transition:background .18s,color .18s,border-color .18s}
+.modes button:hover{border-color:var(--cyan)}
+.modes button.active{border-color:var(--pink);background:var(--pink);color:#fff}
+.desk.dark .modes button.active{color:#060d14;box-shadow:0 0 14px rgba(255,60,159,.4)}
+
+/* index */
+.index{border-left:1px solid var(--rule);display:grid;grid-template-rows:auto repeat(4,1fr)}
+.desk.dark .index{border-left-color:var(--line)}
+.index .head{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:44px;
+  border-bottom:1px solid var(--rule);font-size:9.5px;letter-spacing:.22em;color:var(--muted)}
+.desk.dark .index .head{border-bottom-color:var(--line)}
+.index .head b{color:var(--pink);font-weight:400}
+.row{position:relative;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:0 24px;
+  border-bottom:1px solid var(--line);transition:background .16s}
+.row:last-child{border-bottom:0}
+.row:before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--pink);transform:scaleY(0);transition:transform .2s}
+.row:hover:before{transform:scaleY(1)}
+.row:hover{background:rgba(13,126,166,.07)}
+.desk.dark .row:hover{background:rgba(82,220,255,.08)}
+.row .meta{display:flex;justify-content:space-between;font-size:9.5px;letter-spacing:.2em;color:var(--muted)}
+.row .go{opacity:.25;transform:translateX(-6px);transition:opacity .18s,transform .18s}
+.desk.dark .row .go{color:var(--cyan)}
+.row:hover .go{opacity:1;transform:translateX(0)}
+.row .title{font-size:28px;letter-spacing:-.03em;color:var(--ink)}
+
+/* footer */
+.foot{position:relative;z-index:3;flex:0 0 60px;display:flex;align-items:stretch;border-top:1px solid var(--rule);
+  font-size:11px;letter-spacing:.12em;background:transparent}
+.desk.dark .foot{border-top-color:var(--line);background:rgba(4,10,16,.72)}
+.foot .signal{display:flex;align-items:center;gap:12px;padding:0 24px 0 var(--gutter);
+  border-right:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.foot .signal i{display:block;width:14px;height:14px;border:1px solid var(--ink);border-radius:50%;animation:spin 8s linear infinite}
+.desk.dark .foot .signal i{border-color:var(--mint)}
+.foot nav{display:flex;align-items:stretch;white-space:nowrap}
+.foot nav a{display:flex;align-items:center;padding:0 18px;border-left:1px solid var(--line);color:var(--ink)}
+.foot nav a:first-child{border-left:0}
+.foot nav a:last-child{border-right:1px solid var(--line)}
+.ticker{flex:1 1 auto;overflow:hidden;display:flex;align-items:center;padding-right:24px;color:var(--muted)}
+.ticker span{display:flex;gap:44px;white-space:nowrap;animation:marquee 26s linear infinite}
+.ticker b{color:var(--mint);font-weight:400}
+
+/* music easter egg */
+.music-easter{position:absolute;left:116px;bottom:100px;z-index:4}
+.music-trinkets{position:absolute;left:0;bottom:96px;display:flex;align-items:flex-end;gap:22px;pointer-events:none;
+  transition:transform .42s cubic-bezier(.16,1,.3,1)}
+.music-easter.open .music-trinkets{transform:translateY(-32px)}
+.radar{position:relative;display:block;width:54px;height:54px;border:1px solid var(--line);border-radius:50%;overflow:hidden}
+.radar i{position:absolute;display:block;background:var(--line)}
+.radar .r1{inset:12px;border:1px solid var(--line);border-radius:50%;background:none}
+.radar .sweep{left:50%;top:50%;width:26px;height:1px;transform-origin:0 0;
+  background:linear-gradient(90deg,var(--cyan),transparent);animation:spin 3.4s linear infinite}
+.radar .v{left:50%;top:6px;width:1px;height:42px}
+.radar .h{left:6px;top:50%;width:42px;height:1px}
+.bars{display:flex;align-items:flex-end;gap:4px;height:40px}
+.bars i{display:block;width:3px;background:var(--cyan);opacity:.75;transform-origin:bottom;animation:bars 1.5s ease-in-out infinite}
+.bars i:nth-child(1){height:40%}
+.bars i:nth-child(2){height:70%;animation-duration:1.15s;animation-delay:.2s}
+.bars i:nth-child(3){height:55%;background:var(--pink);opacity:.8;animation-duration:1.7s;animation-delay:.05s}
+.bars i:nth-child(4){height:85%;opacity:.65;animation-duration:1.3s;animation-delay:.32s}
+.bars i:nth-child(5){height:50%;opacity:.6;animation-duration:1.9s;animation-delay:.12s}
+.sensor{font-size:9px;line-height:1.7;letter-spacing:.18em;color:var(--muted)}
+.sensor b{color:var(--pink);font-weight:400}
+
+.music-front,.music-back{position:absolute;left:0;bottom:0;transform-origin:0 100%;
+  transition:opacity .26s ease,transform .42s cubic-bezier(.16,1,.3,1)}
+.music-front{display:grid;place-items:center;width:62px;height:62px;padding:0;border:1px solid var(--line);
+  background:transparent;color:var(--ink);cursor:pointer}
+.music-front:hover{transform:translateY(-3px) rotate(-3deg)}
+.music-front .disc{position:relative;display:grid;place-items:center;width:30px;height:30px;
+  border:1px solid var(--line);border-radius:50%;animation:spin 7s linear infinite}
+.music-front .disc i{position:absolute;inset:6px;display:block;border:1px dotted var(--pink);border-radius:50%}
+.music-front .disc b{display:block;width:5px;height:5px;border-radius:50%;background:var(--cyan)}
+.music-front .tag{position:absolute;left:0;right:0;bottom:4px;text-align:center;font-size:6.5px;letter-spacing:.18em;color:var(--muted)}
+.music-back{width:320px;border:1px solid var(--line);background:transparent;opacity:0;
+  transform:scale(.78) translateY(10px);pointer-events:none}
+.music-easter.open .music-back{opacity:1;transform:none;pointer-events:auto}
+.music-easter.open .music-front{opacity:0;transform:scale(.7);pointer-events:none}
+.music-back .bar{display:flex;align-items:center;justify-content:space-between;padding:9px 11px;
+  border-bottom:1px solid var(--line);font-size:8.5px;letter-spacing:.14em;color:var(--pink);white-space:nowrap}
+.music-close{width:18px;height:18px;padding:0;border:0;background:none;color:var(--muted);font-size:13px;cursor:pointer}
+.music-body{display:grid;grid-template-columns:56px 1fr;gap:12px;padding:12px}
+.album{position:relative;display:grid;place-items:center;width:56px;height:56px;border:1px solid var(--line);
+  border-radius:50%;animation:spin 9s linear infinite}
+.album i{position:absolute;inset:9px;display:block;border:2px dotted var(--pink);border-radius:50%}
+.album b{display:block;width:8px;height:8px;border-radius:50%;background:var(--cyan)}
+.track-data{display:flex;flex-direction:column;gap:8px;min-width:0}
+.track-heading{display:flex;align-items:baseline;gap:8px}
+.music-track-position{font-size:9px;letter-spacing:.18em;color:var(--muted)}
+.track-heading strong{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track-progress{height:4px;border:1px solid var(--line)}
+.track-progress i{display:block;width:0;height:100%;background:var(--pink);transition:width .12s linear}
+.track-controls{display:flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.14em}
+.track-controls button{width:24px;height:20px;padding:0;border:1px solid var(--line);background:transparent;
+  color:var(--ink);font-size:9px;cursor:pointer}
+.track-controls button:hover{border-color:var(--cyan)}
+.track-controls .play-toggle{border-color:var(--pink);background:var(--pink);color:#fff}
+.track-time{margin-left:auto;color:var(--muted)}
+.music-easter.has-error .music-eyebrow{color:var(--pink)}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bars{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+@keyframes blink{0%,72%{opacity:1}76%,84%{opacity:.25}88%,100%{opacity:1}}
+@keyframes marquee{to{transform:translateX(-50%)}}
+
+@media (max-width:1500px){
+  .cols{grid-template-columns:minmax(360px,34vw) minmax(0,1fr) 300px}
+  .ascii-layer{left:-46px;right:-30px}
+  .desk{--model-shift:-40px}
+  .reticle{width:min(430px,30vw);height:min(430px,30vw)}
+  .slot{width:min(320px,24vw);height:min(320px,24vw)}
+}
+@media (max-height:840px){
+  .intro{padding-bottom:196px}
+  .music-trinkets{display:none}
+}
+@media (max-height:720px){
+  .intro{padding-bottom:150px;gap:26px}
+  .music-easter{bottom:76px}
+}
+@media (max-width:1060px){
+  .desk{--rail:44px}
+  .top{padding-left:20px;gap:12px}
+  .readouts>.sys,.readouts>.tz{display:none}
+  .status{padding:0 12px}
+  .theme-toggle{padding:0 16px 0 12px}
+  .foot .signal{padding-left:20px}
+}
+@media (max-width:760px){
+  .top{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:10px 20px;gap:8px 16px}
+  .top .who{flex-wrap:wrap;gap:6px 12px}
+  .readouts{height:auto}
+  .readouts>*{border-left:0;padding:0}
+  .theme-toggle{border-left:0;padding:0}
+}
+@media (max-width:1180px){
+  body{overflow:auto}
+  .desk{height:auto;min-height:100dvh}
+  .body{flex-direction:column}
+  .side{flex:0 0 auto;flex-direction:row;justify-content:space-between;padding:10px 20px;
+    border-right:0;border-bottom:1px solid var(--line)}
+  .side .build,.side .geo{writing-mode:horizontal-tb;transform:none}
+  .cols{grid-template-columns:1fr}
+  .index{border-left:0;border-top:1px solid var(--line);grid-template-rows:auto}
+  .row{min-height:96px}
+  .ascii-layer{inset:-20px 0 0;opacity:.5}
+  .deco,.music-trinkets{display:none}
+  .stage{padding:24px 20px 44px}
+  .desk{--model-shift:0px}
+  .reticle{width:min(430px,88vw);height:min(430px,88vw)}
+  .slot{width:min(320px,66vw);height:min(320px,66vw)}
+  .slot .scale{display:none}
+  .music-easter{position:relative;left:auto;bottom:auto;margin:0 20px 28px;height:62px}
+  .foot{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:8px 0}
+  .ticker{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .radar .sweep,.bars i,.album,.music-front .disc,.reticle .ring,.reticle .ring2,.ticker span,.status i,.foot .signal i{animation:none}
+  .music-front,.music-back,.music-trinkets{transition:none}
+}
+</style>
 </head>
 <body>
 
-<div id="portfolio-consolidated">
-  <div style="display:flex;align-items:center;justify-content:center;min-height:60vh">
-    <p class="subtitle">Loading the consolidated portfolio preview…</p>
+<main class="desk mono" id="desk" data-app-ready="false">
+
+  <i class="scanlines" aria-hidden="true"></i>
+  <i class="vignette" aria-hidden="true"></i>
+
+  <div class="deco" aria-hidden="true">
+    <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <span class="mark" style="left:640px;top:120px">+</span>
+    <span class="mark" style="left:1010px;top:210px;opacity:.55">+</span>
+    <span class="mark" style="left:700px;top:640px;opacity:.55">+</span>
+    <span class="mark" style="left:1046px;top:604px;color:var(--pink);opacity:.6">&times;</span>
+    <span class="hatch">&#9585;&#9585;&#9585;</span>
+    <span class="ticks"><i></i><i></i><i></i></span>
   </div>
-</div>
 
-<script>
-  window.addEventListener("load", async () => {
-    const host = document.querySelector("#portfolio-consolidated");
-    const response = await fetch("/files/desktop-composition-v2.html");
-    host.innerHTML = await response.text();
-    host.querySelectorAll("script").forEach((script) => script.remove());
-
-    const desktop = host.querySelector(".desktop-v2");
-    const introColumn = host.querySelector(".intro-column");
-    const introCopy = host.querySelector(".intro-body p");
-    const nowNote = host.querySelector(".now-note");
-    const dock = host.querySelector(".utility-dock");
-    const cubePlaceholder = host.querySelector("#artifact-cube");
-    const artifactZone = host.querySelector("#artifact-zone");
-    const artifactMeta = host.querySelector(".artifact-meta");
-    const composition = host.querySelector(".composition-wrap");
-
-    const asciiLayer = document.createElement("div");
-    asciiLayer.className = "ascii-portrait-layer";
-    asciiLayer.dataset.asciiReady = "false";
-    asciiLayer.setAttribute("aria-hidden", "true");
-    asciiLayer.innerHTML = `
-      <div class="ascii-central-field">
-        <canvas class="ascii-portrait-canvas" aria-hidden="true"></canvas>
-        <i class="ascii-scan" aria-hidden="true"></i>
-      </div>
-      <canvas class="ascii-creature-canvas ascii-manta-canvas" data-creature="manta" aria-hidden="true"></canvas>
-      <canvas class="ascii-creature-canvas ascii-jellyfish-canvas" data-creature="jellyfish" aria-hidden="true"></canvas>
-    `;
-    desktop.prepend(asciiLayer);
-
-    introCopy.textContent = "Design Engineering student at Imperial College London, exploring ideas through design, technology, research, and illustration.";
-    nowNote.remove();
-
-    const themePicker = document.createElement("div");
-    themePicker.className = "final-theme-picker";
-    themePicker.innerHTML = `
-      <button type="button" class="theme-toggle" aria-label="Switch to dark theme" aria-pressed="false">
-        <span class="theme-toggle-icon" aria-hidden="true"><i></i></span>
-        <span class="theme-toggle-label">Theme // light</span>
+  <header class="top">
+    <span class="who"><b>ASTERIA_WANG</b><span>DESIGN ENGINEERING / IMPERIAL</span></span>
+    <span class="readouts">
+      <span class="sys">SYS &#9679; OK</span>
+      <span class="tz">UTC+8</span>
+      <span class="status"><i></i>OPEN TO INTERNSHIPS</span>
+      <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch colour theme">
+        <span class="theme-toggle-label">THEME // LIGHT</span>
+        <i><b></b></i>
       </button>
-    `;
-    desktop.appendChild(themePicker);
+    </span>
+  </header>
 
-    const infoCard = document.createElement("section");
-    infoCard.className = "profile-card info-card";
-    infoCard.innerHTML = `
-      <div class="profile-head mono">
-        <span>info.card</span>
-        <span class="pink">student / 01</span>
-      </div>
-      <div class="profile-row"><span class="mono">School</span><strong>Imperial College London</strong></div>
-      <div class="profile-row"><span class="mono">Course</span><strong>Design Engineering</strong></div>
-      <div class="profile-row"><span class="mono">Stage</span><strong>First year</strong></div>
-      <div class="profile-row"><span class="mono">Timezone</span><strong>UTC+8</strong></div>
-      <div class="profile-row"><span class="mono">Available</span><strong>Open to internships</strong></div>
-      <div class="profile-row"><span class="mono">Focus</span><strong>Design · Tech · Research · Art</strong></div>
-    `;
+  <div class="body">
+    <div class="side" aria-hidden="true">
+      <span class="build">ASTERIA_OS // BUILD 2026.07</span>
+      <span class="marks"><i></i><i></i><i></i><i></i></span>
+      <span class="geo">N 51.49&deg; / W 0.17&deg;</span>
+    </div>
 
-    const contactCard = document.createElement("section");
-    contactCard.className = "profile-card contact-card-final";
-    contactCard.innerHTML = `
-      <div class="profile-head mono">
-        <span>contact.card</span>
-        <span class="pink">● online</span>
-      </div>
-      <div class="profile-row">
-        <span class="mono">Email</span>
-        <a href="mailto:Asteria0526@gmail.com">Asteria0526@gmail.com <b>↗</b></a>
-      </div>
-      <div class="profile-row"><span class="mono">微信</span><strong>IthinkitsAsu</strong></div>
-      <div class="profile-row">
-        <span class="mono">GitHub</span>
-        <a href="https://github.com/DiethylEtherene" target="_blank" rel="noreferrer">@DiethylEtherene <b>↗</b></a>
-      </div>
-    `;
-    introColumn.append(infoCard, contactCard);
-
-    dock.innerHTML = `
-      <button type="button">ABOUT</button>
-      <button type="button">CV</button>
-      <button type="button">SOCIALS</button>
-      <button type="button">SETTINGS</button>
-    `;
-
-    artifactMeta.innerHTML = `
-      Desk_tidy.stl<br>Auto-rotate / drag<br><span class="pink">Open project ↗</span>
-      <span class="artifact-mode">
-        <button type="button" class="active" data-model-mode="auto">Auto</button>
-        <button type="button" data-model-mode="solid">Solid</button>
-        <button type="button" data-model-mode="wire">Wire</button>
-      </span>
-    `;
-
-    const music = document.createElement("div");
-    music.className = "music-easter";
-    music.innerHTML = `
-      <div class="music-inner">
-        <button type="button" class="music-face music-front" aria-label="Reveal hidden playlist" aria-hidden="false">
-          <span class="mini-disc"><i></i></span>
-          <span class="music-question mono">signal_?</span>
-        </button>
-        <section class="music-face music-back" aria-label="Hidden signal playlist" inert aria-hidden="true">
-          <button type="button" class="music-close" aria-label="Close player">&times;</button>
-          <div class="album-chip"><span class="album-orbit"></span></div>
-          <div class="track-data">
-            <span class="music-eyebrow mono pink">NOW.PLAYING / HIDDEN SIGNAL</span>
-            <div class="track-heading" aria-live="polite" aria-atomic="true">
-              <span class="music-track-position mono">01 / 02</span>
-              <strong><span class="music-track-title">Track 01</span> &mdash; <span class="music-track-artist">Ether</span></strong>
-            </div>
-            <div class="track-progress" aria-hidden="true"><i></i></div>
-            <div class="track-controls">
-              <button type="button" class="track-prev" aria-label="Previous track">←</button>
-              <button type="button" class="play-toggle" aria-label="Play Track 01">▶</button>
-              <button type="button" class="track-next" aria-label="Next track">→</button>
-              <span class="track-time mono">00:00 / 00:00</span>
-            </div>
+    <div class="cols">
+      <section class="intro">
+        <div>
+          <div class="eyebrow">&#9656; IDENTITY.LOCKED</div>
+          <h1 class="name" style="font-family:Helvetica,Arial,sans-serif">
+            <span class="ghost g1" aria-hidden="true">Asteria<br>Wang</span>
+            <span class="ghost g2" aria-hidden="true">Asteria<br>Wang</span>
+            <span class="real">Asteria<br>Wang</span>
+          </h1>
+          <p class="lede" style="font-family:Helvetica,Arial,sans-serif">First-year Design Engineering at Imperial. I build things &mdash; hardware, software, drawings &mdash; and publish what I learn.</p>
+        </div>
+        <div class="transmit" style="margin-top:auto">
+          <div class="rule"><i></i>TRANSMIT<i></i></div>
+          <div class="links">
+            <a href="mailto:Asteria0526@gmail.com">asteria0526@gmail.com</a>
+            <a href="https://github.com/DiethylEtherene" target="_blank" rel="noreferrer">github/@DiethylEtherene &#8599;</a>
+            <span>&#24494;&#20449; IthinkitsAsu</span>
           </div>
-          <audio class="playlist-audio" preload="metadata" hidden></audio>
-        </section>
+          <p class="reach-note" style="margin:16px 0 0;font-size:9.5px;line-height:1.6;letter-spacing:.16em;color:var(--muted)"><span style="color:var(--pink)">&#9656;</span> IF YOU&rsquo;D LIKE TO REACH OUT,<br>PLEASE EMAIL ME.</p>
+        </div>
+      </section>
+
+      <section class="stage" id="stage">
+        <div class="ascii-layer" aria-hidden="true"><canvas class="ascii-portrait-canvas"></canvas></div>
+        <div class="caption"><i></i>ASCII_NAUTICAL / LIVE<i></i></div>
+        <div class="reticle">
+          <i class="ring"><b></b></i>
+          <i class="ring2"><b></b></i>
+          <i class="cx"></i>
+          <i class="cy"></i>
+          <div class="slot" id="model-shell" data-mode="auto" data-ready="loading" role="img" aria-label="Interactive 3D model of Asteria's desk tidy">
+            <canvas aria-hidden="true"></canvas>
+            <span class="model-status">Loading desk_tidy / 0%</span>
+            <i class="bracket b1"></i><i class="bracket b2"></i><i class="bracket b3"></i><i class="bracket b4"></i>
+            <span class="dim">320.00</span>
+            <span class="scale">1:1</span>
+            <span class="drag-hint"><i></i>DRAG TO ROTATE</span>
+          </div>
+        </div>
+        <div class="modes" id="modes">
+          <button type="button" class="active" data-model-mode="auto">Auto</button>
+          <button type="button" data-model-mode="solid">Solid</button>
+          <button type="button" data-model-mode="wire">Wire</button>
+        </div>
+      </section>
+
+      <nav class="index" aria-label="Sections">
+        <div class="head"><span>NAV.INDEX</span><b>04</b></div>
+        <a class="row" href="#work"><span class="meta"><span>[01] 04 ITEMS</span><span class="go">&#8599;</span></span><span class="title" style="font-family:Helvetica,Arial,sans-serif">Selected work</span></a>
+        <a class="row" href="#research"><span class="meta"><span>[02] 06 ITEMS</span><span class="go">&#8599;</span></span><span class="title" style="font-family:Helvetica,Arial,sans-serif">Research</span></a>
+        <a class="row" href="#illustration"><span class="meta"><span>[03] MANY</span><span class="go">&#8599;</span></span><span class="title" style="font-family:Helvetica,Arial,sans-serif">Illustration</span></a>
+        <a class="row" href="#lab"><span class="meta"><span>[04] ??</span><span class="go">&#8599;</span></span><span class="title" style="font-family:Helvetica,Arial,sans-serif">Lab</span></a>
+      </nav>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span class="signal"><i></i>SIGNAL_?</span>
+    <nav>
+      <a href="#about">ABOUT</a>
+      <a href="#cv">CV</a>
+      <a href="#socials">SOCIALS</a>
+    </nav>
+    <span class="ticker" aria-hidden="true"><span>
+      <span>NOW.PLAYING / HIDDEN SIGNAL &mdash; <b>TRACK 01 &mdash; ETHER</b> &middot; ASCII_NAUTICAL RENDERED LOCALLY &middot; DESK_TIDY.STL &middot; OPEN TO INTERNSHIPS</span>
+      <span>NOW.PLAYING / HIDDEN SIGNAL &mdash; <b>TRACK 01 &mdash; ETHER</b> &middot; ASCII_NAUTICAL RENDERED LOCALLY &middot; DESK_TIDY.STL &middot; OPEN TO INTERNSHIPS</span>
+    </span></span>
+  </footer>
+
+  <div class="music-easter" id="music">
+    <div class="music-trinkets" aria-hidden="true">
+      <span class="radar"><i class="r1"></i><i class="sweep"></i><i class="v"></i><i class="h"></i></span>
+      <span class="bars"><i></i><i></i><i></i><i></i><i></i></span>
+      <span class="sensor">0x2F1A&nbsp;&nbsp;&#9679;&#9679;&#9675;&#9675;<br>SENSOR&nbsp;/&nbsp;IDLE<br><b>NO&nbsp;SIGNAL&nbsp;LOSS</b></span>
+    </div>
+    <button type="button" class="music-front" aria-label="Reveal hidden playlist">
+      <span class="disc"><i></i><b></b></span>
+      <span class="tag">SIGNAL_?</span>
+    </button>
+    <section class="music-back" aria-label="Hidden signal playlist" inert aria-hidden="true">
+      <div class="bar"><span class="music-eyebrow">NOW.PLAYING / HIDDEN SIGNAL</span><button type="button" class="music-close" aria-label="Close player">&times;</button></div>
+      <div class="music-body">
+        <span class="album"><i></i><b></b></span>
+        <div class="track-data">
+          <div class="track-heading" aria-live="polite" aria-atomic="true">
+            <span class="music-track-position">01 / 02</span>
+            <strong><span class="music-track-title">Track 01</span> &mdash; <span class="music-track-artist">Ether</span></strong>
+          </div>
+          <div class="track-progress" aria-hidden="true"><i></i></div>
+          <div class="track-controls">
+            <button type="button" class="track-prev" aria-label="Previous track">&larr;</button>
+            <button type="button" class="play-toggle" aria-label="Play">&#9654;</button>
+            <button type="button" class="track-next" aria-label="Next track">&rarr;</button>
+            <span class="track-time">00:00 / 00:00</span>
+          </div>
+        </div>
       </div>
-    `;
-    desktop.appendChild(music);
+      <audio class="playlist-audio" preload="metadata" hidden></audio>
+    </section>
+  </div>
+</main>
 
-    const finalStyle = document.createElement("style");
-    finalStyle.textContent = `
-      #portfolio-consolidated .desktop-v2 {
-        --ink: #202936;
-        --mint: #c5f2e3;
-        --blue: #c8e6ff;
-        --pink: #ff2b8d;
-        --clean-shadow: rgba(59,76,91,.16);
-        --ascii-base: #355a70;
-        --ascii-edge: #3c718f;
-        --ascii-scan: rgba(53,90,112,.18);
-        --ascii-base-alpha: .2;
-        --ascii-edge-alpha: .38;
-        --ascii-creature-base: #2f718f;
-        --ascii-creature-edge: #145e82;
-        --ascii-manta-opacity: .74;
-        --ascii-jelly-opacity: .66;
-        --ascii-panel-surface: #fff;
-        min-height: 720px;
-        isolation: isolate;
-        background:
-          radial-gradient(circle at 1px 1px, rgba(32,41,54,.13) 1px, transparent 1.15px),
-          #e1edf5;
-        background-size: 19px 19px;
-        transition: background-color 320ms ease, color 320ms ease, border-color 320ms ease;
-      }
-      #portfolio-consolidated .ascii-portrait-layer {
-        position: absolute;
-        inset: 0;
-        z-index: 1;
-        overflow: hidden;
-        pointer-events: none;
-        user-select: none;
-        contain: layout paint style;
-        transform: translateZ(0);
-      }
-      #portfolio-consolidated .ascii-central-field {
-        position: absolute;
-        left: 27%;
-        right: 220px;
-        top: 42px;
-        bottom: 48px;
-        overflow: hidden;
-      }
-      /* The percentages above are tuned for the base (sub-1024px) layout,
-         where .artifact-zone is also positioned with plain percentages
-         against the same box. At the desktop grid breakpoint,
-         .artifact-zone instead sits in the grid's middle column, whose
-         bounds depend on --intro-track/--folder-track (which can differ
-         from each other) rather than a fixed percentage. Without this
-         override the ASCII field drifts out of alignment with the model,
-         orbit rings, and artifact zone it's meant to sit behind. Reuse the
-         same grid variables so it always matches exactly. */
-      @media (min-width: 1024px) {
-        #portfolio-consolidated .desktop-v2 {
-          /* Fine-tuning offsets for the centered ASCII field: negative
-             shift-x nudges it left of dead-center, positive shift-y lifts
-             it up. Both edges move together (rather than resizing the
-             box), and stay well inside the ~34px clearance to the intro
-             and folder columns on either side. Tune these two values if
-             the balance needs revisiting. */
-          --ascii-field-shift-x: 10px;
-          --ascii-field-shift-y: 28px;
-        }
-        #portfolio-consolidated .ascii-central-field {
-          left: calc(
-            max(var(--layout-gutter), (100vw - 2200px) / 2 + var(--layout-gutter))
-            + var(--intro-track) + var(--layout-gap) + var(--ascii-field-shift-x)
-          );
-          right: calc(
-            max(var(--layout-gutter), (100vw - 2200px) / 2 + var(--layout-gutter))
-            + var(--folder-track) + var(--layout-gap) - var(--ascii-field-shift-x)
-          );
-          top: calc(58px - var(--ascii-field-shift-y));
-          bottom: calc(126px + var(--ascii-field-shift-y));
-        }
-        /* The jellyfish creature's fixed 320px width was tuned against the
-           old absolute-positioned artifact zone. At the desktop grid
-           breakpoint it now needs to stay clear of the folder column
-           instead, or it visually overlaps/peeks out from behind the
-           folder cards. Anchor it to the same artifact-zone right edge
-           (plus a smaller inset than the field above, so it sits closer
-           to the folder column while still keeping a safe ~30px+
-           clearance from it). */
-        #portfolio-consolidated .ascii-jellyfish-canvas {
-          right: calc(
-            max(var(--layout-gutter), (100vw - 2200px) / 2 + var(--layout-gutter))
-            + var(--folder-track) + var(--layout-gap) + 12px
-          );
-        }
-      }
-      /* Folder cards, the intro bio, and the profile rows were sized for
-         the old, narrower cards. Now that the desktop grid gives folders
-         and columns much more room, those same font sizes read as too
-         small for the space they sit in. Scale them up at the desktop
-         breakpoint only; the tighter mobile/tablet cards keep their
-         original sizes. */
-      @media (min-width: 1024px) {
-        #portfolio-consolidated .folder > .mono:first-child {
-          font-size: 13px;
-        }
-        #portfolio-consolidated .folder strong {
-          font-size: 26px;
-        }
-        #portfolio-consolidated .folder .count {
-          font-size: 12px;
-        }
-        #portfolio-consolidated .intro-body p {
-          font-size: 14px;
-        }
-        #portfolio-consolidated .profile-row .mono {
-          font-size: 9px;
-        }
-        #portfolio-consolidated .profile-row strong,
-        #portfolio-consolidated .profile-row a {
-          font-size: 10.5px;
-        }
-      }
-      #portfolio-consolidated .ascii-portrait-canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-      }
-      #portfolio-consolidated .ascii-creature-canvas {
-        position: absolute;
-        display: block;
-        pointer-events: none;
-      }
-      #portfolio-consolidated .ascii-manta-canvas {
-        left: clamp(120px, 14vw, 230px);
-        bottom: -70px;
-        width: 560px;
-        height: 375px;
-        opacity: var(--ascii-manta-opacity);
-        -webkit-mask: linear-gradient(to right, #000 0%, #000 48%, transparent 82%);
-        mask: linear-gradient(to right, #000 0%, #000 48%, transparent 82%);
-        transform: rotate(-4deg);
-        transform-origin: center;
-      }
-      #portfolio-consolidated .ascii-jellyfish-canvas {
-        right: clamp(70px, 7vw, 115px);
-        top: -42px;
-        width: 320px;
-        height: 750px;
-        opacity: var(--ascii-jelly-opacity);
-        -webkit-mask: linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
-        mask: linear-gradient(to right, transparent 0%, transparent 8%, #000 30%, #000 100%);
-        transform: rotate(2deg);
-        transform-origin: center;
-      }
-      #portfolio-consolidated .ascii-scan {
-        position: absolute;
-        width: 16%;
-        height: 140%;
-        left: -30%;
-        top: -20%;
-        opacity: 0;
-        background: linear-gradient(
-          90deg,
-          transparent,
-          color-mix(in srgb, var(--ascii-scan) 72%, transparent),
-          transparent
-        );
-        transform: skewX(-11deg);
-        animation: asciiSignalSweep 12s ease-in-out infinite;
-      }
-      #portfolio-consolidated .artifact-zone {
-        z-index: 3;
-      }
-      #portfolio-consolidated .intro-column,
-      #portfolio-consolidated .folder-column {
-        z-index: 10;
-      }
-      #portfolio-consolidated .utility-dock {
-        z-index: 30;
-      }
-      #portfolio-consolidated .final-theme-picker {
-        position: absolute;
-        right: 24px;
-        bottom: 16px;
-        z-index: 40;
-      }
-      #portfolio-consolidated .final-theme-picker button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 9px;
-        min-width: 138px;
-        height: 34px;
-        border: 1.25px solid #202936;
-        padding: 0 12px;
-        color: #202936;
-        background: rgba(255,255,255,.92);
-        box-shadow: 4px 4px 0 rgba(59,76,91,.14);
-        cursor: pointer;
-        font: 700 8px/1 "Courier New", monospace;
-        text-transform: uppercase;
-        letter-spacing: .1em;
-        transition:
-          color 220ms ease,
-          background-color 220ms ease,
-          border-color 220ms ease,
-          box-shadow 240ms ease,
-          transform 240ms cubic-bezier(.16,1.3,.36,1);
-      }
-      #portfolio-consolidated .final-theme-picker button:hover {
-        transform: translate(-2px,-2px);
-        box-shadow: 6px 6px 0 rgba(59,76,91,.16);
-      }
-      #portfolio-consolidated .final-theme-picker button:active {
-        transform: translate(1px,1px) scale(.98);
-        box-shadow: 2px 2px 0 rgba(59,76,91,.14);
-      }
-      #portfolio-consolidated .theme-toggle-icon {
-        width: 24px;
-        height: 12px;
-        position: relative;
-        border: 1px solid #202936;
-        border-radius: 10px;
-        background: #e1edf5;
-        transition: border-color 220ms ease, background-color 220ms ease;
-      }
-      #portfolio-consolidated .theme-toggle-icon i {
-        width: 8px;
-        height: 8px;
-        position: absolute;
-        left: 1px;
-        top: 1px;
-        border-radius: 50%;
-        background: #202936;
-        transition:
-          left 280ms cubic-bezier(.16,1.3,.36,1),
-          background-color 220ms ease,
-          box-shadow 220ms ease;
-      }
-      #portfolio-consolidated .intro-column {
-        top: 58px;
-        bottom: 34px;
-        display: flex;
-        flex-direction: column;
-        gap: 26px;
-        transition: transform 520ms cubic-bezier(.16,1,.3,1);
-      }
-      #portfolio-consolidated .os-window,
-      #portfolio-consolidated .profile-card,
-      #portfolio-consolidated .folder,
-      #portfolio-consolidated .music-face,
-      #portfolio-consolidated .utility-dock {
-        box-shadow: 5px 5px 0 var(--clean-shadow);
-      }
-      #portfolio-consolidated .os-window,
-      #portfolio-consolidated .profile-card,
-      #portfolio-consolidated .utility-dock {
-        background-color: var(--ascii-panel-surface);
-      }
-      #portfolio-consolidated .os-window {
-        flex: 0 0 auto;
-        border-width: 1.5px;
-      }
-      #portfolio-consolidated .window-bar {
-        border-bottom-width: 1.5px;
-      }
-      #portfolio-consolidated .window-bar > .mono,
-      #portfolio-consolidated .folder > .mono:first-child {
-        font-size: 11px;
-        line-height: 1.2;
-        letter-spacing: .095em;
-      }
-      #portfolio-consolidated .intro-body p {
-        font-size: 12px;
-        line-height: 1.5;
-      }
-      #portfolio-consolidated .profile-card {
-        flex: 0 0 auto;
-        border: 1.25px solid var(--ink);
-        background: var(--ascii-panel-surface);
-      }
-      #portfolio-consolidated .profile-head {
-        min-height: 28px;
-        padding: 0 10px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1.25px solid var(--ink);
-        background: var(--blue);
-      }
-      #portfolio-consolidated .contact-card-final .profile-head {
-        background: var(--mint);
-      }
-      #portfolio-consolidated .profile-row {
-        min-height: 27px;
-        display: grid;
-        grid-template-columns: 72px 1fr;
-        align-items: center;
-        gap: 8px;
-        padding: 0 10px;
-        border-bottom: 1px solid rgba(32,41,54,.22);
-      }
-      #portfolio-consolidated .contact-card-final .profile-row {
-        min-height: 31px;
-        grid-template-columns: 58px 1fr;
-      }
-      #portfolio-consolidated .profile-row:last-child {
-        border-bottom: 0;
-      }
-      #portfolio-consolidated .profile-row .mono {
-        font-size: 8px;
-        color: #667383;
-      }
-      #portfolio-consolidated .profile-row strong,
-      #portfolio-consolidated .profile-row a {
-        min-width: 0;
-        overflow: hidden;
-        color: var(--ink);
-        font-size: 9px;
-        font-weight: 700;
-        text-decoration: none;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      #portfolio-consolidated .profile-row a b,
-      #portfolio-consolidated .profile-row a:hover {
-        color: var(--pink);
-      }
-      #portfolio-consolidated .artifact-zone {
-        left: 30%;
-        right: 265px;
-      }
-      #portfolio-consolidated .folder-column {
-        right: 34px;
-        top: 78px;
-        bottom: 72px;
-        width: 220px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        gap: 0;
-      }
-      #portfolio-consolidated .folder {
-        --tilt: 0deg;
-        flex: 0 0 auto;
-        width: 205px;
-        height: 124px;
-        border-width: 1.25px;
-        transform: rotate(var(--tilt));
-      }
-      #portfolio-consolidated .folder:before {
-        left: -1.25px;
-        top: -13px;
-        height: 13px;
-        border-width: 1.25px;
-        border-bottom-width: 0;
-      }
-      #portfolio-consolidated .folder:nth-child(1) { --tilt: 1.8deg; background: #c5f2e3; }
-      #portfolio-consolidated .folder:nth-child(2) { --tilt: -1.45deg; background: #c5eee9; }
-      #portfolio-consolidated .folder:nth-child(3) { --tilt: 1.2deg; background: #c6eaf3; }
-      #portfolio-consolidated .folder:nth-child(4) { --tilt: -1.9deg; background: #c8e6ff; }
-      #portfolio-consolidated .folder:hover {
-        transform: translate(-7px,-4px) rotate(var(--tilt)) scale(1.025);
-        box-shadow: 9px 9px 0 rgba(255,43,141,.12);
-      }
-      #portfolio-consolidated .folder:active {
-        transform: translate(2px,2px) rotate(var(--tilt)) scale(.98);
-      }
-      #portfolio-consolidated .artifact-mode {
-        display: flex;
-        justify-content: flex-end;
-        gap: 5px;
-        margin-top: 8px;
-      }
-      #portfolio-consolidated .artifact-mode button {
-        border: 1px solid var(--ink);
-        padding: 5px 7px;
-        background: white;
-        color: var(--ink);
-        cursor: pointer;
-        font: 700 7px/1 "Courier New", monospace;
-        text-transform: uppercase;
-        letter-spacing: .1em;
-      }
-      #portfolio-consolidated .artifact-mode button.active {
-        color: white;
-        background: var(--pink);
-        border-color: var(--pink);
-      }
-      #portfolio-consolidated .stl-model-shell {
-        width: min(29vw, 360px);
-        height: min(29vw, 360px);
-        position: relative;
-        z-index: 4;
-        display: grid;
-        place-items: center;
-      }
-      #portfolio-consolidated .stl-model-shell canvas {
-        width: 100%;
-        height: 100%;
-        display: block;
-        filter: drop-shadow(0 16px 18px rgba(32,41,54,.13));
-        transition: filter 320ms ease;
-      }
-      #portfolio-consolidated .stl-model-shell[data-phase="wire"] canvas {
-        filter:
-          drop-shadow(0 0 .8px rgba(255,43,141,.88))
-          drop-shadow(0 0 2.4px rgba(255,43,141,.3))
-          drop-shadow(0 16px 18px rgba(32,41,54,.13));
-      }
-      #portfolio-consolidated .stl-model-status {
-        position: absolute;
-        left: 50%;
-        top: 50%;
-        padding: 7px 9px;
-        border: 1px solid var(--ink);
-        color: var(--ink);
-        background: rgba(255,255,255,.82);
-        font: 700 7px/1 "Courier New", monospace;
-        letter-spacing: .1em;
-        text-transform: uppercase;
-        transform: translate(-50%,-50%);
-      }
-      #portfolio-consolidated .cube .cube-face {
-        background-image:
-          linear-gradient(rgba(32,41,54,.11) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(32,41,54,.11) 1px, transparent 1px);
-        background-color: rgba(197,242,227,.72);
-        transition:
-          background-color 1800ms cubic-bezier(.4,0,.2,1),
-          border-color 1800ms cubic-bezier(.4,0,.2,1),
-          box-shadow 1800ms cubic-bezier(.4,0,.2,1);
-      }
-      #portfolio-consolidated .cube .right,
-      #portfolio-consolidated .cube .left {
-        background-color: rgba(200,230,255,.76);
-      }
-      #portfolio-consolidated .cube.wireframe .cube-face {
-        background-image:
-          linear-gradient(rgba(255,43,141,.12) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,43,141,.12) 1px, transparent 1px);
-        background-color: rgba(255,255,255,.035);
-        border-color: var(--pink);
-        box-shadow: inset 0 0 22px rgba(255,43,141,.06);
-      }
-      #portfolio-consolidated .utility-dock {
-        bottom: 16px;
-      }
-      #portfolio-consolidated .utility-dock button {
-        width: auto;
-        min-width: 64px;
-        padding: 0 12px;
-        white-space: nowrap;
-      }
-      #portfolio-consolidated .music-easter {
-        position: absolute;
-        left: 24px;
-        bottom: 16px;
-        width: 60px;
-        height: 60px;
-        z-index: 35;
-        perspective: 900px;
-        transition:
-          width 520ms cubic-bezier(.16,1,.3,1),
-          height 520ms cubic-bezier(.16,1,.3,1);
-      }
-      #portfolio-consolidated .music-easter.open {
-        width: clamp(250px, 27vw, 315px);
-        height: 94px;
-      }
-      #portfolio-consolidated .music-inner {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        transform-style: preserve-3d;
-        transition: transform 640ms cubic-bezier(.16,1,.3,1);
-      }
-      #portfolio-consolidated .music-easter.open .music-inner {
-        transform: rotateY(180deg);
-      }
-      #portfolio-consolidated .music-face {
-        position: absolute;
-        inset: 0;
-        border: 1.25px solid var(--ink);
-        color: var(--ink);
-        background: white;
-        backface-visibility: hidden;
-      }
-      #portfolio-consolidated .music-front {
-        display: grid;
-        place-items: center;
-        padding: 0;
-        background: var(--mint);
-        cursor: pointer;
-      }
-      #portfolio-consolidated .music-front:hover {
-        transform: rotate(-4deg) translateY(-4px);
-      }
-      #portfolio-consolidated .mini-disc {
-        width: 28px;
-        height: 28px;
-        display: grid;
-        place-items: center;
-        border: 1px solid var(--ink);
-        border-radius: 50%;
-        background:
-          repeating-radial-gradient(circle, transparent 0 3px, rgba(32,41,54,.22) 3px 4px),
-          var(--blue);
-        animation: finalMiniSpin 7s linear infinite;
-      }
-      #portfolio-consolidated .mini-disc i {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--pink);
-      }
-      #portfolio-consolidated .music-question {
-        position: absolute;
-        left: 6px;
-        bottom: 5px;
-        font-size: 6px;
-      }
-      #portfolio-consolidated .music-back {
-        transform: rotateY(180deg);
-        display: grid;
-        grid-template-columns: 69px 1fr;
-        gap: 10px;
-        padding: 10px;
-        background:
-          linear-gradient(115deg, rgba(200,230,255,.55), transparent 58%),
-          white;
-      }
-      #portfolio-consolidated .music-close {
-        position: absolute;
-        right: 5px;
-        top: 5px;
-        width: 19px;
-        height: 19px;
-        border: 1px solid var(--ink);
-        background: white;
-        cursor: pointer;
-      }
-      #portfolio-consolidated .album-chip {
-        display: grid;
-        place-items: center;
-        border: 1px solid var(--ink);
-        background: var(--blue);
-        clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
-      }
-      #portfolio-consolidated .album-orbit {
-        width: 42px;
-        height: 42px;
-        position: relative;
-        border: 1px solid var(--ink);
-        border-radius: 50%;
-        animation: finalMiniSpin 9s linear infinite reverse;
-      }
-      #portfolio-consolidated .album-orbit:after {
-        content: "";
-        position: absolute;
-        inset: 11px;
-        border: 2px dotted var(--pink);
-        border-radius: 50%;
-      }
-      #portfolio-consolidated .track-data {
-        display: flex;
-        flex-direction: column;
-        min-width: 0;
-        justify-content: center;
-        gap: 4px;
-      }
-      #portfolio-consolidated .music-eyebrow {
-        overflow: hidden;
-        padding-right: 18px;
-        font-size: 6px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      #portfolio-consolidated .track-heading {
-        display: grid;
-        grid-template-columns: auto minmax(0, 1fr);
-        gap: 6px;
-        align-items: baseline;
-        padding-right: 18px;
-      }
-      #portfolio-consolidated .music-track-position {
-        color: #687583;
-        font-size: 6px;
-      }
-      #portfolio-consolidated .track-heading strong {
-        overflow: hidden;
-        font-size: 9px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      #portfolio-consolidated .track-progress {
-        height: 5px;
-        overflow: hidden;
-        border: 1px solid var(--ink);
-      }
-      #portfolio-consolidated .track-progress i {
-        display: block;
-        width: 0;
-        height: 100%;
-        background: var(--pink);
-        transition: width 120ms linear;
-      }
-      #portfolio-consolidated .track-controls {
-        display: grid;
-        grid-template-columns: 22px 22px 22px minmax(0, 1fr);
-        gap: 5px;
-        align-items: center;
-      }
-      #portfolio-consolidated .track-controls button {
-        width: 22px;
-        height: 19px;
-        padding: 0;
-        border: 1px solid var(--ink);
-        color: var(--ink);
-        background: var(--mint);
-        cursor: pointer;
-        font-size: 8px;
-      }
-      #portfolio-consolidated .track-controls button:hover {
-        transform: translateY(-2px);
-        background: var(--blue);
-      }
-      #portfolio-consolidated .track-controls button:active {
-        transform: translateY(1px) scale(.94);
-      }
-      #portfolio-consolidated .track-time {
-        color: #687583;
-        font-size: 6px;
-        text-align: right;
-        white-space: nowrap;
-      }
-      #portfolio-consolidated .music-front:focus-visible,
-      #portfolio-consolidated .music-close:focus-visible,
-      #portfolio-consolidated .track-controls button:focus-visible {
-        outline: 2px solid var(--pink);
-        outline-offset: 2px;
-      }
-      #portfolio-consolidated .music-easter.has-error .music-eyebrow {
-        color: var(--pink);
-      }
-      #portfolio-consolidated .desktop-v2.dark-theme {
-        --ink: #dffbf1;
-        --mint: #67f5c6;
-        --blue: #61c8ff;
-        --pink: #ff3c9f;
-        --clean-shadow: rgba(0,0,0,.46);
-        --ascii-base: #38a8a5;
-        --ascii-edge: #62dfff;
-        --ascii-scan: rgba(109,255,208,.34);
-        --ascii-base-alpha: .28;
-        --ascii-edge-alpha: .5;
-        --ascii-creature-base: #42d8cb;
-        --ascii-creature-edge: #7aeaff;
-        --ascii-manta-opacity: .68;
-        --ascii-jelly-opacity: .61;
-        --ascii-panel-surface: #111d28;
-        color: #eaf9f6;
-        background:
-          radial-gradient(circle at 1px 1px, rgba(185,245,227,.14) 1px, transparent 1.15px),
-          #0d1520;
-        background-size: 19px 19px;
-        border-color: #8ce8cf;
-      }
-      #portfolio-consolidated .dark-theme .desktop-top,
-      #portfolio-consolidated .dark-theme .mono {
-        color: #dffbf1;
-      }
-      #portfolio-consolidated .dark-theme .os-window,
-      #portfolio-consolidated .dark-theme .profile-card,
-      #portfolio-consolidated .dark-theme .music-face,
-      #portfolio-consolidated .dark-theme .utility-dock {
-        color: #eaf9f6;
-        background-color: #14202c;
-        border-color: #a4f3dc;
-      }
-      #portfolio-consolidated .dark-theme .window-bar,
-      #portfolio-consolidated .dark-theme .contact-card-final .profile-head {
-        color: #eaf9f6;
-        background-color: #173c3a;
-        border-color: #a4f3dc;
-      }
-      #portfolio-consolidated .dark-theme .info-card .profile-head {
-        color: #eaf9f6;
-        background-color: #172d3e;
-        border-color: #a4f3dc;
-      }
-      #portfolio-consolidated .dark-theme .profile-row {
-        border-color: rgba(164,243,220,.23);
-      }
-      #portfolio-consolidated .dark-theme .intro-body p,
-      #portfolio-consolidated .dark-theme .profile-row .mono,
-      #portfolio-consolidated .dark-theme .music-track-position,
-      #portfolio-consolidated .dark-theme .track-time {
-        color: #9fcbe0;
-      }
-      #portfolio-consolidated .dark-theme .profile-row a,
-      #portfolio-consolidated .dark-theme .profile-row strong,
-      #portfolio-consolidated .dark-theme .track-data strong {
-        color: #eaf9f6;
-      }
-      #portfolio-consolidated .dark-theme .folder:nth-child(1) {
-        --folder-edge: #6dffd0;
-        --folder-glow: rgba(109,255,208,.28);
-        background: #12372f;
-      }
-      #portfolio-consolidated .dark-theme .folder:nth-child(2) {
-        --folder-edge: #58f5df;
-        --folder-glow: rgba(88,245,223,.27);
-        background: #12343a;
-      }
-      #portfolio-consolidated .dark-theme .folder:nth-child(3) {
-        --folder-edge: #52dcff;
-        --folder-glow: rgba(82,220,255,.27);
-        background: #142f43;
-      }
-      #portfolio-consolidated .dark-theme .folder:nth-child(4) {
-        --folder-edge: #62aaff;
-        --folder-glow: rgba(98,170,255,.29);
-        background: #172a4d;
-      }
-      #portfolio-consolidated .dark-theme .folder {
-        border-color: var(--folder-edge);
-        box-shadow: 5px 5px 0 rgba(0,0,0,.34);
-      }
-      #portfolio-consolidated .dark-theme .folder:before {
-        border-color: var(--folder-edge);
-      }
-      #portfolio-consolidated .dark-theme .folder:hover {
-        border-color: var(--folder-edge);
-        box-shadow:
-          0 0 0 1px var(--folder-edge),
-          0 0 20px var(--folder-glow),
-          9px 9px 0 rgba(0,0,0,.34);
-      }
-      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .cube-face {
-        border-color: #64eadf;
-        background-image:
-          linear-gradient(rgba(82,220,255,.17) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(82,220,255,.17) 1px, transparent 1px);
-        background-color: rgba(13,46,54,.88);
-        box-shadow:
-          inset 0 0 26px rgba(88,245,223,.08),
-          0 0 12px rgba(82,220,255,.06);
-      }
-      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .right,
-      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .left {
-        border-color: #55cfff;
-        background-color: rgba(14,36,65,.9);
-      }
-      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .top,
-      #portfolio-consolidated .dark-theme .cube:not(.wireframe) .bottom {
-        border-color: #6dffd0;
-        background-color: rgba(19,67,58,.86);
-      }
-      #portfolio-consolidated .dark-theme .stl-model-shell canvas {
-        filter:
-          drop-shadow(0 0 13px rgba(82,220,255,.18))
-          drop-shadow(0 18px 20px rgba(0,0,0,.38));
-      }
-      #portfolio-consolidated .dark-theme .stl-model-shell[data-phase="wire"] canvas {
-        filter:
-          drop-shadow(0 0 .9px rgba(82,220,255,.96))
-          drop-shadow(0 0 2.8px rgba(82,220,255,.42))
-          drop-shadow(0 18px 20px rgba(0,0,0,.38));
-      }
-      #portfolio-consolidated .dark-theme .stl-model-status {
-        color: #dffbf1;
-        background: rgba(13,21,32,.82);
-        border-color: #52dcff;
-      }
-      #portfolio-consolidated .dark-theme .orbit-a {
-        border-color: rgba(82,220,255,.64);
-        box-shadow:
-          0 0 18px rgba(82,220,255,.1),
-          inset 0 0 18px rgba(82,220,255,.045);
-      }
-      #portfolio-consolidated .dark-theme .orbit-a:before {
-        background: #6dffd0;
-        box-shadow: 0 0 10px rgba(109,255,208,.68);
-      }
-      #portfolio-consolidated .dark-theme .artifact-label {
-        color: #dffbf1;
-        background: rgba(13,21,32,.78);
-      }
-      #portfolio-consolidated .dark-theme .artifact-meta {
-        color: #9fb7bd;
-      }
-      #portfolio-consolidated .dark-theme .artifact-mode button,
-      #portfolio-consolidated .dark-theme .utility-dock button,
-      #portfolio-consolidated .dark-theme .music-close,
-      #portfolio-consolidated .dark-theme .track-controls button {
-        color: #dffbf1;
-        background: #111c27;
-        border-color: #a4f3dc;
-      }
-      #portfolio-consolidated .dark-theme .track-controls button:hover {
-        color: #0d1520;
-        background: var(--blue);
-      }
-      #portfolio-consolidated .dark-theme .artifact-mode button.active {
-        color: white;
-        background: var(--pink);
-        border-color: var(--pink);
-      }
-      #portfolio-consolidated .dark-theme .music-front {
-        background: #183c38;
-      }
-      #portfolio-consolidated .dark-theme .music-back {
-        background:
-          linear-gradient(115deg, rgba(97,200,255,.12), transparent 58%),
-          #14202c;
-      }
-      #portfolio-consolidated .dark-theme .album-chip {
-        background: #172f43;
-        border-color: #a4f3dc;
-      }
-      #portfolio-consolidated .dark-theme .track-progress {
-        border-color: #a4f3dc;
-      }
-      #portfolio-consolidated .dark-theme .utility-dock button:hover {
-        color: #0d1520;
-        background: var(--mint);
-      }
-      #portfolio-consolidated .dark-theme .final-theme-picker button {
-        color: #dffbf1;
-        background: rgba(17,28,39,.94);
-        border-color: #59dfff;
-        box-shadow: 4px 4px 0 rgba(0,0,0,.4);
-      }
-      #portfolio-consolidated .dark-theme .final-theme-picker button:hover {
-        box-shadow:
-          0 0 0 1px #59dfff,
-          0 0 16px rgba(89,223,255,.25),
-          6px 6px 0 rgba(0,0,0,.4);
-      }
-      #portfolio-consolidated .dark-theme .theme-toggle-icon {
-        border-color: #6dffd0;
-        background: #132d34;
-      }
-      #portfolio-consolidated .dark-theme .theme-toggle-icon i {
-        left: 13px;
-        background: #59dfff;
-        box-shadow: 0 0 8px rgba(89,223,255,.7);
-      }
-      @keyframes finalMiniSpin { to { transform: rotate(360deg); } }
-      @keyframes asciiSignalSweep {
-        0%, 68% { left: -30%; opacity: 0; }
-        72% { opacity: .12; }
-        84% { opacity: .2; }
-        96%, 100% { left: 116%; opacity: 0; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        #portfolio-consolidated .mini-disc,
-        #portfolio-consolidated .album-orbit,
-        #portfolio-consolidated .orbit-a,
-        #portfolio-consolidated .orbit-b {
-          animation: none;
-        }
-        #portfolio-consolidated .ascii-scan {
-          animation: none;
-        }
-        #portfolio-consolidated .music-easter,
-        #portfolio-consolidated .music-inner,
-        #portfolio-consolidated .track-progress i {
-          transition: none;
-        }
-      }
-      @media (max-width: 860px) {
-        #portfolio-consolidated .desktop-v2 { min-height: 1180px; }
-        #portfolio-consolidated .intro-column {
-          right: 24px;
-          bottom: auto;
-        }
-        #portfolio-consolidated .artifact-zone {
-          left: 8%;
-          right: 8%;
-          top: 645px;
-          bottom: 300px;
-        }
-        #portfolio-consolidated .ascii-central-field {
-          left: 8%;
-          right: 8%;
-          top: 610px;
-          bottom: auto;
-          height: 370px;
-          opacity: .48;
-        }
-        #portfolio-consolidated .ascii-manta-canvas {
-          left: -84px;
-          bottom: 238px;
-          width: 420px;
-          height: 281px;
-          opacity: calc(var(--ascii-manta-opacity) * .52);
-        }
-        #portfolio-consolidated .ascii-jellyfish-canvas {
-          display: none;
-        }
-        #portfolio-consolidated .ascii-scan {
-          display: none;
-        }
-        #portfolio-consolidated .stl-model-shell {
-          width: 300px;
-          height: 300px;
-        }
-        #portfolio-consolidated .folder-column {
-          left: 50%;
-          right: auto;
-          top: auto;
-          bottom: 192px;
-          width: 440px;
-          height: 280px;
-          transform: translateX(-50%);
-          display: grid;
-          grid-template-columns: 205px 205px;
-          gap: 24px 30px;
-        }
-        #portfolio-consolidated .music-easter {
-          bottom: 78px;
-        }
-        #portfolio-consolidated .utility-dock {
-          bottom: 16px;
-        }
-      }
-      @media (forced-colors: active) {
-        #portfolio-consolidated .ascii-portrait-layer {
-          display: none;
-        }
-      }
-    `;
-    host.appendChild(finalStyle);
+<script type="module">
+const desk = document.querySelector("#desk");
+const stage = document.querySelector("#stage");
+const modelShell = document.querySelector("#model-shell");
+const modelCanvas = modelShell.querySelector("canvas");
+const modelStatus = modelShell.querySelector(".model-status");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    let asciiController = {
-      setTheme() {},
-      destroy() {}
-    };
-    try {
-      const { createAsciiPortraitRenderer } = await import("/files/ascii-portrait-renderer.js");
-      asciiController = createAsciiPortraitRenderer({
-        desktop,
-        layer: asciiLayer,
-        canvas: asciiLayer.querySelector(".ascii-portrait-canvas"),
-        creatureCanvases: {
-          manta: asciiLayer.querySelector(".ascii-manta-canvas"),
-          jellyfish: asciiLayer.querySelector(".ascii-jellyfish-canvas")
-        }
-      });
-    } catch (error) {
-      asciiLayer.dataset.asciiReady = "unavailable";
-      asciiLayer.hidden = true;
-      console.warn("ASCII background unavailable", error);
-    }
+/* ---------- theme ---------- */
+const THEME_KEY = "asteria-theme";
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+const themeButton = desk.querySelector(".theme-toggle");
+const themeLabel = desk.querySelector(".theme-toggle-label");
+let asciiController = { setTheme() {}, destroy() {} };
+let updateModelTheme = () => {};
 
-    const modelShell = document.createElement("div");
-    modelShell.className = "stl-model-shell";
-    modelShell.dataset.mode = "auto";
-    modelShell.dataset.ready = "loading";
-    modelShell.setAttribute("role", "img");
-    modelShell.setAttribute("aria-label", "Interactive 3D model of Asu's desk tidy");
-    modelShell.innerHTML = `
-      <canvas aria-hidden="true"></canvas>
-      <span class="stl-model-status">Loading desk_tidy / 0%</span>
-    `;
-    cubePlaceholder.replaceWith(modelShell);
+const applyTheme = (dark) => {
+  desk.classList.toggle("dark", dark);
+  themeButton.setAttribute("aria-pressed", String(dark));
+  themeLabel.textContent = dark ? "THEME // DARK" : "THEME // LIGHT";
+  asciiController.setTheme(dark ? "dark" : "light");
+  updateModelTheme();
+};
+const stored = localStorage.getItem(THEME_KEY);
+applyTheme(stored ? stored === "dark" : systemDark.matches);
+themeButton.addEventListener("click", () => {
+  const dark = !desk.classList.contains("dark");
+  localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+  applyTheme(dark);
+});
+systemDark.addEventListener("change", (event) => {
+  if (!localStorage.getItem(THEME_KEY)) applyTheme(event.matches);
+});
 
-    const modelCanvas = modelShell.querySelector("canvas");
-    const modelStatus = modelShell.querySelector(".stl-model-status");
-    let THREE = null;
-    let modelRenderer = null;
-    let modelScene = null;
-    let modelCamera = null;
-    let modelRoot = null;
-    let solidMaterial = null;
-    let wireMaterial = null;
-    let silhouetteMaterial = null;
-    let curveMaterial = null;
-    let solidMesh = null;
-    let wireMesh = null;
-    let silhouetteMesh = null;
-    let curveMesh = null;
-    let wireMix = 0;
-    let wireTarget = 0;
-    let wireMaxOpacity = .52;
-    let silhouetteMaxOpacity = .66;
-    let curveMaxOpacity = .46;
-    let modelWorldRadius = 0;
-    let modelFitPoints = null;
-    const modelCameraDistance = 4;
-    const modelViewportTarget = .94;
-    const modelOutlineScale = 1.012;
-    const modelCameraMargin = 1 / modelViewportTarget;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let requestModelRender = () => {};
-    modelShell.dataset.motion = reducedMotion ? "reduced" : "full";
-    modelShell.dataset.renderLoop = reducedMotion ? "on-demand" : "continuous";
+/* ---------- ascii artwork ---------- */
+try {
+  const { createAsciiPortraitRenderer } = await import("./files/ascii-portrait-renderer.js");
+  const layer = desk.querySelector(".ascii-layer");
+  asciiController = createAsciiPortraitRenderer({
+    desktop: desk,
+    layer,
+    canvas: layer.querySelector(".ascii-portrait-canvas"),
+    creatureCanvases: {}
+  });
+  asciiController.setTheme(desk.classList.contains("dark") ? "dark" : "light");
+} catch (error) {
+  console.warn("ASCII background unavailable", error);
+}
 
-    const fitModelCamera = () => {
-      if (!THREE || !modelCamera || !modelWorldRadius) return;
-      const aspect = modelCamera.aspect || 1;
-      const safeRadius = modelWorldRadius * modelOutlineScale;
-      const verticalHalfExtent =
-        safeRadius / modelViewportTarget / Math.min(1, aspect);
-      const horizontalHalfExtent = verticalHalfExtent * aspect;
-      modelCamera.left = -horizontalHalfExtent;
-      modelCamera.right = horizontalHalfExtent;
-      modelCamera.top = verticalHalfExtent;
-      modelCamera.bottom = -verticalHalfExtent;
-      modelCamera.position.z = modelCameraDistance;
-      modelCamera.updateProjectionMatrix();
+/* ---------- desk tidy model ---------- */
+let THREE = null;
+let modelRenderer = null, modelScene = null, modelCamera = null, modelRoot = null;
+let solidMaterial = null, wireMaterial = null, silhouetteMaterial = null, curveMaterial = null;
+let solidMesh = null, wireMesh = null, silhouetteMesh = null, curveMesh = null;
+let wireMix = 0, wireTarget = 0;
+let wireMaxOpacity = .94, silhouetteMaxOpacity = .84, curveMaxOpacity = .78;
+let modelWorldRadius = 0, modelFitPoints = null;
+const modelCameraDistance = 4, modelViewportTarget = .94, modelOutlineScale = 1.012;
+let requestModelRender = () => {};
 
-      let viewportFill = 0;
-      if (modelFitPoints && modelRoot) {
-        modelRoot.updateMatrix();
-        const matrix = modelRoot.matrix.elements;
-        for (let point = 0; point < modelFitPoints.length; point += 3) {
-          const x = (
-            matrix[0] * modelFitPoints[point] +
-            matrix[4] * modelFitPoints[point + 1] +
-            matrix[8] * modelFitPoints[point + 2]
-          ) * modelOutlineScale;
-          const y = (
-            matrix[1] * modelFitPoints[point] +
-            matrix[5] * modelFitPoints[point + 1] +
-            matrix[9] * modelFitPoints[point + 2]
-          ) * modelOutlineScale;
-          viewportFill = Math.max(
-            viewportFill,
-            Math.abs(x) / horizontalHalfExtent,
-            Math.abs(y) / verticalHalfExtent
-          );
-        }
+const fitModelCamera = () => {
+  if (!THREE || !modelCamera || !modelWorldRadius) return;
+  const aspect = modelCamera.aspect || 1;
+  const safeRadius = modelWorldRadius * modelOutlineScale;
+  const verticalHalfExtent = safeRadius / modelViewportTarget / Math.min(1, aspect);
+  const horizontalHalfExtent = verticalHalfExtent * aspect;
+  modelCamera.left = -horizontalHalfExtent;
+  modelCamera.right = horizontalHalfExtent;
+  modelCamera.top = verticalHalfExtent;
+  modelCamera.bottom = -verticalHalfExtent;
+  modelCamera.position.z = modelCameraDistance;
+  modelCamera.updateProjectionMatrix();
+};
+
+updateModelTheme = () => {
+  if (!solidMaterial || !wireMaterial || !silhouetteMaterial || !curveMaterial || !modelRenderer) return;
+  const dark = desk.classList.contains("dark");
+  solidMaterial.color.setHex(dark ? 0x0a3c49 : 0xaeead9);
+  solidMaterial.emissive.setHex(dark ? 0x062932 : 0x0c241e);
+  solidMaterial.emissiveIntensity = dark ? .34 : .08;
+  solidMaterial.metalness = dark ? .28 : .12;
+  solidMaterial.roughness = dark ? .42 : .58;
+  wireMaterial.color.setHex(dark ? 0x52dcff : 0xff2b8d);
+  silhouetteMaterial.color.setHex(dark ? 0x52dcff : 0xff2b8d);
+  curveMaterial.uniforms.outlineColor.value.setHex(dark ? 0x52dcff : 0xff2b8d);
+  wireMaxOpacity = dark ? 1 : .94;
+  silhouetteMaxOpacity = dark ? .96 : .84;
+  curveMaxOpacity = dark ? .9 : .78;
+  modelRenderer.toneMappingExposure = dark ? 1.18 : 1;
+  requestModelRender();
+};
+
+try {
+  const [threeModule, loaderModule] = await Promise.all([
+    import("./files/three.module.min.js"),
+    import("./files/STLLoader.js")
+  ]);
+  THREE = threeModule;
+
+  modelRenderer = new THREE.WebGLRenderer({ canvas: modelCanvas, alpha: true, antialias: true, powerPreference: "high-performance" });
+  modelRenderer.setClearColor(0x000000, 0);
+  modelRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  modelRenderer.outputColorSpace = THREE.SRGBColorSpace;
+  modelRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+  modelScene = new THREE.Scene();
+  modelCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 20);
+  modelCamera.aspect = 1;
+  modelCamera.position.set(0, 0, modelCameraDistance);
+
+  const hemisphere = new THREE.HemisphereLight(0xdffbf1, 0x0b1423, 2.25);
+  const keyLight = new THREE.DirectionalLight(0x8affdf, 3.1);
+  const rimLight = new THREE.DirectionalLight(0x5eaaff, 1.65);
+  keyLight.position.set(3, 4, 5);
+  rimLight.position.set(-4, 1, 2);
+  modelScene.add(hemisphere, keyLight, rimLight);
+
+  const resizeModel = () => {
+    if (!modelRenderer || !modelCamera) return;
+    const bounds = modelShell.getBoundingClientRect();
+    const width = Math.max(1, Math.round(bounds.width));
+    const height = Math.max(1, Math.round(bounds.height));
+    modelRenderer.setSize(width, height, false);
+    modelCamera.aspect = width / height;
+    fitModelCamera();
+    requestModelRender();
+  };
+  new ResizeObserver(resizeModel).observe(modelShell);
+  resizeModel();
+
+  const loader = new loaderModule.STLLoader();
+  const geometry = await loader.loadAsync("./files/asu-desk-tidy.stl", (progress) => {
+    if (!progress.total) return;
+    const percent = Math.min(99, Math.round(progress.loaded / progress.total * 100));
+    modelStatus.textContent = `Loading desk_tidy / ${percent}%`;
+  });
+  geometry.rotateX(-Math.PI / 2);
+  geometry.center();
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+
+  const positions = geometry.getAttribute("position");
+  const normals = geometry.getAttribute("normal");
+  const surfaceVertices = new Map();
+  for (let vertex = 0; vertex < positions.count; vertex += 1) {
+    const x = positions.getX(vertex), y = positions.getY(vertex), z = positions.getZ(vertex);
+    const key = `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(z * 1e4)}`;
+    let surface = surfaceVertices.get(key);
+    if (!surface) { surface = { x, y, z, nx: 0, ny: 0, nz: 0 }; surfaceVertices.set(key, surface); }
+    surface.nx += normals.getX(vertex);
+    surface.ny += normals.getY(vertex);
+    surface.nz += normals.getZ(vertex);
+  }
+  modelFitPoints = new Float32Array(surfaceVertices.size * 3);
+  const smoothedNormalByPosition = new Map();
+  let fitPoint = 0;
+  surfaceVertices.forEach((surface, key) => {
+    modelFitPoints[fitPoint] = surface.x;
+    modelFitPoints[fitPoint + 1] = surface.y;
+    modelFitPoints[fitPoint + 2] = surface.z;
+    fitPoint += 3;
+    const length = Math.hypot(surface.nx, surface.ny, surface.nz) || 1;
+    smoothedNormalByPosition.set(key, [surface.nx / length, surface.ny / length, surface.nz / length]);
+  });
+
+  const curveGeometry = geometry.clone();
+  const smoothedNormals = new Float32Array(positions.count * 3);
+  for (let vertex = 0; vertex < positions.count; vertex += 1) {
+    const key = `${Math.round(positions.getX(vertex) * 1e4)},${Math.round(positions.getY(vertex) * 1e4)},${Math.round(positions.getZ(vertex) * 1e4)}`;
+    const normal = smoothedNormalByPosition.get(key);
+    smoothedNormals[vertex * 3] = normal[0];
+    smoothedNormals[vertex * 3 + 1] = normal[1];
+    smoothedNormals[vertex * 3 + 2] = normal[2];
+  }
+  curveGeometry.setAttribute("normal", new THREE.Float32BufferAttribute(smoothedNormals, 3));
+
+  solidMaterial = new THREE.MeshStandardMaterial({
+    color: 0xaeead9, emissive: 0x0c241e, emissiveIntensity: .08, metalness: .12, roughness: .58,
+    transparent: true, opacity: .96, side: THREE.DoubleSide,
+    polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
+  });
+  wireMaterial = new THREE.LineBasicMaterial({ color: 0xff2b8d, transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+  silhouetteMaterial = new THREE.MeshBasicMaterial({ color: 0xff2b8d, side: THREE.BackSide, transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+  curveMaterial = new THREE.ShaderMaterial({
+    uniforms: { outlineColor: { value: new THREE.Color(0xff2b8d) }, outlineOpacity: { value: 0 } },
+    vertexShader: `
+      varying float rimAmount;
+      void main() {
+        vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+        vec3 viewNormal = normalize(normalMatrix * normal);
+        vec3 viewDirection = normalize(-viewPosition.xyz);
+        rimAmount = 1.0 - max(dot(viewNormal, viewDirection), 0.0);
+        gl_Position = projectionMatrix * viewPosition;
       }
-
-      modelShell.dataset.cameraFitMargin = modelCameraMargin.toFixed(2);
-      modelShell.dataset.cameraFitStrategy = "fixed-orthographic";
-      modelShell.dataset.cameraProjection = "orthographic";
-      modelShell.dataset.cameraDistance = modelCameraDistance.toFixed(3);
-      modelShell.dataset.orthographicSpan = (verticalHalfExtent * 2).toFixed(3);
-      modelShell.dataset.viewportFill = viewportFill.toFixed(3);
-    };
-
-    const updateModelTheme = () => {
-      if (
-        !solidMaterial ||
-        !wireMaterial ||
-        !silhouetteMaterial ||
-        !curveMaterial ||
-        !modelRenderer
-      ) return;
-      const dark = desktop.classList.contains("dark-theme");
-      solidMaterial.color.setHex(dark ? 0x0a3c49 : 0xaeead9);
-      solidMaterial.emissive.setHex(dark ? 0x062932 : 0x0c241e);
-      solidMaterial.emissiveIntensity = dark ? .34 : .08;
-      solidMaterial.metalness = dark ? .28 : .12;
-      solidMaterial.roughness = dark ? .42 : .58;
-      wireMaterial.color.setHex(dark ? 0x52dcff : 0xff2b8d);
-      silhouetteMaterial.color.setHex(dark ? 0x52dcff : 0xff2b8d);
-      curveMaterial.uniforms.outlineColor.value.setHex(dark ? 0x52dcff : 0xff2b8d);
-      wireMaxOpacity = dark ? 1 : .94;
-      silhouetteMaxOpacity = dark ? .96 : .84;
-      curveMaxOpacity = dark ? .9 : .78;
-      modelRenderer.toneMappingExposure = dark ? 1.18 : 1;
-      requestModelRender();
-    };
-
-    try {
-      const [threeModule, loaderModule] = await Promise.all([
-        import("/files/three.module.min.js"),
-        import("/files/STLLoader.js")
-      ]);
-      THREE = threeModule;
-
-      modelRenderer = new THREE.WebGLRenderer({
-        canvas: modelCanvas,
-        alpha: true,
-        antialias: true,
-        powerPreference: "high-performance"
-      });
-      modelRenderer.setClearColor(0x000000, 0);
-      modelRenderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      modelRenderer.outputColorSpace = THREE.SRGBColorSpace;
-      modelRenderer.toneMapping = THREE.ACESFilmicToneMapping;
-
-      modelScene = new THREE.Scene();
-      modelCamera = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 20);
-      modelCamera.aspect = 1;
-      modelCamera.position.set(0, 0, modelCameraDistance);
-
-      const hemisphere = new THREE.HemisphereLight(0xdffbf1, 0x0b1423, 2.25);
-      const keyLight = new THREE.DirectionalLight(0x8affdf, 3.1);
-      const rimLight = new THREE.DirectionalLight(0x5eaaff, 1.65);
-      keyLight.position.set(3, 4, 5);
-      rimLight.position.set(-4, 1, 2);
-      modelScene.add(hemisphere, keyLight, rimLight);
-
-      const resizeModel = () => {
-        if (!modelRenderer || !modelCamera) return;
-        const bounds = modelShell.getBoundingClientRect();
-        const width = Math.max(1, Math.round(bounds.width));
-        const height = Math.max(1, Math.round(bounds.height));
-        modelRenderer.setSize(width, height, false);
-        modelCamera.aspect = width / height;
-        modelCamera.updateProjectionMatrix();
-        fitModelCamera();
-        requestModelRender();
-      };
-      new ResizeObserver(resizeModel).observe(modelShell);
-      resizeModel();
-
-      const loader = new loaderModule.STLLoader();
-      const geometry = await loader.loadAsync(
-        "/files/asu-desk-tidy.stl",
-        (progress) => {
-          if (!progress.total) return;
-          const percent = Math.min(99, Math.round(progress.loaded / progress.total * 100));
-          modelStatus.textContent = `Loading desk_tidy / ${percent}%`;
-        }
-      );
-      geometry.rotateX(-Math.PI / 2);
-      geometry.center();
-      geometry.computeVertexNormals();
-      geometry.computeBoundingSphere();
-
-      const positions = geometry.getAttribute("position");
-      const normals = geometry.getAttribute("normal");
-      const surfaceVertices = new Map();
-      for (let vertex = 0; vertex < positions.count; vertex += 1) {
-        const x = positions.getX(vertex);
-        const y = positions.getY(vertex);
-        const z = positions.getZ(vertex);
-        const key = `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(z * 1e4)}`;
-        let surface = surfaceVertices.get(key);
-        if (!surface) {
-          surface = {
-            x,
-            y,
-            z,
-            nx: 0,
-            ny: 0,
-            nz: 0
-          };
-          surfaceVertices.set(key, surface);
-        }
-        surface.nx += normals.getX(vertex);
-        surface.ny += normals.getY(vertex);
-        surface.nz += normals.getZ(vertex);
+    `,
+    fragmentShader: `
+      uniform vec3 outlineColor;
+      uniform float outlineOpacity;
+      varying float rimAmount;
+      void main() {
+        float curveLine = smoothstep(0.68, 0.93, rimAmount);
+        float alpha = curveLine * outlineOpacity;
+        if (alpha < 0.01) discard;
+        gl_FragColor = vec4(outlineColor, alpha);
       }
-      modelFitPoints = new Float32Array(surfaceVertices.size * 3);
-      const smoothedNormalByPosition = new Map();
-      let fitPoint = 0;
-      surfaceVertices.forEach((surface, key) => {
-        modelFitPoints[fitPoint] = surface.x;
-        modelFitPoints[fitPoint + 1] = surface.y;
-        modelFitPoints[fitPoint + 2] = surface.z;
-        fitPoint += 3;
-        const length = Math.hypot(surface.nx, surface.ny, surface.nz) || 1;
-        smoothedNormalByPosition.set(key, [
-          surface.nx / length,
-          surface.ny / length,
-          surface.nz / length
-        ]);
-      });
+    `,
+    side: THREE.FrontSide, transparent: true, depthWrite: false, toneMapped: false,
+    polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1
+  });
 
-      const curveGeometry = geometry.clone();
-      const smoothedNormals = new Float32Array(positions.count * 3);
-      for (let vertex = 0; vertex < positions.count; vertex += 1) {
-        const x = positions.getX(vertex);
-        const y = positions.getY(vertex);
-        const z = positions.getZ(vertex);
-        const key = `${Math.round(x * 1e4)},${Math.round(y * 1e4)},${Math.round(z * 1e4)}`;
-        const normal = smoothedNormalByPosition.get(key);
-        smoothedNormals[vertex * 3] = normal[0];
-        smoothedNormals[vertex * 3 + 1] = normal[1];
-        smoothedNormals[vertex * 3 + 2] = normal[2];
-      }
-      curveGeometry.setAttribute(
-        "normal",
-        new THREE.Float32BufferAttribute(smoothedNormals, 3)
-      );
+  solidMesh = new THREE.Mesh(geometry, solidMaterial);
+  const detectedEdges = new THREE.EdgesGeometry(geometry, 24);
+  const detectedPositions = detectedEdges.getAttribute("position").array;
+  const retainedPositions = [];
+  for (let edge = 0; edge < detectedPositions.length; edge += 6) {
+    const dx = detectedPositions[edge + 3] - detectedPositions[edge];
+    const dy = detectedPositions[edge + 4] - detectedPositions[edge + 1];
+    const dz = detectedPositions[edge + 5] - detectedPositions[edge + 2];
+    const length = Math.hypot(dx, dy, dz);
+    const midpointY = (detectedPositions[edge + 1] + detectedPositions[edge + 4]) * .5;
+    const structuralEdge = length >= 3.6;
+    const semanticCurve = midpointY >= 8 && length >= .8;
+    if (!structuralEdge && !semanticCurve) continue;
+    retainedPositions.push(
+      detectedPositions[edge], detectedPositions[edge + 1], detectedPositions[edge + 2],
+      detectedPositions[edge + 3], detectedPositions[edge + 4], detectedPositions[edge + 5]
+    );
+  }
+  detectedEdges.dispose();
+  const featureEdges = new THREE.BufferGeometry();
+  featureEdges.setAttribute("position", new THREE.Float32BufferAttribute(retainedPositions, 3));
+  wireMesh = new THREE.LineSegments(featureEdges, wireMaterial);
+  silhouetteMesh = new THREE.Mesh(geometry, silhouetteMaterial);
+  curveMesh = new THREE.Mesh(curveGeometry, curveMaterial);
+  silhouetteMesh.scale.setScalar(1.01);
+  wireMesh.visible = silhouetteMesh.visible = curveMesh.visible = false;
+  solidMesh.renderOrder = 1; silhouetteMesh.renderOrder = 2; curveMesh.renderOrder = 3; wireMesh.renderOrder = 4;
 
-      solidMaterial = new THREE.MeshStandardMaterial({
-        color: 0xaeead9,
-        emissive: 0x0c241e,
-        emissiveIntensity: .08,
-        metalness: .12,
-        roughness: .58,
-        transparent: true,
-        opacity: .96,
-        side: THREE.DoubleSide,
-        polygonOffset: true,
-        polygonOffsetFactor: 1,
-        polygonOffsetUnits: 1
-      });
-      wireMaterial = new THREE.LineBasicMaterial({
-        color: 0xff2b8d,
-        transparent: true,
-        opacity: 0,
-        depthTest: true,
-        depthWrite: false,
-        toneMapped: false
-      });
-      silhouetteMaterial = new THREE.MeshBasicMaterial({
-        color: 0xff2b8d,
-        side: THREE.BackSide,
-        transparent: true,
-        opacity: 0,
-        depthTest: true,
-        depthWrite: false,
-        toneMapped: false
-      });
-      curveMaterial = new THREE.ShaderMaterial({
-        uniforms: {
-          outlineColor: { value: new THREE.Color(0xff2b8d) },
-          outlineOpacity: { value: 0 }
-        },
-        vertexShader: `
-          varying float rimAmount;
-          void main() {
-            vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
-            vec3 viewNormal = normalize(normalMatrix * normal);
-            vec3 viewDirection = normalize(-viewPosition.xyz);
-            rimAmount = 1.0 - max(dot(viewNormal, viewDirection), 0.0);
-            gl_Position = projectionMatrix * viewPosition;
-          }
-        `,
-        fragmentShader: `
-          uniform vec3 outlineColor;
-          uniform float outlineOpacity;
-          varying float rimAmount;
-          void main() {
-            float curveLine = smoothstep(0.68, 0.93, rimAmount);
-            float alpha = curveLine * outlineOpacity;
-            if (alpha < 0.01) discard;
-            gl_FragColor = vec4(outlineColor, alpha);
-          }
-        `,
-        side: THREE.FrontSide,
-        transparent: true,
-        depthTest: true,
-        depthWrite: false,
-        toneMapped: false,
-        polygonOffset: true,
-        polygonOffsetFactor: -1,
-        polygonOffsetUnits: -1
-      });
+  modelRoot = new THREE.Group();
+  const fittedScale = 1.104 / Math.max(geometry.boundingSphere.radius, .001);
+  modelRoot.scale.setScalar(fittedScale);
+  modelWorldRadius = geometry.boundingSphere.radius * fittedScale;
+  fitModelCamera();
+  modelRoot.add(solidMesh, silhouetteMesh, curveMesh, wireMesh);
+  modelScene.add(modelRoot);
+  modelStatus.remove();
+  modelShell.dataset.ready = "true";
+  updateModelTheme();
+} catch (error) {
+  modelShell.dataset.ready = "error";
+  if (modelStatus.isConnected) modelStatus.textContent = "Model unavailable";
+  console.error("Desk tidy viewer failed to load", error);
+}
 
-      solidMesh = new THREE.Mesh(geometry, solidMaterial);
-      const detectedEdges = new THREE.EdgesGeometry(geometry, 24);
-      const detectedPositions = detectedEdges.getAttribute("position").array;
-      const retainedPositions = [];
-      const minimumStructuralLength = 3.6;
-      const minimumSemanticLength = .8;
-      const semanticRegionFloor = 8;
-      let semanticSegmentCount = 0;
-      for (let edge = 0; edge < detectedPositions.length; edge += 6) {
-        const dx = detectedPositions[edge + 3] - detectedPositions[edge];
-        const dy = detectedPositions[edge + 4] - detectedPositions[edge + 1];
-        const dz = detectedPositions[edge + 5] - detectedPositions[edge + 2];
-        const length = Math.hypot(dx, dy, dz);
-        const midpointY = (detectedPositions[edge + 1] + detectedPositions[edge + 4]) * .5;
-        const structuralEdge = length >= minimumStructuralLength;
-        const semanticCurve =
-          midpointY >= semanticRegionFloor &&
-          length >= minimumSemanticLength;
-        if (!structuralEdge && !semanticCurve) continue;
-        if (!structuralEdge && semanticCurve) semanticSegmentCount += 1;
-        retainedPositions.push(
-          detectedPositions[edge],
-          detectedPositions[edge + 1],
-          detectedPositions[edge + 2],
-          detectedPositions[edge + 3],
-          detectedPositions[edge + 4],
-          detectedPositions[edge + 5]
-        );
-      }
-      detectedEdges.dispose();
-      const featureEdges = new THREE.BufferGeometry();
-      featureEdges.setAttribute(
-        "position",
-        new THREE.Float32BufferAttribute(retainedPositions, 3)
-      );
-      wireMesh = new THREE.LineSegments(featureEdges, wireMaterial);
-      silhouetteMesh = new THREE.Mesh(geometry, silhouetteMaterial);
-      curveMesh = new THREE.Mesh(curveGeometry, curveMaterial);
-      silhouetteMesh.scale.setScalar(1.01);
-      wireMesh.visible = false;
-      silhouetteMesh.visible = false;
-      curveMesh.visible = false;
-      solidMesh.renderOrder = 1;
-      silhouetteMesh.renderOrder = 2;
-      curveMesh.renderOrder = 3;
-      wireMesh.renderOrder = 4;
+/* ---------- drag / auto-rotate / modes ---------- */
+let dragging = false, lastX = 0, lastY = 0, rx = -18, ry = 32, lastFrame = performance.now();
+let automaticMorph = !reducedMotion, wireState = false;
+const modeButtons = [...document.querySelectorAll("#modes [data-model-mode]")];
 
-      modelRoot = new THREE.Group();
-      const fittedScale = 1.104 / Math.max(geometry.boundingSphere.radius, .001);
-      modelRoot.scale.setScalar(fittedScale);
-      modelWorldRadius = geometry.boundingSphere.radius * fittedScale;
-      fitModelCamera();
-      modelRoot.add(solidMesh, silhouetteMesh, curveMesh, wireMesh);
-      modelScene.add(modelRoot);
-      modelShell.dataset.outline = "hybrid";
-      modelShell.dataset.curveOutline = "fresnel";
-      modelShell.dataset.edgeVisibility = "visible-only";
-      modelShell.dataset.lineDepthBias = "surface-offset";
-      modelShell.dataset.outlineToneMapping = "disabled";
-      modelShell.dataset.lineWeight = "reinforced-halo";
-      modelShell.dataset.semanticRegionFloor = String(semanticRegionFloor);
-      modelShell.dataset.edgeSegments = String(featureEdges.getAttribute("position").count / 2);
-      modelShell.dataset.semanticSegments = String(semanticSegmentCount);
-      modelStatus.remove();
-      modelShell.dataset.ready = "true";
-      updateModelTheme();
-    } catch (error) {
-      modelShell.dataset.ready = "error";
-      modelStatus.textContent = "Model load error";
-      console.error("Desk tidy viewer failed to load", error);
-    }
+const paintModel = () => {
+  if (!modelRoot || !THREE) return;
+  modelRoot.rotation.x = THREE.MathUtils.degToRad(rx);
+  modelRoot.rotation.y = THREE.MathUtils.degToRad(ry);
+  fitModelCamera();
+  requestModelRender();
+};
+const animateModel = (time) => {
+  const delta = Math.min(time - lastFrame, 32);
+  if (!dragging && !reducedMotion) { ry += delta * .012; paintModel(); }
+  if (solidMaterial && wireMaterial && silhouetteMaterial && curveMaterial) {
+    wireMix += (wireTarget - wireMix) * Math.min(1, delta * .0024);
+    const surfaceFade = 1 - wireMix;
+    solidMaterial.opacity = .02 + .94 * surfaceFade * surfaceFade;
+    wireMaterial.opacity = wireMix * wireMaxOpacity;
+    silhouetteMaterial.opacity = wireMix * silhouetteMaxOpacity;
+    curveMaterial.uniforms.outlineOpacity.value = wireMix * curveMaxOpacity;
+    wireMesh.visible = silhouetteMesh.visible = curveMesh.visible = wireMix > .008;
+    modelShell.dataset.phase = wireMix >= .5 ? "wire" : "solid";
+  }
+  lastFrame = time;
+  if (modelRenderer && modelScene && modelCamera) modelRenderer.render(modelScene, modelCamera);
+  if (!reducedMotion) requestAnimationFrame(animateModel);
+};
+requestModelRender = () => { if (reducedMotion) requestAnimationFrame(animateModel); };
 
-    const themeButton = themePicker.querySelector(".theme-toggle");
-    const themeLabel = themePicker.querySelector(".theme-toggle-label");
-    const applyTheme = (dark) => {
-      desktop.classList.toggle("dark-theme", dark);
-      themeButton.setAttribute("aria-pressed", String(dark));
-      themeButton.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
-      themeLabel.textContent = dark ? "Theme // dark" : "Theme // light";
-      asciiController.setTheme(dark ? "dark" : "light");
-      updateModelTheme();
-    };
-    themeButton.addEventListener("click", () => applyTheme(!desktop.classList.contains("dark-theme")));
+stage.addEventListener("pointerdown", (event) => {
+  if (event.target.closest("button")) return;
+  dragging = true;
+  lastX = event.clientX;
+  lastY = event.clientY;
+  stage.setPointerCapture(event.pointerId);
+});
+stage.addEventListener("pointermove", (event) => {
+  if (!dragging) return;
+  ry -= (event.clientX - lastX) * .65;
+  rx += (event.clientY - lastY) * .65;
+  lastX = event.clientX;
+  lastY = event.clientY;
+  paintModel();
+});
+stage.addEventListener("pointerup", () => { dragging = false; });
+stage.addEventListener("pointercancel", () => { dragging = false; });
 
-    let dragging = false;
-    let lastX = 0;
-    let lastY = 0;
-    let rx = -18;
-    let ry = 32;
-    let lastFrame = performance.now();
-    let automaticMorph = true;
-    let wireState = false;
-    const modelButtons = [...artifactMeta.querySelectorAll("[data-model-mode]")];
+modeButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.stopPropagation();
+    const mode = button.dataset.modelMode;
+    automaticMorph = !reducedMotion && mode === "auto";
+    modelShell.dataset.mode = mode;
+    if (mode === "solid") { wireState = false; wireTarget = 0; }
+    if (mode === "wire") { wireState = true; wireTarget = 1; }
+    if (reducedMotion) wireMix = wireTarget;
+    modeButtons.forEach((item) => item.classList.toggle("active", item === button));
+    requestModelRender();
+  });
+});
+if (reducedMotion) {
+  automaticMorph = false;
+  modelShell.dataset.mode = "solid";
+} else {
+  window.setInterval(() => {
+    if (!automaticMorph) return;
+    wireState = !wireState;
+    wireTarget = wireState ? 1 : 0;
+  }, 6200);
+}
+paintModel();
+requestAnimationFrame(animateModel);
 
-    const paintModel = () => {
-      if (!modelRoot || !THREE) return;
-      modelRoot.rotation.x = THREE.MathUtils.degToRad(rx);
-      modelRoot.rotation.y = THREE.MathUtils.degToRad(ry);
-      fitModelCamera();
-      modelShell.dataset.rotation = `${rx.toFixed(2)},${ry.toFixed(2)}`;
-      requestModelRender();
-    };
-    const animateModel = (time) => {
-      const delta = Math.min(time - lastFrame, 32);
-      if (!dragging && !reducedMotion) {
-        ry += delta * .012;
-        paintModel();
-      }
-      if (
-        solidMaterial &&
-        wireMaterial &&
-        silhouetteMaterial &&
-        curveMaterial &&
-        solidMesh &&
-        wireMesh &&
-        silhouetteMesh &&
-        curveMesh
-      ) {
-        wireMix += (wireTarget - wireMix) * Math.min(1, delta * .0024);
-        const surfaceFade = 1 - wireMix;
-        solidMaterial.opacity = .02 + .94 * surfaceFade * surfaceFade;
-        solidMaterial.depthWrite = true;
-        wireMaterial.opacity = wireMix * wireMaxOpacity;
-        silhouetteMaterial.opacity = wireMix * silhouetteMaxOpacity;
-        curveMaterial.uniforms.outlineOpacity.value = wireMix * curveMaxOpacity;
-        wireMesh.visible = wireMix > .008;
-        silhouetteMesh.visible = wireMix > .008;
-        curveMesh.visible = wireMix > .008;
-        modelShell.dataset.lineOpacity = wireMaterial.opacity.toFixed(3);
-        modelShell.dataset.surfaceOpacity = solidMaterial.opacity.toFixed(3);
-        modelShell.dataset.phase = wireMix >= .5 ? "wire" : "solid";
-      }
-      lastFrame = time;
-      if (modelRenderer && modelScene && modelCamera) {
-        modelRenderer.render(modelScene, modelCamera);
-      }
-      if (!reducedMotion) requestAnimationFrame(animateModel);
-    };
-    requestModelRender = () => {
-      if (reducedMotion) requestAnimationFrame(animateModel);
-    };
-    artifactZone.addEventListener("pointerdown", (event) => {
-      if (event.target.closest("button")) return;
-      dragging = true;
-      lastX = event.clientX;
-      lastY = event.clientY;
-      artifactZone.setPointerCapture(event.pointerId);
-    });
-    artifactZone.addEventListener("pointermove", (event) => {
-      if (!dragging) return;
-      ry -= (event.clientX - lastX) * .65;
-      rx += (event.clientY - lastY) * .65;
-      lastX = event.clientX;
-      lastY = event.clientY;
-      paintModel();
-    });
-    artifactZone.addEventListener("pointerup", () => { dragging = false; });
-    artifactZone.addEventListener("pointercancel", () => { dragging = false; });
-    modelButtons.forEach((button) => {
-      button.addEventListener("click", (event) => {
-        event.stopPropagation();
-        const mode = button.dataset.modelMode;
-        automaticMorph = !reducedMotion && mode === "auto";
-        modelShell.dataset.mode = mode;
-        if (mode === "solid") {
-          wireState = false;
-          wireTarget = 0;
-        }
-        if (mode === "wire") {
-          wireState = true;
-          wireTarget = 1;
-        }
-        if (reducedMotion) wireMix = wireTarget;
-        modelButtons.forEach((item) => item.classList.toggle("active", item === button));
-        requestModelRender();
-      });
-    });
-    if (reducedMotion) {
-      automaticMorph = false;
-      modelShell.dataset.mode = "solid";
-    } else {
-      window.setInterval(() => {
-        if (!automaticMorph) return;
-        wireState = !wireState;
-        wireTarget = wireState ? 1 : 0;
-      }, 6200);
-    }
-    paintModel();
-    requestAnimationFrame(animateModel);
+/* ---------- hidden signal player ---------- */
+const music = document.querySelector("#music");
+const musicFront = music.querySelector(".music-front");
+const musicBack = music.querySelector(".music-back");
+const musicClose = music.querySelector(".music-close");
+const focusMusicControl = (element) => {
+  try { element.focus({ preventScroll: true }); } catch { element.focus(); }
+};
+const setMusicOpen = (open) => {
+  music.classList.toggle("open", open);
+  musicFront.inert = open;
+  musicFront.setAttribute("aria-hidden", String(open));
+  musicBack.inert = !open;
+  musicBack.setAttribute("aria-hidden", String(!open));
+  focusMusicControl(open ? musicClose : musicFront);
+};
+try {
+  const { createPlaylistPlayer } = await import("./files/playlist-player.js");
+  createPlaylistPlayer({
+    root: music,
+    onOpenChange: setMusicOpen,
+    tracks: [
+      { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
+      { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
+      { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
+    ]
+  });
+} catch (error) {
+  console.warn("Playlist unavailable", error);
+}
 
-    const musicFront = music.querySelector(".music-front");
-    const musicBack = music.querySelector(".music-back");
-    const musicClose = music.querySelector(".music-close");
-    const focusMusicControl = (element) => {
-      try {
-        element.focus({ preventScroll: true });
-      } catch {
-        element.focus();
-      }
-    };
-    const setMusicOpen = (open) => {
-      music.classList.toggle("open", open);
-      desktop.classList.toggle("music-player-open", open);
-      musicFront.inert = open;
-      musicFront.setAttribute("aria-hidden", String(open));
-      musicBack.inert = !open;
-      musicBack.setAttribute("aria-hidden", String(!open));
-      focusMusicControl(open ? musicClose : musicFront);
-    };
-    const { createPlaylistPlayer } = await import("/files/playlist-player.js");
-    createPlaylistPlayer({
-      root: music,
-      onOpenChange: setMusicOpen,
-      tracks: [
-        { title: "Track 01", artist: "Ether", src: "/files/audio/track-01.mp3" },
-        { title: "Track 02", artist: "Ether", src: "/files/audio/track-02.mp3" },
-        { title: "Track 03", artist: "Ether", src: "/files/audio/track-03.mp3" }
-      ]
-    });
-    desktop.dataset.appReady = "true";
-  }, { once: true });
+desk.dataset.appReady = "true";
 </script>
 </body>
 </html>
