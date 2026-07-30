@@ -3,3 +3,4 @@ Thumbs.db
 .idea/
 .vscode/
 .worktrees/
+node_modules/
