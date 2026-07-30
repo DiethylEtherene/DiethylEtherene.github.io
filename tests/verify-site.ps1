@@ -30,6 +30,7 @@ function Read-StrictUtf8 {
 
 $requiredFiles = @(
   "index.html",
+  "files/responsive-layout.css",
   "files/desktop-composition-v2.html",
   "files/ascii-portrait-renderer.js",
   "files/ascii-portrait-data.js",
@@ -49,12 +50,18 @@ foreach ($relativePath in $requiredFiles) {
 }
 
 $index = Read-StrictUtf8 (Join-Path $siteRoot "index.html")
+$responsiveCss = Read-StrictUtf8 (Join-Path $siteRoot "files/responsive-layout.css")
 $composition = Read-StrictUtf8 (Join-Path $siteRoot "files/desktop-composition-v2.html")
 $playlistModule = Read-StrictUtf8 (Join-Path $siteRoot "files/playlist-player.js")
 
 Assert-SiteCondition ($index.StartsWith("<!doctype html>")) "index.html must start with an HTML5 doctype."
 Assert-SiteCondition ($index.Contains('<meta charset="utf-8">')) "index.html must declare UTF-8 before rendering interface text."
 Assert-SiteCondition ($index.Contains('<meta name="viewport" content="width=device-width, initial-scale=1">')) "index.html must include a mobile viewport."
+Assert-SiteCondition ($index.Contains('<link rel="stylesheet" href="/files/responsive-layout.css">')) "index.html must link the responsive layout stylesheet."
+Assert-SiteCondition ($responsiveCss -match 'grid-template-areas:\s*"intro artifact folders"') "responsive-layout.css must define the desktop grid areas."
+Assert-SiteCondition ($responsiveCss -match '@media\s*\(max-width:\s*1023px\)') "responsive-layout.css must define the tablet flow breakpoint."
+Assert-SiteCondition ($responsiveCss -match '@media\s*\(max-width:\s*479px\)') "responsive-layout.css must define the phone flow breakpoint."
+Assert-SiteCondition (-not ($index -match '(?is)\.music-player-open\s+\.intro-column\s*\{[^}]*\btransform\s*:\s*[^;}]*translateY\s*\(')) "The playlist-open state must not translate the intro column."
 $expectedTitle = "<title>Asteria $([char]0x2014) Portfolio</title>"
 Assert-SiteCondition ($index.Contains($expectedTitle)) "index.html must include the public-facing page title."
 Assert-SiteCondition (-not $composition.Contains("Homepage composition:")) "The public page must not render the internal prototype heading."
