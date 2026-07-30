@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { createReadStream } from "node:fs";
-import { realpath, stat } from "node:fs/promises";
+import { readFile, realpath, stat } from "node:fs/promises";
 import { createServer, request as httpRequest } from "node:http";
 import { dirname, extname, isAbsolute, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -253,6 +253,12 @@ async function readGeometry(page) {
         scrollWidth: document.documentElement.scrollWidth,
       },
       desktop: box(desktop),
+      desktopLayout: {
+        display: getComputedStyle(desktop).display,
+        introPosition: getComputedStyle(required(".intro-column")).position,
+        artifactPosition: getComputedStyle(required(".artifact-zone")).position,
+        foldersPosition: getComputedStyle(required(".folder-column")).position,
+      },
       shell: { ...box(shell), layoutWidth: shell.offsetWidth, layoutHeight: shell.offsetHeight },
       canvas: box(canvas),
       outerOrbit: { ...box(outerOrbit), layoutWidth: outerOrbit.offsetWidth, layoutHeight: outerOrbit.offsetHeight },
@@ -289,6 +295,19 @@ function assertContained(label, child, parent, viewport) {
     `${viewport}: visible ${label} must stay inside .desktop-v2; child=${JSON.stringify(child)} desktop=${JSON.stringify(parent)}`,
   );
 }
+
+test("desktop geometry authority owns the folder rail direction", async () => {
+  const stylesheet = await readFile(resolve(SITE_ROOT, "files/responsive-layout.css"), "utf8");
+  const folderRailRule = stylesheet.match(
+    /#portfolio-consolidated\s+\.composition-wrap\s*>\s*\.desktop-v2\s*>\s*\.folder-column\s*\{([^}]*)\}/,
+  );
+  assert.ok(folderRailRule, "responsive layout stylesheet must define the direct folder rail rule");
+  assert.match(
+    folderRailRule[1],
+    /\bflex-direction:\s*column\s*;/,
+    "responsive layout stylesheet must own the folder rail column direction",
+  );
+});
 
 test("responsive portfolio geometry remains balanced and interaction-stable", { timeout: 90_000 }, async (t) => {
   assert.ok(
@@ -373,13 +392,11 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
 
     for (const viewport of ACTIVE_VIEWPORTS) {
       await t.test(`${viewport.width}x${viewport.height}`, { timeout: 10_000 }, async () => {
-        const music = page.locator(".music-easter");
-        if (await music.evaluate((element) => element.classList.contains("open"))) {
-          await page.locator(".music-close").click();
-          await page.locator(".music-easter.open").waitFor({ state: "detached" });
-        }
         await page.setViewportSize(viewport);
-        await page.waitForTimeout(20);
+        const viewportResponse = await page.reload({ waitUntil: "load" });
+        assert.ok(viewportResponse?.ok(), `${viewport.width}x${viewport.height}: viewport reload failed`);
+        await page.locator(".desktop-v2").waitFor({ state: "visible" });
+        await page.locator(".stl-model-shell").waitFor({ state: "visible" });
         assert.deepEqual(pageErrors, [], `${viewport.width}x${viewport.height}: uncaught page/component errors`);
         assert.deepEqual(resourceErrors, [], `${viewport.width}x${viewport.height}: local component resources failed`);
 
@@ -412,6 +429,10 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
           `${label}: folder aspect ratio must be 205/124; measured ${geometry.folder.layoutWidth}/${geometry.folder.layoutHeight}`,
         );
         if (viewport.width >= 1024) {
+          assert.equal(geometry.desktopLayout.display, "grid", `${label}: desktop surface must use a grid layout`);
+          assert.equal(geometry.desktopLayout.introPosition, "relative", `${label}: intro must be a grid item`);
+          assert.equal(geometry.desktopLayout.artifactPosition, "relative", `${label}: artifact must be a grid item`);
+          assert.equal(geometry.desktopLayout.foldersPosition, "relative", `${label}: folders must be a grid item`);
           assert.ok(
             geometry.intro.width <= 361,
             `${label}: intro column must be at most 361px wide; measured ${geometry.intro.width}`,

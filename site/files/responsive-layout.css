@@ -1,0 +1,86 @@
+@media (min-width: 1024px) {
+  #portfolio-consolidated .composition-wrap > .desktop-v2 {
+    --layout-gutter: clamp(20px, 2vw, 40px);
+    --layout-gap: clamp(18px, 2vw, 40px);
+    --intro-track: clamp(280px, 20vw, 360px);
+    --folder-track: clamp(250px, 18vw, 360px);
+    box-sizing: border-box;
+    container-type: inline-size;
+    display: grid;
+    grid-template-columns: var(--intro-track) minmax(0, 1fr) var(--folder-track);
+    grid-template-areas: "intro artifact folders";
+    gap: var(--layout-gap);
+    align-items: stretch;
+    min-height: max(780px, calc(100dvh - 16px));
+    padding:
+      58px
+      max(var(--layout-gutter), calc((100vw - 2200px) / 2 + var(--layout-gutter)))
+      126px;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .intro-column {
+    grid-area: intro;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    max-width: 360px;
+    transform: none;
+    gap: clamp(16px, 2dvh, 26px);
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .artifact-zone {
+    grid-area: artifact;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    min-width: 0;
+    justify-self: center;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 > .folder-column {
+    grid-area: folders;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    transform: none;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .folder {
+    width: min(100%, calc((100dvh - 210px) * .41));
+    height: auto;
+    aspect-ratio: 205 / 124;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .stl-model-shell {
+    width: clamp(280px, min(27cqw, 46dvh), 540px);
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-a {
+    width: clamp(340px, min(34cqw, 58dvh), 680px);
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-b {
+    width: clamp(300px, min(30cqw, 51dvh), 600px);
+    height: auto;
+    aspect-ratio: 1;
+  }
+
+  @media (min-width: 1440px) {
+    #portfolio-consolidated .composition-wrap > .desktop-v2 .stl-model-shell {
+      min-width: 380px;
+    }
+
+    #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-a {
+      min-width: 480px;
+    }
+  }
+}
