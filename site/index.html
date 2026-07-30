@@ -726,7 +726,7 @@ try {
 }
 
 /* ---------- drag / auto-rotate / modes ---------- */
-let dragging = false, lastX = 0, lastY = 0, rx = -30, ry = 0, lastFrame = performance.now();
+let dragging = false, lastX = 0, lastY = 0, rx = 30, ry = 0, lastFrame = performance.now();
 let automaticMorph = !reducedMotion, wireState = false;
 const modeButtons = [...document.querySelectorAll("#modes [data-model-mode]")];
 
