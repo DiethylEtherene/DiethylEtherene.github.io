@@ -23,10 +23,20 @@ const VIEWPORTS = [
   { width: 1920, height: 1080 },
   { width: 2560, height: 1440 },
 ];
+const SEAM_PAIRS = [[860, 861], [879, 880]];
 const REQUESTED_VIEWPORT = process.env.RESPONSIVE_VIEWPORT;
-const ACTIVE_VIEWPORTS = REQUESTED_VIEWPORT
-  ? VIEWPORTS.filter(({ width, height }) => `${width}x${height}` === REQUESTED_VIEWPORT)
-  : VIEWPORTS;
+const REQUESTED_VIEWPORT_ENTRY = VIEWPORTS.find(
+  ({ width, height }) => `${width}x${height}` === REQUESTED_VIEWPORT,
+);
+const ACTIVE_VIEWPORTS = (() => {
+  if (!REQUESTED_VIEWPORT) return VIEWPORTS;
+  if (!REQUESTED_VIEWPORT_ENTRY) return [];
+  const widths = new Set([REQUESTED_VIEWPORT_ENTRY.width]);
+  SEAM_PAIRS
+    .find((pair) => pair.includes(REQUESTED_VIEWPORT_ENTRY.width))
+    ?.forEach((width) => widths.add(width));
+  return VIEWPORTS.filter(({ width }) => widths.has(width));
+})();
 const SNAPSHOT_SELECTORS = [
   ".intro-column",
   ".artifact-zone",
@@ -103,15 +113,54 @@ async function startStaticServer() {
 
       const fileStats = await stat(canonicalFilePath);
       if (!fileStats.isFile()) throw new Error("Not a file");
-      response.writeHead(200, {
-        "content-length": fileStats.size,
+      let start = 0;
+      let end = fileStats.size - 1;
+      let status = 200;
+      const range = request.headers.range;
+      if (range) {
+        const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+        if (!match || (!match[1] && !match[2])) {
+          response.writeHead(416, {
+            "accept-ranges": "bytes",
+            "content-range": `bytes */${fileStats.size}`,
+          });
+          response.end();
+          return;
+        }
+        if (match[1]) {
+          start = Number(match[1]);
+          end = match[2] ? Math.min(Number(match[2]), end) : end;
+        } else {
+          const suffixLength = Number(match[2]);
+          start = Math.max(0, fileStats.size - suffixLength);
+        }
+        if (
+          !Number.isSafeInteger(start)
+          || !Number.isSafeInteger(end)
+          || start < 0
+          || start > end
+          || start >= fileStats.size
+        ) {
+          response.writeHead(416, {
+            "accept-ranges": "bytes",
+            "content-range": `bytes */${fileStats.size}`,
+          });
+          response.end();
+          return;
+        }
+        status = 206;
+      }
+      response.writeHead(status, {
+        "accept-ranges": "bytes",
+        "content-length": end - start + 1,
         "content-type": MIME_TYPES.get(extname(canonicalFilePath).toLowerCase()) ?? "application/octet-stream",
+        ...(status === 206 ? { "content-range": `bytes ${start}-${end}/${fileStats.size}` } : {}),
       });
       if (method === "HEAD") {
         response.end();
         return;
       }
-      createReadStream(canonicalFilePath)
+      createReadStream(canonicalFilePath, { start, end })
         .on("error", () => response.destroy())
         .pipe(response);
     } catch (error) {
@@ -138,10 +187,11 @@ async function startStaticServer() {
   };
 }
 
-function rawResponse(baseURL, path, method = "GET") {
+function rawResponse(baseURL, path, method = "GET", headers = {}) {
   const url = new URL(baseURL);
   return new Promise((resolveResponse, rejectResponse) => {
     const request = httpRequest({
+      headers,
       hostname: url.hostname,
       method,
       port: url.port,
@@ -186,6 +236,52 @@ async function openBrowser() {
       { cause: error },
     );
   }
+}
+
+async function waitForPortfolioReady(page, label) {
+  try {
+    await Promise.all([
+      page.locator('.stl-model-shell[data-ready="true"]').waitFor({ state: "attached" }),
+      page.locator('.desktop-v2[data-app-ready="true"]').waitFor({ state: "attached" }),
+    ]);
+  } catch (error) {
+    throw new Error(`${label}: portfolio app did not reach explicit model-and-player readiness`, {
+      cause: error,
+    });
+  }
+}
+
+async function waitForPlaylistResourceReady(page, label) {
+  await page.locator(".playlist-audio").evaluate((audio) => {
+    if (audio.error) {
+      throw new Error(`playlist audio failed with media error ${audio.error.code}`);
+    }
+    if (audio.readyState >= HTMLMediaElement.HAVE_ENOUGH_DATA) return;
+    return new Promise((resolveReady, rejectReady) => {
+      const cleanup = () => {
+        clearTimeout(timeout);
+        audio.removeEventListener("canplaythrough", onReady);
+        audio.removeEventListener("error", onError);
+      };
+      const onReady = () => {
+        cleanup();
+        resolveReady();
+      };
+      const onError = () => {
+        const code = audio.error?.code ?? "unknown";
+        cleanup();
+        rejectReady(new Error(`playlist audio failed with media error ${code}`));
+      };
+      const timeout = setTimeout(() => {
+        cleanup();
+        rejectReady(new Error("playlist audio did not fully buffer within 5 seconds"));
+      }, 5_000);
+      audio.addEventListener("canplaythrough", onReady, { once: true });
+      audio.addEventListener("error", onError, { once: true });
+    });
+  }).catch((error) => {
+    throw new Error(`${label}: playlist resource did not reach buffered readiness`, { cause: error });
+  });
 }
 
 async function readGeometry(page) {
@@ -350,6 +446,14 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
     ACTIVE_VIEWPORTS.length > 0,
     `RESPONSIVE_VIEWPORT must match a configured viewport; received ${REQUESTED_VIEWPORT}`,
   );
+  const requestedSeam = SEAM_PAIRS.find((pair) => pair.includes(REQUESTED_VIEWPORT_ENTRY?.width));
+  if (requestedSeam) {
+    assert.deepEqual(
+      ACTIVE_VIEWPORTS.map(({ width }) => width),
+      requestedSeam,
+      `RESPONSIVE_VIEWPORT=${REQUESTED_VIEWPORT} must exercise both sides of its seam`,
+    );
+  }
   const staticServer = await startStaticServer();
   let browser;
   let context;
@@ -373,6 +477,19 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
     assert.equal(headResponse.status, 200, "Static server must serve HEAD requests");
     assert.equal(headResponse.body.length, 0, "HEAD response must not contain a body");
     assert.ok(Number(headResponse.headers["content-length"]) > 0, "HEAD response must include file length");
+    const rangeResponse = await rawResponse(
+      staticServer.baseURL,
+      "/files/audio/track-01.mp3",
+      "GET",
+      { Range: "bytes=0-99" },
+    );
+    assert.equal(rangeResponse.status, 206, "Static server must honor media byte ranges");
+    assert.equal(rangeResponse.body.length, 100, "Static server must return only the requested bytes");
+    assert.match(
+      rangeResponse.headers["content-range"] ?? "",
+      /^bytes 0-99\/\d+$/,
+      "Static server must describe the fulfilled media range",
+    );
 
     ({ browser, externallyOwned } = await openBrowser());
     context = await browser.newContext({
@@ -390,7 +507,10 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
     requestFailedListener = (request) => {
       const failure = request.failure()?.errorText ?? "unknown failure";
       if (request.url().startsWith(staticServer.baseURL)) {
-        resourceErrors.push(`${request.method()} ${request.url()}: ${failure}`);
+        const range = request.headers().range;
+        resourceErrors.push(
+          `${request.method()} ${request.url()}: ${failure}${range ? ` (range ${range})` : ""}`,
+        );
       }
     };
     responseListener = (localResponse) => {
@@ -410,6 +530,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
       response = await page.goto(`${staticServer.baseURL}/`, { waitUntil: "load" });
       await page.locator(".desktop-v2").waitFor({ state: "visible" });
       await page.locator(".stl-model-shell").waitFor({ state: "visible" });
+      await waitForPortfolioReady(page, "initial load");
       await page.waitForLoadState("networkidle");
     } catch (error) {
       throw new Error(
@@ -430,11 +551,13 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
     const tabletSnapshots = new Map();
     for (const viewport of ACTIVE_VIEWPORTS) {
       await t.test(`${viewport.width}x${viewport.height}`, { timeout: 10_000 }, async () => {
+        await waitForPortfolioReady(page, `${viewport.width}x${viewport.height} pre-reload`);
         await page.setViewportSize(viewport);
         const viewportResponse = await page.reload({ waitUntil: "load" });
         assert.ok(viewportResponse?.ok(), `${viewport.width}x${viewport.height}: viewport reload failed`);
         await page.locator(".desktop-v2").waitFor({ state: "visible" });
         await page.locator(".stl-model-shell").waitFor({ state: "visible" });
+        await waitForPortfolioReady(page, `${viewport.width}x${viewport.height} reload`);
         await page.waitForLoadState("networkidle");
         assert.deepEqual(pageErrors, [], `${viewport.width}x${viewport.height}: uncaught page/component errors`);
         assert.deepEqual(resourceErrors, [], `${viewport.width}x${viewport.height}: local component resources failed`);
@@ -532,8 +655,12 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         }
 
         const before = await snapshotRegions(page);
+        await page.locator(".playlist-audio").evaluate((audio) => {
+          audio.preload = "auto";
+        });
         await page.locator(".music-front").click();
         await page.locator(".music-easter.open").waitFor({ state: "visible" });
+        await waitForPlaylistResourceReady(page, label);
         await page.waitForTimeout(60);
         assert.deepEqual(pageErrors, [], `${label}: uncaught page/component errors after music interaction`);
         assert.deepEqual(resourceErrors, [], `${label}: local resources failed after music interaction`);
@@ -554,7 +681,7 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
         }
       });
     }
-    for (const [firstWidth, secondWidth] of [[860, 861], [879, 880]]) {
+    for (const [firstWidth, secondWidth] of SEAM_PAIRS) {
       if (!tabletSnapshots.has(firstWidth) || !tabletSnapshots.has(secondWidth)) continue;
       const first = tabletSnapshots.get(firstWidth);
       const second = tabletSnapshots.get(secondWidth);
