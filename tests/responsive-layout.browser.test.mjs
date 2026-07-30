@@ -849,7 +849,12 @@ test("responsive portfolio geometry remains balanced and interaction-stable", { 
           );
         }
 
-        const before = await snapshotRegions(page);
+                // Settle before capturing the baseline too: container-query-driven
+        // sizes (e.g. .artifact-zone's height: clamp(420px, 60cqw, 560px))
+        // can lag a frame behind the sentinel-based resize settle above,
+        // which otherwise only confirms theme/music position, not every
+        // container-query-derived dimension.
+        const before = await settleSnapshotRegions(page);
         let interactionError;
         let interactionFailed = false;
         try {
