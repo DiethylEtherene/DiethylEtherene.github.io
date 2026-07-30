@@ -54,6 +54,9 @@ const MIME_TYPES = new Map([
 ]);
 const PIXEL_TOLERANCE = 0.5;
 const RESPONSIVE_SENTINEL_TOLERANCE = 0.02;
+const RESPONSIVE_SETTLE_TIMEOUT_MS = 2_500;
+const RESPONSIVE_SETTLE_POLL_INTERVAL_MS = 25;
+const RESPONSIVE_STABLE_SAMPLE_COUNT = 2;
 const FOLDER_ASPECT_RATIO = 205 / 124;
 const REQUIRED_RESOURCE_PATHS = ["/", "/files/desktop-composition-v2.html"];
 
@@ -288,47 +291,34 @@ async function waitForPlaylistResourceReady(page, label, runtimeMetrics) {
 
 async function settleResponsiveResize(page, viewport) {
   const expected = expectedResponsiveSentinels(viewport);
-  try {
-    await page.waitForFunction(
-      ({ expectedSentinels, tolerance }) => {
-        const theme = document.querySelector(".final-theme-picker");
-        const music = document.querySelector(".music-easter");
-        if (!theme || !music) return false;
-        const themeStyle = getComputedStyle(theme);
-        const musicStyle = getComputedStyle(music);
-        const observed = {
-          innerWidth,
-          innerHeight,
-          themeRight: Number.parseFloat(themeStyle.right),
-          themeBottom: Number.parseFloat(themeStyle.bottom),
-          musicLeft: Number.parseFloat(musicStyle.left),
-          musicBottom: Number.parseFloat(musicStyle.bottom),
-        };
-        return Object.entries(expectedSentinels).every(
-          ([name, value]) => Math.abs(observed[name] - value) <= tolerance,
-        );
-      },
-      {
-        expectedSentinels: expected,
-        tolerance: RESPONSIVE_SENTINEL_TOLERANCE,
-      },
-      {
-        polling: "raf",
-        timeout: 2_500,
-      },
-    );
-  } catch (error) {
-    const observed = await readResponsiveSentinels(page);
-    throw new Error(
-      `${viewport.width}x${viewport.height}: responsive sentinels did not settle; expected=${JSON.stringify(expected)} observed=${JSON.stringify(observed)}`,
-      { cause: error },
-    );
-  }
-  await page.evaluate(() => new Promise((resolveSettled) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(resolveSettled);
+  const startedAt = Date.now();
+  const deadline = Date.now() + RESPONSIVE_SETTLE_TIMEOUT_MS;
+  let observed = null;
+  let stableSampleCount = 0;
+  let mismatches = [];
+
+  while (Date.now() <= deadline) {
+    try {
+      observed = await readResponsiveSentinels(page);
+    } catch (error) {
+      throw new Error(
+        `${viewport.width}x${viewport.height}: could not read responsive sentinels`,
+        { cause: error },
+      );
+    }
+
+    mismatches = responsiveSentinelMismatches(expected, observed);
+    stableSampleCount = mismatches.length === 0 ? stableSampleCount + 1 : 0;
+    if (stableSampleCount >= RESPONSIVE_STABLE_SAMPLE_COUNT) return;
+
+    await new Promise((resolvePoll) => {
+      setTimeout(resolvePoll, RESPONSIVE_SETTLE_POLL_INTERVAL_MS);
     });
-  }));
+  }
+
+  throw new Error(
+    `${viewport.width}x${viewport.height}: responsive sentinels did not settle after ${Date.now() - startedAt}ms; stable=${stableSampleCount}/${RESPONSIVE_STABLE_SAMPLE_COUNT}; mismatches=${mismatches.join(", ")}; expected=${JSON.stringify(expected)} observed=${JSON.stringify(observed)}`,
+  );
 }
 
 function expectedResponsiveSentinels(viewport) {
@@ -365,11 +355,18 @@ async function readResponsiveSentinels(page) {
   });
 }
 
+function responsiveSentinelMismatches(expected, observed) {
+  return Object.entries(expected)
+    .filter(([name, value]) => (
+      !Number.isFinite(observed?.[name])
+      || Math.abs(observed[name] - value) > RESPONSIVE_SENTINEL_TOLERANCE
+    ))
+    .map(([name, value]) => `${name}=${observed?.[name]} (expected ${value})`);
+}
+
 function assertResponsiveSentinels(viewport, observed) {
   const expected = expectedResponsiveSentinels(viewport);
-  const mismatches = Object.entries(expected)
-    .filter(([name, value]) => Math.abs(observed[name] - value) > RESPONSIVE_SENTINEL_TOLERANCE)
-    .map(([name, value]) => `${name}=${observed[name]} (expected ${value})`);
+  const mismatches = responsiveSentinelMismatches(expected, observed);
   assert.equal(
     mismatches.length,
     0,
@@ -531,6 +528,29 @@ test("desktop geometry authority owns the folder rail direction", async () => {
     folderRailRule[1],
     /\bflex-direction:\s*column\s*;/,
     "responsive layout stylesheet must own the folder rail column direction",
+  );
+});
+
+test("responsive settling ignores stale breakpoint samples without animation frames", async () => {
+  const viewport = { width: 768, height: 1024 };
+  const expected = expectedResponsiveSentinels(viewport);
+  const staleMobileSample = expectedResponsiveSentinels({ width: 480, height: 900 });
+  const samples = [expected, staleMobileSample, expected, expected];
+  let sampleCount = 0;
+  const pageWithoutAnimationFrames = {
+    async evaluate() {
+      const sample = samples[Math.min(sampleCount, samples.length - 1)];
+      sampleCount += 1;
+      return sample;
+    },
+  };
+
+  await settleResponsiveResize(pageWithoutAnimationFrames, viewport);
+
+  assert.equal(
+    sampleCount,
+    4,
+    "responsive settling must reset after a stale breakpoint and confirm two consecutive stable samples",
   );
 });
 
