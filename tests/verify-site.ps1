@@ -41,7 +41,8 @@ $requiredFiles = @(
   "files/asu-desk-tidy.stl",
   "files/playlist-player.js",
   "files/audio/track-01.mp3",
-  "files/audio/track-02.mp3"
+  "files/audio/track-02.mp3",
+  "files/audio/track-03.mp3"
 )
 
 foreach ($relativePath in $requiredFiles) {
@@ -94,11 +95,12 @@ Assert-SiteCondition ($index -match $audioPattern) "The playlist audio element m
 
 foreach ($track in @(
   '{ title: "Track 01", artist: "Ether", src: "/files/audio/track-01.mp3" }',
-  '{ title: "Track 02", artist: "Ether", src: "/files/audio/track-02.mp3" }'
+  '{ title: "Track 02", artist: "Ether", src: "/files/audio/track-02.mp3" }',
+  '{ title: "Track 03", artist: "Ether", src: "/files/audio/track-03.mp3" }'
 )) {
   Assert-SiteCondition ($index.Contains($track)) "index.html is missing the exact playlist record: $track"
 }
-Assert-SiteCondition ([regex]::Matches($index, 'artist: "Ether"').Count -eq 2) "The playlist must contain exactly two Ether artist records."
+Assert-SiteCondition ([regex]::Matches($index, 'artist: "Ether"').Count -eq 3) "The playlist must contain exactly three Ether artist records."
 
 Assert-SiteCondition ($playlistModule.Contains("export function createPlaylistPlayer")) "playlist-player.js must export createPlaylistPlayer."
 
@@ -110,7 +112,8 @@ Assert-SiteCondition (-not ($index -match $placeholderLinkPattern)) "index.html 
 
 foreach ($audioSpec in @(
   @{ File = "track-01.mp3"; Length = 2882504; Hash = "793EF78631C44F3DCAE95B05DD0D8E91EAFB44C548DA4839BBD60FA8C95FB082" },
-  @{ File = "track-02.mp3"; Length = 3717871; Hash = "404D9F6D7A92E18E339F862FB74068BB43E3F764191483C32ECD42FDAF4149AF" }
+  @{ File = "track-02.mp3"; Length = 3717871; Hash = "404D9F6D7A92E18E339F862FB74068BB43E3F764191483C32ECD42FDAF4149AF" },
+  @{ File = "track-03.mp3"; Length = 2761837; Hash = "84300AB0F8FD03CCF631CBA2287E5AB78D3EFD04757074DBC032B5066A7292D8" }
 )) {
   $audioFile = $audioSpec.File
   $audioPath = Join-Path $siteRoot ("files/audio/" + $audioFile)
