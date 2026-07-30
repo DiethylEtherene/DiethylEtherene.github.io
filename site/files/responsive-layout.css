@@ -26,6 +26,7 @@
     max-width: 360px;
     transform: none;
     gap: clamp(16px, 2dvh, 26px);
+    justify-content: center;
   }
 
   #portfolio-consolidated .composition-wrap > .desktop-v2 > .artifact-zone {
@@ -46,13 +47,24 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    gap: clamp(14px, 2.2vh, 26px);
     transform: none;
   }
 
+  /* Each folder grows to fill an equal share of the column's own height
+     (flex: 1 1 0, with min-height: 0 so it can shrink below its content
+     size) and derives its width from that height via aspect-ratio. This
+     guarantees the four folders always fit within the available height
+     with real gaps between them, unlike a viewport-height-based width
+     formula, which can size folders larger than the column actually has
+     room for and cause them to overlap. */
   #portfolio-consolidated .composition-wrap > .desktop-v2 .folder {
-    width: min(100%, calc((100dvh - 210px) * .41));
+    width: auto;
+    max-width: 100%;
     height: auto;
+    flex: 1 1 0;
+    min-height: 0;
     aspect-ratio: 205 / 124;
   }
 
@@ -81,6 +93,24 @@
 
     #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-a {
       min-width: 480px;
+    }
+  }
+
+  /* On very wide monitors the 540/680/600px caps above are reached well
+     before the model has used the available room in the artifact zone,
+     leaving it looking small against all the surrounding space. Raise the
+     ceiling (not the formula) so the model keeps growing on wide screens. */
+  @media (min-width: 1920px) {
+    #portfolio-consolidated .composition-wrap > .desktop-v2 .stl-model-shell {
+      width: clamp(280px, min(27cqw, 46dvh), 680px);
+    }
+
+    #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-a {
+      width: clamp(340px, min(34cqw, 58dvh), 820px);
+    }
+
+    #portfolio-consolidated .composition-wrap > .desktop-v2 .orbit-b {
+      width: clamp(300px, min(30cqw, 51dvh), 720px);
     }
   }
 }
