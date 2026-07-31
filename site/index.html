@@ -350,10 +350,15 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   /* Let the DOCUMENT be the scroller: html/body grow to content and
      neither is a scroll container, so single-finger scrolling works on iOS
      and position:fixed anchors to the viewport (the SIGNAL_? chip stays
-     pinned). overflow-x:clip on .desk blocks sideways scroll without
-     turning an ancestor into a scroll container. */
+     pinned). .desk's overflow must be symmetric: mixing overflow-x:clip
+     with overflow-y:visible is an invalid combination per spec, and
+     browsers silently resolve the 'visible' axis to 'auto' -- turning
+     .desk into an actual (if invisible) scroll container, which is a
+     classic trigger for iOS Safari's "fixed positioned element inside a
+     scrollable ancestor" bug (exactly the jumping/drifting we saw). Clip
+     both axes instead so no auto-resolution kicks in. */
   html,body{height:auto;overflow:visible}
-  .desk{height:auto;min-height:100dvh;overflow-x:clip;overflow-y:visible}
+  .desk{height:auto;min-height:100dvh;overflow:clip}
   .intro{padding:48px var(--gutter) 52px;gap:32px}
   .transmit{margin-top:0!important}
   .body{flex-direction:column}
