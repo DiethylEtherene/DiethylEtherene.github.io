@@ -216,7 +216,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .music-easter{position:absolute;left:116px;bottom:100px;z-index:4}
 .music-trinkets{position:absolute;left:0;bottom:96px;display:flex;align-items:flex-end;gap:22px;pointer-events:none;
   transition:transform .42s cubic-bezier(.16,1,.3,1)}
-.music-easter.open .music-trinkets{transform:translateY(-24px)}
+.music-easter.open .music-trinkets{transform:translateY(-36px)}
 .radar{position:relative;display:block;width:54px;height:54px;border:1px solid var(--line);border-radius:50%;overflow:hidden}
 .radar i{position:absolute;display:block;background:var(--line)}
 .radar .r1{inset:12px;border:1px solid var(--line);border-radius:50%;background:none}
@@ -743,7 +743,7 @@ const animateModel = (time) => {
   if (solidMaterial && wireMaterial && silhouetteMaterial && curveMaterial) {
     wireMix += (wireTarget - wireMix) * Math.min(1, delta * .0024);
     const surfaceFade = 1 - wireMix;
-    solidMaterial.opacity = .02 + .94 * surfaceFade * surfaceFade;
+    solidMaterial.opacity = .3 + .66 * surfaceFade * surfaceFade;
     wireMaterial.opacity = wireMix * wireMaxOpacity;
     silhouetteMaterial.opacity = wireMix * silhouetteMaxOpacity;
     curveMaterial.uniforms.outlineOpacity.value = wireMix * curveMaxOpacity;
@@ -805,8 +805,29 @@ const music = document.querySelector("#music");
 const musicFront = music.querySelector(".music-front");
 const musicBack = music.querySelector(".music-back");
 const musicClose = music.querySelector(".music-close");
+const musicTrinkets = music.querySelector(".music-trinkets");
 const focusMusicControl = (element) => {
   try { element.focus({ preventScroll: true }); } catch { element.focus(); }
+};
+// Vertically center the radar cluster in the gap between the "please email
+// me" line and the top of the expanded player. That gap grows with viewport
+// height, so it is measured live rather than pinned to a fixed offset.
+const centerRadarInGap = () => {
+  if (!musicTrinkets) return;
+  if (!music.classList.contains("open") || getComputedStyle(musicTrinkets).display === "none") {
+    musicTrinkets.style.transform = "";
+    return;
+  }
+  const reach = desk.querySelector(".reach-note");
+  const radar = musicTrinkets.querySelector(".radar");
+  if (!reach || !radar) return;
+  const reachRect = reach.getBoundingClientRect();
+  const playerRect = musicBack.getBoundingClientRect();
+  const radarRect = radar.getBoundingClientRect();
+  const delta = (reachRect.bottom + playerRect.top) / 2 - (radarRect.top + radarRect.height / 2);
+  let currentTy = 0;
+  try { currentTy = new DOMMatrixReadOnly(getComputedStyle(musicTrinkets).transform).m42; } catch (error) {}
+  musicTrinkets.style.transform = `translateY(${currentTy + delta}px)`;
 };
 const setMusicOpen = (open) => {
   music.classList.toggle("open", open);
@@ -815,7 +836,10 @@ const setMusicOpen = (open) => {
   musicBack.inert = !open;
   musicBack.setAttribute("aria-hidden", String(!open));
   focusMusicControl(open ? musicClose : musicFront);
+  if (open) window.setTimeout(centerRadarInGap, 460);
+  else if (musicTrinkets) musicTrinkets.style.transform = "";
 };
+window.addEventListener("resize", () => { if (music.classList.contains("open")) centerRadarInGap(); });
 try {
   const { createPlaylistPlayer } = await import("./files/playlist-player.js");
   createPlaylistPlayer({
