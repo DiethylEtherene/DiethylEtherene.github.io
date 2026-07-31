@@ -527,6 +527,7 @@ let solidMaterial = null, wireMaterial = null, silhouetteMaterial = null, curveM
 let solidMesh = null, wireMesh = null, silhouetteMesh = null, curveMesh = null;
 let wireMix = 0, wireTarget = 0;
 let wireMaxOpacity = .94, silhouetteMaxOpacity = .84, curveMaxOpacity = .78;
+let solidFillSolid = null, solidFillEmissive = null, wireFillBg = null, blackColor = null, solidEmissiveBase = .08;
 let modelWorldRadius = 0, modelFitPoints = null;
 const modelCameraDistance = 4, modelViewportTarget = 1.081, modelOutlineScale = 1.012;
 let requestModelRender = () => {};
@@ -548,9 +549,11 @@ const fitModelCamera = () => {
 updateModelTheme = () => {
   if (!solidMaterial || !wireMaterial || !silhouetteMaterial || !curveMaterial || !modelRenderer) return;
   const dark = desk.classList.contains("dark");
-  solidMaterial.color.setHex(dark ? 0x0a3c49 : 0xaeead9);
-  solidMaterial.emissive.setHex(dark ? 0x062932 : 0x0c241e);
-  solidMaterial.emissiveIntensity = dark ? .34 : .08;
+  if (!solidFillSolid) { solidFillSolid = new THREE.Color(); solidFillEmissive = new THREE.Color(); wireFillBg = new THREE.Color(); blackColor = new THREE.Color(0, 0, 0); }
+  solidFillSolid.setHex(dark ? 0x0a3c49 : 0xaeead9);
+  solidFillEmissive.setHex(dark ? 0x062932 : 0x0c241e);
+  wireFillBg.setHex(dark ? 0x060d14 : 0xe8eef1);
+  solidEmissiveBase = dark ? .34 : .08;
   solidMaterial.metalness = dark ? .28 : .12;
   solidMaterial.roughness = dark ? .42 : .58;
   wireMaterial.color.setHex(dark ? 0x52dcff : 0xff2b8d);
@@ -743,7 +746,12 @@ const animateModel = (time) => {
   if (solidMaterial && wireMaterial && silhouetteMaterial && curveMaterial) {
     wireMix += (wireTarget - wireMix) * Math.min(1, delta * .0024);
     const surfaceFade = 1 - wireMix;
-    solidMaterial.opacity = .3 + .66 * surfaceFade * surfaceFade;
+    solidMaterial.opacity = .25 + .71 * surfaceFade * surfaceFade;
+    if (solidFillSolid) {
+      solidMaterial.color.lerpColors(solidFillSolid, blackColor, wireMix);
+      solidMaterial.emissive.lerpColors(solidFillEmissive, wireFillBg, wireMix);
+      solidMaterial.emissiveIntensity = solidEmissiveBase + (1 - solidEmissiveBase) * wireMix;
+    }
     wireMaterial.opacity = wireMix * wireMaxOpacity;
     silhouetteMaterial.opacity = wireMix * silhouetteMaxOpacity;
     curveMaterial.uniforms.outlineOpacity.value = wireMix * curveMaxOpacity;
