@@ -158,7 +158,7 @@
 
 /* doodle canvas: fits its panel, so the page never has to scroll */
 .doodle-frame{display:grid;place-items:center;max-width:100%;margin:0 auto}
-.doodle-frame canvas{width:auto;height:auto;max-width:100%}
+.doodle-frame canvas{width:auto;height:auto;max-width:100%;touch-action:none}
 
 /* the matte state lives inside the frame: idle text, then progress, then the result */
 .overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;
@@ -1026,6 +1026,12 @@ doodle.addEventListener("pointermove", (event) => {
 
 function paintStroke(from, to) {
   doodleCtx.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
+  // Semi-transparent ink so overlapping passes build up density instead of
+  // every stroke instantly saturating to full opacity — that's what lets a
+  // doodle carry tone (scribble more in a spot, it reads denser) instead of
+  // every inked pixel mapping to the same darkest glyph. The eraser stays
+  // fully destructive (alpha 1) since a partial erase would be confusing.
+  doodleCtx.globalAlpha = tool === "eraser" ? 1 : 0.4;
   doodleCtx.strokeStyle = strokeInk();
   doodleCtx.lineWidth = weight;
   doodleCtx.lineCap = "round";
@@ -1034,6 +1040,7 @@ function paintStroke(from, to) {
   doodleCtx.moveTo(from.x, from.y);
   doodleCtx.lineTo(to.x, to.y);
   doodleCtx.stroke();
+  doodleCtx.globalAlpha = 1;
   doodleCtx.globalCompositeOperation = "source-over";
   if (tool === "pen") {
     hasStrokes = true;
@@ -1209,16 +1216,21 @@ const setMusicOpen = (open) => {
   try { (open ? musicClose : musicFront).focus({ preventScroll: true }); } catch {}
 };
 try {
-  const { createPlaylistPlayer } = await import("./files/playlist-player.js?v=4");
-  createPlaylistPlayer({
+  const [{ createPlaylistPlayer }, { attachMusicContinuity }] = await Promise.all([
+    import("./files/playlist-player.js?v=4"),
+    import("./files/music-continuity.js"),
+  ]);
+  const tracks = [
+    { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
+    { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
+    { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
+  ];
+  const player = createPlaylistPlayer({
     root: music,
     onOpenChange: setMusicOpen,
-    tracks: [
-      { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
-      { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
-      { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
-    ]
+    tracks,
   });
+  attachMusicContinuity({ player, audio: musicAudio, tracks });
 } catch (error) {
   console.warn("Playlist unavailable", error);
 }

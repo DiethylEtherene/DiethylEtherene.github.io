@@ -1230,17 +1230,23 @@ const setMusicOpen = (open) => {
 window.addEventListener("resize", () => { if (music.classList.contains("open")) centerRadarInGap(); });
 closeMusicPanel = () => { if (music.classList.contains("open")) musicClose.click(); };
 try {
-  const { createPlaylistPlayer } = await import("./files/playlist-player.js?v=4");
-  createPlaylistPlayer({
+  const [{ createPlaylistPlayer }, { attachMusicContinuity }] = await Promise.all([
+    import("./files/playlist-player.js?v=4"),
+    import("./files/music-continuity.js"),
+  ]);
+  const tracks = [
+    { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
+    { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
+    { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
+  ];
+  const player = createPlaylistPlayer({
     root: music,
     onOpenChange: setMusicOpen,
     onPlayStateChange: (isPlaying) => { isMusicPlaying = isPlaying; updateMusicPin(); },
-    tracks: [
-      { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
-      { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
-      { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
-    ]
+    tracks,
   });
+  const musicAudio = music.querySelector(".playlist-audio");
+  attachMusicContinuity({ player, audio: musicAudio, tracks });
 } catch (error) {
   console.warn("Playlist unavailable", error);
 }
