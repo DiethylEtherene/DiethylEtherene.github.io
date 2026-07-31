@@ -333,7 +333,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 }
 @media (max-width:700px),(max-width:1180px) and (orientation:portrait){
   body{overflow:auto;overflow-x:hidden}
-  .desk{height:auto;min-height:100dvh}
+  .desk{height:auto;min-height:100dvh;overflow:visible}
   .intro{padding:48px var(--gutter) 52px;gap:32px}
   .transmit{margin-top:0!important}
   .body{flex-direction:column}
@@ -351,14 +351,14 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .reticle{width:min(430px,84vw);height:min(430px,84vw)}
   .reticle .ring{width:109%;height:109%}
   .reticle .ring2{width:94%;height:94%}
-  .slot{width:min(336px,64vw);height:min(336px,64vw);touch-action:pan-y}
+  .slot{width:min(336px,64vw);height:min(336px,64vw);touch-action:none}
   .slot .scale{display:none}
   .music-easter{position:fixed;left:auto;right:10px;top:10px;bottom:auto;margin:0;height:auto;z-index:20}  .music-front{position:relative;width:46px;height:46px;background:var(--hint-bg);backdrop-filter:blur(4px)}
   .music-front:hover{transform:none}
   .music-front .disc{width:22px;height:22px}
   .music-front .disc i{inset:4px}
   .music-front .tag{bottom:3px;font-size:5.5px}
-  .music-back{position:fixed;left:auto;right:10px;top:auto;bottom:64px;transform-origin:100% 100%;
+  .music-back{position:fixed;left:auto;right:10px;top:10px;bottom:auto;transform-origin:100% 0%;
     width:min(300px,calc(100vw - 20px));background:var(--hint-bg);backdrop-filter:blur(8px)}
   .top{padding-right:66px}
   .foot{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:0;order:9}
@@ -410,7 +410,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .stage .caption{transform:none;margin-bottom:12px;font-size:9px}
   .ascii-layer{opacity:.5}
   .reticle{width:min(370px,86vw);height:min(370px,86vw)}
-  .slot{width:min(250px,58vw);height:min(250px,58vw);touch-action:pan-y}  .slot .dim{font-size:8px}
+  .slot{width:min(250px,58vw);height:min(250px,58vw);touch-action:none}  .slot .dim{font-size:8px}
   .slot .drag-hint{bottom:-26px;font-size:8.5px}
   .modes{transform:none;gap:10px}
   .modes button{min-height:40px;padding:0 16px;font-size:10px}
@@ -446,6 +446,9 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .menu{display:flex}
   .menu-note{display:flex}
   .index{display:none}
+  /* float the theme toggle + menu button up to the IDENTITY.LOCKED line */
+  .intro>div:first-child{position:relative}
+  .menu{position:absolute;top:0;right:0}
 
   .top{padding:11px 66px 11px var(--gutter);gap:6px 12px}
   .top .who b{font-size:12px}

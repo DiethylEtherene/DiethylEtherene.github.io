@@ -151,7 +151,7 @@ test("media timing renders duration and progress", async () => {
   assert.equal(elements[".track-progress i"].style.width, "25%");
 });
 
-test("closing pauses and reopening remains paused", async () => {
+test("closing keeps the song playing and reopening shows the playing state", async () => {
   const { root, elements, audio } = makeFixture();
   const openChanges = [];
   createPlaylistPlayer({ root, tracks, audio, onOpenChange: (open) => openChanges.push(open) });
@@ -163,10 +163,11 @@ test("closing pauses and reopening remains paused", async () => {
 
   assert.equal(audio.currentTime, 37);
   assert.equal(audio.src, tracks[0].src);
-  assert.equal(audio.paused, true);
+  assert.equal(audio.paused, false);
+  assert.equal(audio.pauseCalls, 0);
   assert.deepEqual(openChanges, [true, false, true]);
   assert.equal(audio.playCalls, 1);
-  assert.equal(elements[".play-toggle"].getAttribute("aria-label"), "Play Track 01");
+  assert.equal(elements[".play-toggle"].getAttribute("aria-label"), "Pause Track 01");
 });
 
 test("previous and next wrap and retain the existing playing state", async () => {

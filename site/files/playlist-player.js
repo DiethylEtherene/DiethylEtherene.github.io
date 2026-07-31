@@ -122,7 +122,10 @@ export function createPlaylistPlayer({ root, tracks, audio: suppliedAudio, onOpe
   }
 
   function close() {
-    pause();
+    // Closing only hides the panel — playback continues; only the pause
+    // button stops it. Bump the generation so any in-flight play() result
+    // is ignored, but do not pause the audio.
+    playbackGeneration += 1;
     state.isOpen = false;
     root.classList.remove("is-open");
     onOpenChange(false);
