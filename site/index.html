@@ -332,7 +332,10 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .theme-toggle{border-left:0;padding:0}
 }
 @media (max-width:700px),(max-width:1180px) and (orientation:portrait){
-  body{overflow:auto;overflow-x:hidden}
+  /* overflow-x:clip (not hidden/auto) keeps the body from becoming a
+     scroll container, so iOS Safari anchors position:fixed to the viewport
+     and the SIGNAL_? chip stays pinned while the document scrolls. */
+  body{overflow-x:clip}
   .desk{height:auto;min-height:100dvh;overflow:visible}
   .intro{padding:48px var(--gutter) 52px;gap:32px}
   .transmit{margin-top:0!important}
@@ -448,7 +451,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .index{display:none}
   /* float the theme toggle + menu button up to the IDENTITY.LOCKED line */
   .intro>div:first-child{position:relative}
-  .menu{position:absolute;top:0;right:0}
+  .menu{position:absolute;top:-11px;right:0}
 
   .top{padding:11px 66px 11px var(--gutter);gap:6px 12px}
   .top .who b{font-size:12px}
