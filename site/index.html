@@ -1194,22 +1194,21 @@ const centerRadarInGap = () => {
   const delta = (reachBottom + playerTop) / 2 - (radarRect.top + radarRect.height / 2);
   musicTrinkets.style.transform = `translateY(${delta}px)`;
 };
-// On mobile the chip/panel is pinned only while fully idle: not playing
-// AND not open. The moment the user opens it or starts playback, it should
-// scroll away with the page instead of staying pinned.
+// On mobile the chip/panel is pinned to the screen while playing OR open
+// (so the controls stay reachable while in use). Idle (not playing AND
+// closed), it scrolls away with the page like a normal page element.
 //
 // This deliberately never changes `position` (it stays position:fixed at
 // all times). Toggling between fixed and absolute depending on an
 // ancestor's overflow/scroll state turned out to be unreliable on real
-// iOS Safari (reports were of the exact opposite of the intended
-// behaviour). Instead, while "flowing", a plain scroll listener
+// iOS Safari. Instead, while idle/"flowing", a plain scroll listener
 // continuously counter-translates the element by the current scroll
 // offset (transform:translateY(-scrollY)), which fakes "scrolls with the
 // page" on top of an always-fixed element — position:fixed itself is the
 // one positioning mode with no cross-browser edge cases, so this sidesteps
 // the bug entirely rather than trying to out-think it.
 let isMusicPlaying = false;
-const isMusicFlowing = () => isMusicPlaying || music.classList.contains("open");
+const isMusicFlowing = () => !isMusicPlaying && !music.classList.contains("open");
 const updateMusicPin = () => {
   const flowing = isMusicFlowing();
   music.classList.toggle("is-flowing", flowing);
@@ -1231,7 +1230,7 @@ const setMusicOpen = (open) => {
 window.addEventListener("resize", () => { if (music.classList.contains("open")) centerRadarInGap(); });
 closeMusicPanel = () => { if (music.classList.contains("open")) musicClose.click(); };
 try {
-  const { createPlaylistPlayer } = await import("./files/playlist-player.js?v=3");
+  const { createPlaylistPlayer } = await import("./files/playlist-player.js?v=4");
   createPlaylistPlayer({
     root: music,
     onOpenChange: setMusicOpen,
