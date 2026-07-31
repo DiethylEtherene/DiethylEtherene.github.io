@@ -123,7 +123,17 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .transmit .rule{display:flex;align-items:center;gap:10px;color:var(--muted);margin-bottom:14px}
 .transmit .rule i{flex:1 1 auto;height:1px;background:var(--line)}
 .transmit .links{display:flex;flex-direction:column;gap:12px}
-.transmit .links span{color:var(--muted)}
+.transmit .links span{color:var(--ink)}
+.link-row{display:flex;align-items:center;gap:10px}
+.link-row>a,.link-row>span{flex:1 1 auto;min-width:0}
+.copy-btn{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;padding:0;border:1px solid var(--line);
+  background:var(--btn);color:var(--muted);cursor:pointer;transition:color .18s,border-color .18s}
+.copy-btn:hover{color:var(--pink);border-color:var(--cyan)}
+.copy-btn svg{width:13px;height:13px;display:block}
+.copy-btn .ic-check{display:none}
+.copy-btn.copied{color:var(--mint);border-color:var(--mint)}
+.copy-btn.copied .ic-copy{display:none}
+.copy-btn.copied .ic-check{display:block}
 .cjk{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;font-weight:500;letter-spacing:.05em;margin-right:.45em}
 
 /* artifact */
@@ -377,7 +387,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .transmit .links{gap:0}
   .transmit .links a,.transmit .links span{display:flex;align-items:center;min-height:44px;
     border-bottom:1px solid var(--line)}
-  .transmit .links span{border-bottom:0;color:var(--muted)}
+  .transmit .links span{border-bottom:0;color:var(--ink)}
   .modes button{min-height:44px;padding:0 18px}
   .track-controls button{width:36px;height:36px;font-size:11px}
   .music-close{width:32px;height:32px;font-size:16px}
@@ -409,7 +419,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .transmit .links{gap:0}
   .transmit .links a,.transmit .links span{display:flex;align-items:center;min-height:38px;font-size:11.5px;
     border-bottom:1px solid var(--line)}
-  .transmit .links span{border-bottom:0;color:var(--muted)}
+  .transmit .links span{border-bottom:0;color:var(--ink)}
   .reach-note{margin-top:12px!important;line-height:1.5!important}
 
   .stage{padding:10px var(--gutter) 34px;gap:14px}
@@ -613,9 +623,15 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
         <div class="transmit" style="margin-top:auto">
           <div class="rule"><i></i>TRANSMIT<i></i></div>
           <div class="links">
-            <a href="mailto:Asteria0526@gmail.com">asteria0526@gmail.com</a>
+            <div class="link-row">
+              <a href="mailto:Asteria0526@gmail.com">asteria0526@gmail.com</a>
+              <button type="button" class="copy-btn" data-copy="asteria0526@gmail.com" aria-label="Copy email address"><svg class="ic-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></button>
+            </div>
             <a href="https://github.com/DiethylEtherene" target="_blank" rel="noreferrer">github/@DiethylEtherene &#8599;</a>
-            <span><span class="cjk">&#24494;&#20449;</span> IthinkitsAsu</span>
+            <div class="link-row">
+              <span><span class="cjk">&#24494;&#20449;</span> IthinkitsAsu</span>
+              <button type="button" class="copy-btn" data-copy="IthinkitsAsu" aria-label="Copy WeChat ID"><svg class="ic-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></button>
+            </div>
           </div>
           <p class="reach-note" style="margin:16px 0 0;font-size:9.5px;line-height:1.6;letter-spacing:.16em;color:var(--muted)"><span style="color:var(--pink)">&#9656;</span> IF YOU&rsquo;D LIKE TO REACH OUT,<br>PLEASE EMAIL ME.</p>
         </div>
@@ -740,6 +756,36 @@ themeButtons.forEach((button) => button.addEventListener("click", () => {
 }));
 systemDark.addEventListener("change", (event) => {
   if (!localStorage.getItem(THEME_KEY)) applyTheme(event.matches);
+});
+
+/* ---------- copy contact to clipboard ---------- */
+desk.querySelectorAll(".copy-btn").forEach((button) => {
+  let resetTimer = 0;
+  button.addEventListener("click", async () => {
+    const text = button.dataset.copy || "";
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(text);
+      copied = true;
+    } catch (error) {
+      const field = document.createElement("textarea");
+      field.value = text;
+      field.setAttribute("readonly", "");
+      field.style.cssText = "position:fixed;top:-1000px;left:0;opacity:0";
+      document.body.appendChild(field);
+      field.select();
+      try { copied = document.execCommand("copy"); } catch (fallbackError) {}
+      field.remove();
+    }
+    if (!copied) return;
+    button.classList.add("copied");
+    button.setAttribute("aria-label", "Copied");
+    window.clearTimeout(resetTimer);
+    resetTimer = window.setTimeout(() => {
+      button.classList.remove("copied");
+      button.setAttribute("aria-label", button.dataset.copy.includes("@") ? "Copy email address" : "Copy WeChat ID");
+    }, 1400);
+  });
 });
 
 /* ---------- phone section menu ---------- */
