@@ -109,16 +109,19 @@ body{background:#e8eef1;font-family:"JetBrains Mono",ui-monospace,"Courier New",
 .ticker b{color:var(--mint);font-weight:400}
 @keyframes marquee{to{transform:translateX(-50%)}}
 
-/* hidden-signal player — sits on the footer line, pins to the screen when in use */
-.music-easter{position:relative;flex:0 0 auto;align-self:center;width:62px;height:62px;
-  margin:0 16px 0 auto;z-index:20}
+/* hidden-signal player — on the footer line just left of the ticker, pins when in use */
+.music-easter{position:relative;flex:0 0 auto;align-self:center;order:1;width:62px;height:62px;
+  margin:0;z-index:20}
+.ticker{order:2}
 .music-easter.pinned{position:fixed;right:16px;bottom:16px;margin:0}
 .music-front,.music-back{position:absolute;right:0;bottom:0;transform-origin:100% 100%;
   transition:opacity .26s ease,transform .42s cubic-bezier(.16,1,.3,1)}
 .music-front{display:grid;place-items:center;width:62px;height:62px;padding:0;border:1px solid var(--line);
   background:var(--hint-bg);backdrop-filter:blur(6px);color:var(--ink);cursor:pointer;
   transition:opacity .26s ease,transform .42s cubic-bezier(.16,1,.3,1)}
-.music-front:hover{transform:translateY(-3px) rotate(-3deg)}
+.music-front:hover{border-color:var(--cyan)}
+/* the panel opens to the RIGHT of the chip: it sits near the left of the footer */
+.music-back{left:0;right:auto;transform-origin:0 100%}
 .music-front .disc{position:relative;display:grid;place-items:center;width:30px;height:30px;
   border:1px solid var(--line);border-radius:50%;animation:spin 7s linear infinite}
 .music-front .disc i{position:absolute;inset:6px;display:block;border:1px dotted var(--pink);border-radius:50%}
@@ -154,9 +157,28 @@ body{background:#e8eef1;font-family:"JetBrains Mono",ui-monospace,"Courier New",
 @keyframes blink{0%,72%{opacity:1}76%,84%{opacity:.25}88%,100%{opacity:1}}
 
 /* ---------- tablet ---------- */
+@media (min-width:701px){
+  /* one page, always: the shell owns the viewport height and the parameter rail
+     scrolls internally rather than letting the page grow */
+  .desk{height:100dvh;min-height:0}
+  .flow{min-height:0}
+  .sheet{min-height:0;overflow:auto}
+}
 @media (max-width:1180px){
   .desk{--gutter:26px;--rail:48px}
   .sheet{padding-bottom:30px}
+  /* phone + tablet: the player parks at the top of the page so it is reachable on load */
+  .top{padding-right:60px}
+  .music-easter{position:fixed;top:8px;right:12px;bottom:auto;left:auto;margin:0;width:46px;height:46px}
+  .music-easter.pinned{position:fixed;top:8px;right:12px;bottom:auto;margin:0}
+  .music-front,.music-back{top:0;bottom:auto;transform-origin:100% 0}
+  .music-back{left:auto;right:0;transform-origin:100% 0}
+  .music-front{width:46px;height:46px}
+  .music-front:hover{transform:none}
+  .music-front .disc{width:22px;height:22px}
+  .music-front .disc i{inset:4px}
+  .music-front .tag{bottom:3px;font-size:5.5px}
+  .music-back{width:min(300px,calc(100vw - 24px))}
 }
 @media (max-width:900px){
   .side{display:none}
@@ -170,9 +192,10 @@ body{background:#e8eef1;font-family:"JetBrains Mono",ui-monospace,"Courier New",
 @media (max-width:700px){
   .desk{--gutter:20px}
   .deco{display:none}
-  .top{min-height:0;padding:6px 0 0 var(--gutter);gap:6px 12px}
+  .top{min-height:0;padding:6px 64px 0 var(--gutter);gap:6px 12px}
   .top .lead{flex-wrap:wrap;white-space:normal;min-height:24px;font-size:10.5px;gap:10px}
   .readouts{width:100%;align-self:auto;border-top:1px solid var(--line)}
+  .readouts>*:last-child{padding-right:0}
   .readouts>*{flex:1 1 auto;justify-content:center;min-height:30px;padding:0 10px;font-size:9px}
   .readouts>*:first-child{border-left:0}
   .theme-toggle{min-height:30px;padding:0 10px;justify-content:center;font-size:9px}
@@ -183,14 +206,6 @@ body{background:#e8eef1;font-family:"JetBrains Mono",ui-monospace,"Courier New",
   .sheet{padding:16px var(--gutter) 20px}
   .foot{align-items:center;flex-wrap:nowrap}
   .foot .signal{width:auto;flex:0 1 auto;min-height:50px;border-right:0;border-bottom:0;padding:0 12px 0 var(--gutter)}
-  .music-easter{width:46px;height:46px;margin:0 12px 0 auto}
-  .music-easter.pinned{right:12px;bottom:12px}
-  .music-front{width:46px;height:46px}
-  .music-front:hover{transform:none}
-  .music-front .disc{width:22px;height:22px}
-  .music-front .disc i{inset:4px}
-  .music-front .tag{bottom:3px;font-size:5.5px}
-  .music-back{width:min(300px,calc(100vw - 24px))}
 }
 @media (max-width:380px){
   .desk{--gutter:16px}

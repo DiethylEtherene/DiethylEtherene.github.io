@@ -114,10 +114,14 @@
 .crumbs .spacer{flex:1 1 40px;height:1px;background:var(--line);opacity:.7}
 
 .work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(260px,300px);gap:18px;
-  align-items:stretch;flex:1 1 auto;grid-template-rows:minmax(0,1fr) auto}
+  align-items:stretch;flex:1 1 auto;min-height:0;grid-template-rows:minmax(0,1fr) auto}
 .work .wide{grid-column:span 2}
 .out{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,300px);gap:18px;align-items:stretch;
-  flex:1 1 auto;grid-template-rows:minmax(0,1fr) auto}
+  flex:1 1 auto;min-height:0;grid-template-rows:minmax(0,1fr) auto}
+.out .plate-panel{grid-column:1;grid-row:1}
+.out .side{grid-column:2;grid-row:1}
+.out .readout-panel{grid-column:2;grid-row:2}
+.out .export-panel{grid-column:1;grid-row:2}
 /* panels stretch to the bottom of the screen and their previews grow with them */
 .work .panel,.out .panel{min-height:0}
 .work .panel>.pad,.out .panel>.pad{display:flex;flex-direction:column;min-height:0}
@@ -133,6 +137,10 @@
   padding:0 14px;border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:.2em;color:var(--muted);
   flex:0 0 auto}
 .panel>.head b{font-weight:400;color:var(--pink)}
+.head-btn{min-height:26px;padding:0 10px;border:1px solid var(--line);background:transparent;
+  color:var(--cyan);font:700 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;
+  cursor:pointer;transition:border-color .18s,color .18s}
+.head-btn:hover{border-color:var(--cyan);color:var(--pink)}
 .pad{padding:16px;flex:1 1 auto;min-width:0}
 
 .drop{display:flex;flex:1 1 auto;flex-direction:column;align-items:center;justify-content:center;gap:12px;
@@ -191,12 +199,24 @@
 .bar{height:3px;background:var(--line)}
 .bar i{display:block;height:100%;background:var(--mint);width:0;transition:width .2s}
 
+/* readout cells match the entry-screen spec strip: label over value */
+.readout-panel .rows{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+.readout-panel .rows div{flex-direction:column;align-items:flex-start;justify-content:center;gap:5px;
+  padding:10px 14px;min-height:0;border-bottom:0;border-left:1px solid var(--line)}
+.readout-panel .rows div:first-child{border-left:0}
+.readout-panel .rows span{font-size:8.5px;letter-spacing:.12em;line-height:1.4;white-space:normal;
+  overflow:visible;text-overflow:clip;max-width:100%}
+.readout-panel .rows b{font-size:14px;letter-spacing:.04em;color:var(--ink)}
+.readout-panel .rows b.hot{color:var(--cyan)}
+
 .field{display:flex;flex-direction:column;gap:7px;font-size:9.5px;letter-spacing:.2em;color:var(--muted)}
 .field .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .field .row b{font-weight:400;color:var(--cyan)}
 .field .hint{font-family:Helvetica,Arial,sans-serif;font-size:11.5px;line-height:1.55;letter-spacing:0;color:var(--muted)}
 .field input[type=range]{width:100%;min-height:34px;accent-color:var(--pink)}
 .stack{display:flex;flex-direction:column;gap:17px}
+.out .side .pad{row-gap:26px}
+.out .side .field .opts{margin-top:2px}
 
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;
   border:1px solid var(--line);background:var(--btn);color:var(--ink);
@@ -226,13 +246,13 @@
 /* ---------- output ---------- */
 .plate{position:relative;display:grid;place-items:center;flex:1 1 0;min-height:180px;padding:18px;
   border:1px solid var(--cyan);background:var(--slot);overflow:hidden}
-.plate canvas{display:block;max-width:100%;max-height:100%;width:auto;height:auto}
+.plate canvas{display:block}
 .plate .stamp{position:absolute;right:10px;top:8px;font-size:8.5px;letter-spacing:.18em;color:var(--muted)}
 .plate .lead{position:absolute;background:var(--line)}
 .plate .lx{left:8px;right:8px;bottom:8px;height:1px;opacity:.45}
 .plate .ly{top:8px;bottom:8px;left:8px;width:1px;opacity:.45}
 .desk.dark .plate{box-shadow:0 0 30px rgba(82,220,255,.14),inset 0 0 40px rgba(82,220,255,.06)}
-.raw{width:100%;height:170px;margin-top:14px;padding:10px;border:1px solid var(--line);background:var(--slot);
+.raw{width:100%;height:104px;margin-top:14px;padding:10px;border:1px solid var(--line);background:var(--slot);
   color:var(--muted);font:400 9px/1.25 "JetBrains Mono",ui-monospace,monospace;resize:vertical;white-space:pre;
   overflow:auto}
 .copied{align-self:center;font-size:9px;letter-spacing:.18em;color:var(--mint)}
@@ -242,6 +262,12 @@
   .tools{margin-top:16px;gap:10px}
   .tools .chip{min-height:40px}
   .btns{margin-top:16px}
+  .out .side .pad{row-gap:12px;overflow:auto;min-height:0}
+  .out .side .field{gap:6px}
+  .out .side input[type=range]{min-height:26px}
+  .out .side .opts{gap:6px}
+  .out .side .opts button{min-height:28px;padding:0 9px}
+  .raw{height:84px}
 }
 @media (max-width:1180px){
   .hero{grid-template-columns:minmax(0,1fr);min-height:0}
@@ -254,7 +280,13 @@
   .work{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .work .wide,.work .tel-panel{grid-column:span 2}
   .work .tel-panel .pad{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,1.4fr);gap:18px;align-items:start}
-  .out{grid-template-columns:minmax(0,1fr)}
+  /* single column: parameters sit directly under the plate so edits are visible
+     without scrolling; export drops to the bottom */
+  .out{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto auto auto}
+  .out .plate-panel{grid-column:1;grid-row:1}
+  .out .side{grid-column:1;grid-row:2}
+  .out .readout-panel{grid-column:1;grid-row:3}
+  .out .export-panel{grid-column:1;grid-row:4}
   .out .side .pad{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;align-items:start}
   .out .side .pad>.btn{grid-column:1/-1}
 }
@@ -263,12 +295,14 @@
   /* one clear vertical rhythm: copy → the two actions → the specimen band,
      with the spec bars directly under the specimen so they read as its caption */
   .hero{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;min-height:0;gap:14px}
-  .hero .say{grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(210px,.95fr);
-    gap:8px 20px;align-items:end}
+  .hero .say{grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,.82fr) minmax(300px,1.18fr);
+    gap:8px 18px;align-items:end}
   .hero .pick{grid-column:1;grid-row:2;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
   .hero .specimen{grid-column:1;grid-row:3}
   .hero p.lede{font-size:14px;max-width:40ch}
   .pipeline{flex:0 0 auto;border-top:0}
+  .pipeline li{gap:10px}
+  .pipeline .t{min-width:50px}
   .pipeline li:first-child{border-top:1px solid var(--line)}
   .specimen .stage{height:auto;min-height:0;aspect-ratio:3/2;max-height:320px;padding:12px}
   .hero .specimen{grid-column:1;grid-row:3;max-width:540px;justify-self:center;width:100%}
@@ -279,11 +313,14 @@
   .ramp-strip>div{flex:1 1 0;min-width:0;padding:9px 12px}
   .ramp-strip .g{font-size:12px;letter-spacing:.2em}
   /* the workbench fills the screen instead of leaving a void under it */
-  .plate{min-height:140px;padding:14px}
+  .plate{min-height:180px;padding:14px}
   .work .frame{min-height:90px}
   .work .matte-frame{min-height:120px}
-  .raw{height:104px;margin-top:10px;flex:0 0 auto}
-  .out .side .pad{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .raw{height:72px;margin-top:10px;flex:0 0 auto}
+  .out{grid-template-rows:minmax(200px,1fr) auto auto auto}
+  .out .side .pad{grid-template-columns:repeat(3,minmax(0,1fr));gap:26px 12px}
+  .out .readout-panel .rows{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .out .side .rows div{min-height:28px}
   .work .tel-panel .pad{grid-template-columns:minmax(200px,1fr) minmax(0,1.6fr)}
   .work-doodle{grid-template-columns:minmax(0,1.55fr) minmax(230px,1fr);align-items:stretch;
     grid-template-rows:minmax(0,1fr)}
@@ -304,7 +341,24 @@
   .card{padding:18px 16px}
   .card h2{font-size:21px}
   .work,.out{grid-template-columns:minmax(0,1fr);flex:0 0 auto;grid-template-rows:none}
-  .work .panel>.pad,.out .panel>.pad{display:block}
+  .out .plate-panel,.out .side,.out .export-panel{grid-column:1}
+  .out{grid-template-rows:auto auto auto auto}
+  .out .plate-panel{grid-row:1}
+  .out .side{grid-row:2}
+  .out .readout-panel{grid-row:3}
+  .out .export-panel{grid-row:4}
+  /* symmetric: the space above a category label matches the space below it */
+  .out .side{align-self:start}
+  .out .side .pad{display:flex;flex-direction:column;gap:6px;padding:8px 14px 14px;flex:0 0 auto}
+  .out .side>.head{min-height:32px}
+  .out .side .stack{gap:6px}
+  .out .side .field{gap:6px}
+  .out .side input[type=range]{min-height:22px}
+  .out .side .opts{gap:6px}
+  .out .readout-panel .rows{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .out .readout-panel .rows div{min-height:0}
+  .raw{height:120px}
+  .work .panel>.pad,.out .plate-panel>.pad,.out .export-panel>.pad{display:block}
   .work .frame{flex:0 0 auto;min-height:0}
   .work .matte-frame{aspect-ratio:1/1;min-height:0}
   .work .matte-frame canvas{max-height:100%}
@@ -314,7 +368,7 @@
   .plate{flex:0 0 auto;min-height:300px;padding:12px}
   .plate canvas{max-height:44vh}
   .work .wide,.work .tel-panel{grid-column:auto}
-  .work .tel-panel .pad,.out .side .pad{display:block}
+  .work .tel-panel .pad{display:block}
   .drop{margin:14px;padding:28px 14px}
   .pad{padding:14px}
   .strip>div{border-left:0;border-top:1px solid var(--line)}
@@ -466,10 +520,14 @@
                     <div class="track" id="prog-track" hidden><i id="prog-bar"></i></div>
                   </div>
                 </div>
-                <label class="field" style="margin-top:14px">
+                <div class="opts" id="matte-mode" style="margin-top:14px">
+                  <button type="button" id="mode-remove" class="on">REMOVE BACKGROUND</button>
+                  <button type="button" id="mode-keep">KEEP BACKGROUND</button>
+                </div>
+                <label class="field" id="matte-controls" style="margin-top:12px">
                   <span class="row"><span>SENSITIVITY</span><b id="tol-label">0.45</b></span>
                   <input type="range" id="tol" min="0" max="100" step="1" value="45" disabled>
-                  <span class="hint">Nudge if the matte ate part of the subject, or left background behind.</span>
+                  <span class="hint" id="matte-hint">Nudge if the matte ate part of the subject, or left background behind.</span>
                 </label>
                 <div class="btns">
                   <button type="button" class="btn primary" id="to-output" disabled>Generate ASCII &#8594;</button>
@@ -546,7 +604,7 @@
         <section class="view" id="view-output" hidden>
           <div class="crumbs"><b>01 SOURCE</b><span>&#8250;</span><b>02 MATTE</b><span>&#8250;</span><b class="on">03 PLATE</b><i class="spacer" aria-hidden="true"></i><span id="crumb-out">—</span></div>
           <div class="out">
-            <div class="panel">
+            <div class="panel plate-panel">
               <div class="head"><span>[03] ASCII.PLATE</span><b id="plate-badge">—</b></div>
               <div class="pad">
                 <div class="plate">
@@ -554,19 +612,25 @@
                   <span class="stamp" id="plate-stamp">—</span>
                   <canvas id="out-canvas"></canvas>
                 </div>
-                <div class="btns">
+              </div>
+            </div>
+
+            <div class="panel export-panel">
+              <div class="head"><span>[05] EXPORT</span><button type="button" class="head-btn" id="toggle-raw">SHOW RAW TEXT</button></div>
+              <div class="pad">
+                <div class="btns" style="margin-top:0">
                   <button type="button" class="btn primary" id="dl-png">Download PNG</button>
                   <button type="button" class="btn" id="copy-text">Copy ASCII text</button>
                   <button type="button" class="btn" id="out-back">Adjust source</button>
                   <button type="button" class="btn" id="out-restart">Start over</button>
                   <span class="copied" id="copied" hidden>COPIED</span>
                 </div>
-                <textarea class="raw" id="raw" readonly aria-label="Raw ASCII output"></textarea>
+                <textarea class="raw" id="raw" readonly aria-label="Raw ASCII output" hidden></textarea>
               </div>
             </div>
 
             <div class="panel side">
-              <div class="head"><span>[04] PARAMETERS</span><b>LIVE</b></div>
+              <div class="head"><span>[04] PARAMETERS</span><button type="button" class="head-btn" id="rerender">RE-RENDER</button></div>
               <div class="pad stack">
                 <label class="field">
                   <span class="row"><span>DETAIL</span><b id="cols-label">96 COL</b></span>
@@ -595,15 +659,17 @@
                     <button type="button" id="opt-scan" class="on">SCANLINES</button>
                   </div>
                 </div>
-                <div class="field">
-                  <span class="row"><span>PLATE READOUT</span></span>
-                  <div class="rows">
-                    <div><span>GLYPHS SET</span><b id="out-filled">—</b></div>
-                    <div><span>EDGE GLYPHS</span><b class="hot" id="out-edge">—</b></div>
-                    <div><span>FILL RATIO</span><b id="out-ratio">—</b></div>
-                  </div>
+              </div>
+            </div>
+
+            <div class="panel readout-panel">
+              <div class="head"><span>[06] PLATE READOUT</span><b>LIVE</b></div>
+              <div class="pad">
+                <div class="rows">
+                  <div><span>GLYPHS SET</span><b id="out-filled">—</b></div>
+                  <div><span>EDGE GLYPHS</span><b class="hot" id="out-edge">—</b></div>
+                  <div><span>FILL RATIO</span><b id="out-ratio">—</b></div>
                 </div>
-                <button type="button" class="btn" id="rerender">Re-render</button>
               </div>
             </div>
           </div>
@@ -683,6 +749,7 @@ const state = {
   mask: null,
   origin: "photo",
   tolerance: 0.45,
+  keepBackground: false,
   grid: null,
   params: { cols: 96, edge: 0.55, cell: 9, ramp: "signal", palette: "signal", invert: false, scan: true },
 };
@@ -843,16 +910,23 @@ function resetAll() {
 }
 
 // idle → working → ready all happen in the same frame; only the overlay changes.
+// "bypassed" is the keep-the-background mode: no matte, the whole image converts.
 function setMatteState(mode, progress) {
   const overlay = $("matte-overlay");
   const working = mode === "working";
+  const bypassed = mode === "bypassed";
   $("matte-rings").hidden = !working;
   $("prog-track").hidden = !working;
-  overlay.hidden = mode === "ready";
+  overlay.hidden = mode === "ready" || bypassed;
   $("matte-msg").textContent = working ? "REMOVING BACKGROUND / LOCAL" : "AWAITING SOURCE";
-  $("matte-badge").textContent = mode === "ready" ? "READY" : working ? "WORKING" : "STANDBY";
-  $("tol").disabled = mode === "idle";
-  $("to-output").disabled = mode !== "ready";
+  $("matte-badge").textContent =
+    mode === "ready" ? "READY" : working ? "WORKING" : bypassed ? "BYPASSED" : "STANDBY";
+  $("tol").disabled = mode === "idle" || bypassed;
+  $("matte-controls").style.opacity = bypassed ? ".4" : "1";
+  $("matte-hint").textContent = bypassed
+    ? "Background kept — the whole frame is converted, edges and all."
+    : "Nudge if the matte ate part of the subject, or left background behind.";
+  $("to-output").disabled = !(mode === "ready" || bypassed);
   if (working && typeof progress === "number") {
     const pct = Math.round(progress * 100) + "%";
     $("prog-pct").textContent = pct;
@@ -942,13 +1016,43 @@ async function acceptFile(file) {
     canvas.getContext("2d").drawImage(state.source, 0, 0);
     $("src-dim").textContent = state.source.width + " × " + state.source.height + " PX";
     $("crumb-note").textContent = "MATTE RUNNING";
-    await runMatte();
+    applyMatteMode();
   } catch (error) {
     showError(error.message || "Could not read that image");
   }
 }
 
 let matteToken = 0;
+
+// Keep-background mode: skip the matte entirely and show the source as-is.
+function showSourceAsIs() {
+  matteToken += 1; // cancel any matte in flight
+  state.mask = null;
+  const canvas = $("matte-canvas");
+  canvas.width = state.source.width;
+  canvas.height = state.source.height;
+  canvas.getContext("2d").drawImage(state.source, 0, 0);
+  setMatteState("bypassed");
+  $("crumb-matte").classList.add("on");
+  $("crumb-note").textContent = "BACKGROUND KEPT — READY TO GENERATE";
+  updateTelemetry();
+}
+
+function applyMatteMode() {
+  if (!state.source) return;
+  if (state.keepBackground) showSourceAsIs();
+  else runMatte();
+}
+
+const setMatteMode = (keep) => {
+  state.keepBackground = keep;
+  $("mode-keep").classList.toggle("on", keep);
+  $("mode-remove").classList.toggle("on", !keep);
+  if (state.source) applyMatteMode();
+};
+$("mode-keep").addEventListener("click", () => setMatteMode(true));
+$("mode-remove").addEventListener("click", () => setMatteMode(false));
+
 async function runMatte() {
   if (!state.source) return;
   const token = ++matteToken;
@@ -969,6 +1073,7 @@ async function runMatte() {
 
 let tolTimer = 0;
 $("tol").addEventListener("input", (event) => {
+  if (state.keepBackground) return;
   state.tolerance = Number(event.target.value) / 100;
   $("tol-label").textContent = state.tolerance.toFixed(2);
   $("tel-tol").textContent = state.tolerance.toFixed(2);
@@ -1123,6 +1228,11 @@ $("opt-scan").addEventListener("click", () => {
   paint();
 });
 $("rerender").addEventListener("click", build);
+$("toggle-raw").addEventListener("click", () => {
+  const raw = $("raw");
+  raw.hidden = !raw.hidden;
+  $("toggle-raw").textContent = raw.hidden ? "SHOW RAW TEXT" : "HIDE RAW TEXT";
+});
 
 function generate() {
   setView("output");
@@ -1140,14 +1250,41 @@ function build() {
   paint();
 }
 
+// The plate must always show the WHOLE grid: size the canvas's CSS box to fit
+// inside the plate, preserving the bitmap's aspect, rather than relying on
+// percentage max-* (which can't resolve against a flexed, indefinite height).
+function fitPlate() {
+  const canvas = $("out-canvas");
+  const box = canvas.parentElement;
+  if (!canvas.width || !canvas.height) return;
+  const styles = getComputedStyle(box);
+  const availableWidth = box.clientWidth -
+    parseFloat(styles.paddingLeft) - parseFloat(styles.paddingRight);
+  const availableHeight = box.clientHeight -
+    parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom);
+  if (availableWidth <= 0 || availableHeight <= 0) return;
+  const scale = Math.min(availableWidth / canvas.width, availableHeight / canvas.height);
+  canvas.style.width = Math.max(1, Math.floor(canvas.width * scale)) + "px";
+  canvas.style.height = Math.max(1, Math.floor(canvas.height * scale)) + "px";
+}
+if (typeof ResizeObserver === "function") {
+  let plateFrame = 0;
+  new ResizeObserver(() => {
+    cancelAnimationFrame(plateFrame);
+    plateFrame = requestAnimationFrame(() => { if (state.grid) fitPlate(); });
+  }).observe(document.querySelector(".plate"));
+}
+
 function paint() {
   if (!state.grid) return;
+  const canvas = $("out-canvas");
   renderGrid(state.grid, {
-    canvas: $("out-canvas"),
+    canvas,
     paletteKey: state.params.palette,
     cell: state.params.cell,
     scanlines: state.params.scan,
   });
+  fitPlate();
   $("raw").value = gridToText(state.grid);
   const counts = countGlyphs(state.grid);
   $("plate-badge").textContent = state.grid.cols + " × " + state.grid.rows;
@@ -1191,18 +1328,26 @@ const musicBack = music.querySelector(".music-back");
 const musicClose = music.querySelector(".music-close");
 const musicAudio = music.querySelector(".playlist-audio");
 const compact = window.matchMedia("(max-width:1180px)");
+const phone = window.matchMedia("(max-width:700px)");
 let musicPlaying = false;
 
-// The chip lives on the footer line, so idle it simply scrolls away with the page.
-// Once it is open or playing on phone/tablet it pins to the screen so the controls
-// stay reachable while scrolling.
+// Phone: the chip is parked at the TOP of the page. Idle (closed and not playing)
+// it scrolls away with the page; open or playing it pins to the same spot on the
+// SCREEN so the controls stay reachable. It is always position:fixed (swapping
+// position modes mid-scroll is unreliable on iOS) — while "flowing" we simply
+// counter-translate it by the current scroll offset.
+// Tablet: the chip sits on the footer line and pins when in use.
 const updateMusicPin = () => {
-  const pinned = compact.matches && (musicPlaying || music.classList.contains("open"));
-  music.classList.toggle("pinned", pinned);
+  const inUse = musicPlaying || music.classList.contains("open");
+  music.classList.toggle("pinned", compact.matches && inUse);
+  const flowing = compact.matches && !inUse;
+  music.style.transform = flowing ? "translateY(" + -Math.round(window.scrollY) + "px)" : "";
 };
 window.updateMusicPin = updateMusicPin;
+window.addEventListener("scroll", updateMusicPin, { passive: true });
 window.addEventListener("resize", updateMusicPin);
 compact.addEventListener("change", updateMusicPin);
+phone.addEventListener("change", updateMusicPin);
 musicAudio.addEventListener("play", () => { musicPlaying = true; updateMusicPin(); });
 musicAudio.addEventListener("pause", () => { musicPlaying = false; updateMusicPin(); });
 
