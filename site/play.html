@@ -1,0 +1,1232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="ASCII creature generator — turn a photo or a doodle into an ASCII plate, entirely in your browser.">
+<meta name="theme-color" content="#e8eef1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060d14" media="(prefers-color-scheme: dark)">
+<title>Play — ASCII Creature Generator / Asteria Wang</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./files/subpage.css">
+<style>
+.view[hidden]{display:none!important}
+.sheet{display:flex;flex-direction:column;gap:12px}
+.sheet>.view{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:12px}
+
+/* view transitions */
+@keyframes viewIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+@keyframes viewOut{from{opacity:1;transform:none}to{opacity:0;transform:translateY(-10px)}}
+@keyframes wipe{0%{transform:translateY(-4px);opacity:0}18%{opacity:1}100%{transform:translateY(var(--wipe-to,600px));opacity:0}}
+.view.leaving{animation:viewOut .16s ease-in both}
+.view.entering>*{animation:viewIn .42s cubic-bezier(.16,1,.3,1) both}
+.view.entering>*:nth-child(2){animation-delay:.07s}
+.view.entering>*:nth-child(3){animation-delay:.13s}
+.wipe{position:absolute;left:0;right:0;top:0;height:1px;z-index:6;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent)}
+.wipe.run{animation:wipe .52s cubic-bezier(.4,0,.6,1) both}
+
+/* ---------- entry ---------- */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(340px,42%);grid-template-rows:auto auto;
+  gap:16px 22px;align-items:stretch;flex:1 1 auto;min-height:min(46vh,420px)}
+.hero .say{grid-column:1;grid-row:1;display:flex;flex-direction:column;justify-content:flex-start;gap:16px;min-width:0}
+.hero .pick{grid-column:1;grid-row:2}
+.hero .specimen{grid-column:2;grid-row:1/span 2}
+.hero h1{margin:0 0 12px;font-size:clamp(38px,4.8vw,72px);line-height:.86;letter-spacing:-.055em;position:relative}
+.hero h1 .ghost{position:absolute;left:0;top:0;pointer-events:none}
+.hero h1 .g1{color:var(--pink);opacity:.26;transform:translate(-3px,2px)}
+.hero h1 .g2{color:var(--cyan);opacity:.24;transform:translate(3px,-2px)}
+.desk.dark .hero h1 .g1{opacity:.46}
+.desk.dark .hero h1 .g2{opacity:.4}
+.hero h1 .real{position:relative}
+.hero p.lede{margin:0;max-width:44ch;font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;
+  color:var(--muted);text-wrap:pretty}
+
+/* fills the slack between the lede and the source cards */
+.pipeline{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;gap:0;margin:0;padding:0;
+  list-style:none;border-top:1px solid var(--line)}
+.pipeline li{display:flex;align-items:center;gap:12px;min-height:30px;padding:4px 0;
+  border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:.18em;color:var(--muted)}
+.pipeline .n{color:var(--pink)}
+.pipeline .t{min-width:58px;color:var(--ink)}
+.pipeline .d{flex:1 1 auto;font-family:Helvetica,Arial,sans-serif;font-size:11.5px;letter-spacing:0;
+  color:var(--muted)}
+
+.pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:11px;padding:20px 18px;
+  border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;text-align:left;
+  cursor:pointer;overflow:hidden;transition:border-color .18s,transform .18s}
+.card:before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--pink);
+  transform:scaleY(0);transform-origin:top;transition:transform .22s}
+.card:hover{border-color:var(--pink);transform:translateY(-2px)}
+.card:hover:before{transform:scaleY(1)}
+.card .tag{font-size:9.5px;letter-spacing:.22em;color:var(--pink)}
+.card h2{margin:0;font-size:24px;letter-spacing:-.03em;font-weight:400}
+.card p{margin:0;font-family:Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.55;color:var(--muted)}
+.card .go{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:2px;font-size:9.5px;
+  letter-spacing:.2em;color:var(--cyan)}
+.card .go i{display:block;width:20px;height:1px;background:var(--cyan)}
+
+.specimen{display:flex;flex-direction:column;min-width:0}
+.specimen .stage{position:relative;flex:1 1 auto;display:grid;place-items:center;padding:16px;
+  background:var(--slot);min-height:220px;overflow:hidden}
+.specimen canvas{display:block}
+.specimen .cross{position:absolute;background:var(--line)}
+.specimen .cx{left:14px;right:14px;top:50%;height:1px;opacity:.5}
+.specimen .cy{top:14px;bottom:14px;left:50%;width:1px;opacity:.5}
+.specimen .bk{position:absolute;width:16px;height:16px;pointer-events:none}
+.specimen .b1{left:10px;top:10px;border-left:1px solid var(--mint);border-top:1px solid var(--mint)}
+.specimen .b2{right:10px;top:10px;border-right:1px solid var(--mint);border-top:1px solid var(--mint)}
+.specimen .b3{left:10px;bottom:10px;border-left:1px solid var(--mint);border-bottom:1px solid var(--mint)}
+.specimen .b4{right:10px;bottom:10px;border-right:1px solid var(--mint);border-bottom:1px solid var(--mint)}
+.specimen .rail{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px;
+  padding:0 12px;border-top:1px solid var(--line);font-size:9px;letter-spacing:.18em;color:var(--muted)}
+.specimen .rail .nav{display:flex;gap:6px}
+.specimen .rail button{width:30px;height:26px;padding:0;border:1px solid var(--line);background:transparent;
+  color:var(--ink);font-size:9px;cursor:pointer}
+.specimen .rail button:hover{border-color:var(--cyan);color:var(--cyan)}
+.specimen .rail b{font-weight:400;color:var(--cyan)}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border:1px solid var(--line);
+  background:var(--panel)}
+.strip>div{display:flex;flex-direction:column;gap:5px;padding:11px 15px;border-left:1px solid var(--line)}
+.strip>div:first-child{border-left:0}
+.strip .k{font-size:9px;letter-spacing:.2em;color:var(--muted)}
+.strip .v{font-size:14px;letter-spacing:.04em;color:var(--ink)}
+.strip .v em{font-style:normal;color:var(--cyan)}
+
+.ramp-strip{display:flex;flex-wrap:wrap;gap:0;border:1px solid var(--line);background:var(--panel)}
+.ramp-strip>div{flex:1 1 180px;display:flex;flex-direction:column;gap:6px;padding:10px 15px;
+  border-left:1px solid var(--line)}
+.ramp-strip>div:first-child{border-left:0}
+.ramp-strip .k{font-size:9px;letter-spacing:.2em;color:var(--pink)}
+.ramp-strip .g{font-size:14px;letter-spacing:.32em;color:var(--muted);white-space:nowrap;overflow:hidden;
+  text-overflow:clip}
+
+/* ---------- shared workbench ---------- */
+.crumbs{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:9.5px;letter-spacing:.2em;color:var(--muted)}
+.crumbs b{font-weight:400;color:var(--muted)}
+.crumbs b.on{color:var(--pink)}
+.crumbs span{opacity:.4}
+.crumbs .spacer{flex:1 1 40px;height:1px;background:var(--line);opacity:.7}
+
+.work{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(260px,300px);gap:18px;
+  align-items:stretch;flex:1 1 auto;grid-template-rows:minmax(0,1fr) auto}
+.work .wide{grid-column:span 2}
+.out{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,300px);gap:18px;align-items:stretch;
+  flex:1 1 auto;grid-template-rows:minmax(0,1fr) auto}
+/* panels stretch to the bottom of the screen and their previews grow with them */
+.work .panel,.out .panel{min-height:0}
+.work .panel>.pad,.out .panel>.pad{display:flex;flex-direction:column;min-height:0}
+.work .frame{flex:1 1 0;min-height:110px}
+.work .matte-frame{flex:3 1 0;min-height:150px}
+.work .panel>.pad>.field{flex:0 0 auto}
+.work .frame canvas{max-height:100%}
+.work .drop{flex:1 1 auto}
+.doodle-frame{flex:1 1 0;min-height:0}
+.doodle-frame canvas{max-height:100%}
+.panel{display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel);min-width:0}
+.panel>.head{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:38px;
+  padding:0 14px;border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:.2em;color:var(--muted);
+  flex:0 0 auto}
+.panel>.head b{font-weight:400;color:var(--pink)}
+.pad{padding:16px;flex:1 1 auto;min-width:0}
+
+.drop{display:flex;flex:1 1 auto;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  margin:16px;padding:36px 18px;text-align:center;cursor:pointer;background:var(--slot);
+  border:1px dashed var(--line);transition:border-color .18s}
+.drop:hover,.drop.hot{border-color:var(--pink)}
+.drop .k{font-size:9.5px;letter-spacing:.2em;color:var(--cyan)}
+.drop .t{font-size:18px;letter-spacing:-.02em}
+.drop .s{font-family:Helvetica,Arial,sans-serif;font-size:12px;color:var(--muted)}
+.err{margin:0 16px 16px;padding:10px 12px;border:1px solid var(--pink);font-size:10px;
+  letter-spacing:.14em;color:var(--pink)}
+
+.frame{position:relative;display:grid;place-items:center;border:1px solid var(--cyan);background:var(--slot)}
+.frame canvas{display:block;width:auto;height:auto;max-width:100%;max-height:26vh}
+.frame .dim{position:absolute;left:0;top:-19px;font-size:9px;letter-spacing:.18em;color:var(--muted)}
+.frame .bk{position:absolute;width:16px;height:16px}
+.frame .b1{left:-1px;top:-1px;border-left:2px solid var(--mint);border-top:2px solid var(--mint)}
+.frame .b4{right:-1px;bottom:-1px;border-right:2px solid var(--mint);border-bottom:2px solid var(--mint)}
+.checker{background:
+    linear-gradient(45deg,var(--slot) 25%,transparent 25%,transparent 75%,var(--slot) 75%),
+    linear-gradient(45deg,var(--slot) 25%,transparent 25%,transparent 75%,var(--slot) 75%);
+  background-size:14px 14px;background-position:0 0,7px 7px;border-color:var(--mint)}
+
+/* doodle canvas: fits its panel, so the page never has to scroll */
+.doodle-frame{display:grid;place-items:center;max-width:100%;margin:0 auto}
+.doodle-frame canvas{width:auto;height:auto;max-width:100%}
+
+/* the matte state lives inside the frame: idle text, then progress, then the result */
+.overlay{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:12px;padding:16px;text-align:center;background:var(--hint-bg);
+  backdrop-filter:blur(2px);font-size:9.5px;letter-spacing:.2em;color:var(--muted)}
+.overlay[hidden]{display:none}
+.overlay .rings{position:relative;display:grid;place-items:center;width:62px;height:62px}
+.overlay .rings i{position:absolute;border-radius:50%}
+.overlay .rings .a{inset:0;border:2px dashed var(--cyan);opacity:.5;animation:spin 4s linear infinite}
+.overlay .rings .b{inset:12px;border:2px dotted var(--pink);opacity:.65;animation:spin 2.6s linear infinite reverse}
+.overlay .rings span{font-size:10px;letter-spacing:.08em;color:var(--cyan)}
+.overlay .track{width:min(220px,100%);height:2px;background:var(--line)}
+.overlay .track i{display:block;height:100%;width:0;background:var(--pink);transition:width .18s linear}
+
+.idle{display:flex;flex:1 1 auto;align-items:center;justify-content:center;margin:0;padding:40px 18px;
+  text-align:center;font-size:10px;letter-spacing:.18em;color:var(--muted)}
+
+/* telemetry */
+.tel{display:flex;flex-direction:column;gap:14px}
+.histo{position:relative;height:82px;display:flex;align-items:flex-end;gap:2px;padding:8px;
+  border:1px solid var(--line);background:var(--slot)}
+.histo i{flex:1 1 0;display:block;min-height:1px;background:var(--cyan);opacity:.55}
+.histo i.peak{background:var(--pink);opacity:.85}
+.rows{display:flex;flex-direction:column}
+.rows div{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:34px;
+  border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:.16em;color:var(--muted)}
+.rows div:last-child{border-bottom:0}
+.rows b{font-weight:400;color:var(--ink)}
+.rows b.hot{color:var(--cyan)}
+.bar{height:3px;background:var(--line)}
+.bar i{display:block;height:100%;background:var(--mint);width:0;transition:width .2s}
+
+.field{display:flex;flex-direction:column;gap:7px;font-size:9.5px;letter-spacing:.2em;color:var(--muted)}
+.field .row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.field .row b{font-weight:400;color:var(--cyan)}
+.field .hint{font-family:Helvetica,Arial,sans-serif;font-size:11.5px;line-height:1.55;letter-spacing:0;color:var(--muted)}
+.field input[type=range]{width:100%;min-height:34px;accent-color:var(--pink)}
+.stack{display:flex;flex-direction:column;gap:17px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;
+  border:1px solid var(--line);background:var(--btn);color:var(--ink);
+  font:700 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;transition:border-color .18s,background .18s,color .18s}
+.btn:hover{border-color:var(--cyan)}
+.btn.primary{border-color:var(--pink);background:var(--pink);color:#fff}
+.desk.dark .btn.primary{color:#060d14;box-shadow:0 0 14px rgba(255,60,159,.34)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+
+.tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{min-height:38px;padding:0 14px;border:1px solid var(--line);background:var(--btn);color:var(--ink);
+  font:700 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;cursor:pointer}
+.chip.on{border-color:var(--pink);background:var(--pink);color:#fff}
+.desk.dark .chip.on{color:#060d14}
+.tools .weight{flex:1 1 auto;display:flex;align-items:center;gap:8px;min-width:0;font-size:9.5px;
+  letter-spacing:.18em;color:var(--muted)}
+.tools .weight input{flex:1 1 auto;width:auto;min-width:70px;min-height:34px;accent-color:var(--pink)}
+.tools .weight b{font-weight:400;color:var(--cyan)}
+
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opts button{min-height:34px;padding:0 11px;border:1px solid var(--line);background:transparent;color:var(--muted);
+  font:400 9.5px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;cursor:pointer}
+.opts button.on{border-color:var(--cyan);color:var(--cyan)}
+
+/* ---------- output ---------- */
+.plate{position:relative;display:grid;place-items:center;flex:1 1 0;min-height:180px;padding:18px;
+  border:1px solid var(--cyan);background:var(--slot);overflow:hidden}
+.plate canvas{display:block;max-width:100%;max-height:100%;width:auto;height:auto}
+.plate .stamp{position:absolute;right:10px;top:8px;font-size:8.5px;letter-spacing:.18em;color:var(--muted)}
+.plate .lead{position:absolute;background:var(--line)}
+.plate .lx{left:8px;right:8px;bottom:8px;height:1px;opacity:.45}
+.plate .ly{top:8px;bottom:8px;left:8px;width:1px;opacity:.45}
+.desk.dark .plate{box-shadow:0 0 30px rgba(82,220,255,.14),inset 0 0 40px rgba(82,220,255,.06)}
+.raw{width:100%;height:170px;margin-top:14px;padding:10px;border:1px solid var(--line);background:var(--slot);
+  color:var(--muted);font:400 9px/1.25 "JetBrains Mono",ui-monospace,monospace;resize:vertical;white-space:pre;
+  overflow:auto}
+.copied{align-self:center;font-size:9px;letter-spacing:.18em;color:var(--mint)}
+
+@media (min-width:1181px){
+  .work .panel>.pad,.out .panel>.pad{gap:4px}
+  .tools{margin-top:16px;gap:10px}
+  .tools .chip{min-height:40px}
+  .btns{margin-top:16px}
+}
+@media (max-width:1180px){
+  .hero{grid-template-columns:minmax(0,1fr);min-height:0}
+  .hero .say,.hero .pick,.hero .specimen{grid-column:1}
+  .hero .say{grid-row:1}
+  .hero .pick{grid-row:2}
+  .hero .specimen{grid-row:3}
+  .hero .say{gap:22px}
+  .specimen .stage{height:min(50vh,430px);min-height:0}
+  .work{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .work .wide,.work .tel-panel{grid-column:span 2}
+  .work .tel-panel .pad{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,1.4fr);gap:18px;align-items:start}
+  .out{grid-template-columns:minmax(0,1fr)}
+  .out .side .pad{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;align-items:start}
+  .out .side .pad>.btn{grid-column:1/-1}
+}
+/* ---------- tablet: everything on one page, no scrolling ---------- */
+@media (min-width:701px) and (max-width:1180px){
+  /* one clear vertical rhythm: copy → the two actions → the specimen band,
+     with the spec bars directly under the specimen so they read as its caption */
+  .hero{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;min-height:0;gap:14px}
+  .hero .say{grid-column:1;grid-row:1;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(210px,.95fr);
+    gap:8px 20px;align-items:end}
+  .hero .pick{grid-column:1;grid-row:2;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  .hero .specimen{grid-column:1;grid-row:3}
+  .hero p.lede{font-size:14px;max-width:40ch}
+  .pipeline{flex:0 0 auto;border-top:0}
+  .pipeline li:first-child{border-top:1px solid var(--line)}
+  .specimen .stage{height:auto;min-height:0;aspect-ratio:3/2;max-height:320px;padding:12px}
+  .hero .specimen{grid-column:1;grid-row:3;max-width:540px;justify-self:center;width:100%}
+  .card{padding:18px 16px;gap:9px}
+  .card h2{font-size:22px}
+  .strip>div{padding:9px 14px}
+  .strip .v{font-size:13px}
+  .ramp-strip>div{flex:1 1 0;min-width:0;padding:9px 12px}
+  .ramp-strip .g{font-size:12px;letter-spacing:.2em}
+  /* the workbench fills the screen instead of leaving a void under it */
+  .plate{min-height:140px;padding:14px}
+  .work .frame{min-height:90px}
+  .work .matte-frame{min-height:120px}
+  .raw{height:104px;margin-top:10px;flex:0 0 auto}
+  .out .side .pad{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .work .tel-panel .pad{grid-template-columns:minmax(200px,1fr) minmax(0,1.6fr)}
+  .work-doodle{grid-template-columns:minmax(0,1.55fr) minmax(230px,1fr);align-items:stretch;
+    grid-template-rows:minmax(0,1fr)}
+  .work-doodle .wide{grid-column:auto}
+  .work-doodle .doodle-frame canvas{max-height:100%}
+  .work-doodle .tools{gap:6px;margin-top:12px}
+  .work-doodle .tools .weight input{min-width:56px}
+  .work-doodle .chip{padding:0 11px}
+  .work-doodle .rows div{min-height:30px}
+  .histo{height:64px}
+  .btns{margin-top:12px}
+}
+@media (max-width:700px){
+  .sheet{gap:16px}
+  .hero h1{font-size:clamp(34px,10vw,48px)}
+  .pipeline{display:none}
+  .specimen .stage{height:auto;min-height:0;aspect-ratio:3/2}
+  .card{padding:18px 16px}
+  .card h2{font-size:21px}
+  .work,.out{grid-template-columns:minmax(0,1fr);flex:0 0 auto;grid-template-rows:none}
+  .work .panel>.pad,.out .panel>.pad{display:block}
+  .work .frame{flex:0 0 auto;min-height:0}
+  .work .matte-frame{aspect-ratio:1/1;min-height:0}
+  .work .matte-frame canvas{max-height:100%}
+  .work .frame canvas{max-height:30vh}
+  .doodle-frame{flex:0 0 auto}
+  .doodle-frame canvas{max-height:44vh}
+  .plate{flex:0 0 auto;min-height:300px;padding:12px}
+  .plate canvas{max-height:44vh}
+  .work .wide,.work .tel-panel{grid-column:auto}
+  .work .tel-panel .pad,.out .side .pad{display:block}
+  .drop{margin:14px;padding:28px 14px}
+  .pad{padding:14px}
+  .strip>div{border-left:0;border-top:1px solid var(--line)}
+  .strip>div:first-child{border-top:0}
+  .ramp-strip>div{flex:1 1 100%;border-left:0;border-top:1px solid var(--line)}
+  .ramp-strip>div:first-child{border-top:0}
+  .plate{min-height:300px;padding:12px}
+  .doodle-frame canvas{max-height:44vh}
+  .plate canvas{max-height:44vh}
+  .raw{height:130px}
+  .btns .btn{flex:1 1 auto}
+}
+@media (prefers-reduced-motion:reduce){
+  .loader .rings i{animation:none}
+  .overlay .rings i{animation:none}
+  .view.leaving,.view.entering>*,.wipe.run{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="desk" id="desk">
+  <div class="deco" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+
+  <header class="top">
+    <div class="lead">
+      <a class="back" href="./index.html"><span aria-hidden="true">&#8592;</span><span>INDEX</span></a>
+      <span class="sep" aria-hidden="true"></span>
+      <b>PLAY</b>
+      <em>/ ASCII_CREATURE_GEN</em>
+    </div>
+    <div class="readouts">
+      <span class="status"><i></i><span id="status-text">IDLE</span></span>
+      <button type="button" class="theme-toggle" aria-label="Toggle colour scheme">
+        <i aria-hidden="true"><b></b></i><span class="theme-label">DARK</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="body">
+    <aside class="side" aria-hidden="true">
+      <span class="build">PLAY / 03</span>
+      <span class="marks"><i></i><i></i><i></i></span>
+      <span class="geo">LOCAL &middot; NO UPLOAD</span>
+    </aside>
+
+    <div class="flow">
+      <div class="eyebrow-bar">
+        <span>&#9673; IMAGE_TO_ASCII / LOCAL ONLY</span>
+        <i aria-hidden="true"></i>
+        <span class="note">Runs entirely in this browser tab — nothing is uploaded, nothing is stored.</span>
+      </div>
+
+      <main class="sheet">
+        <i class="wipe" id="wipe" aria-hidden="true"></i>
+
+        <!-- 00 · choose a source -->
+        <section class="view" id="view-choose">
+          <div class="hero">
+            <div class="say">
+              <div>
+                <h1>
+                  <span class="ghost g1" aria-hidden="true">Glyph<br>creatures.</span>
+                  <span class="ghost g2" aria-hidden="true">Glyph<br>creatures.</span>
+                  <span class="real">Glyph<br>creatures.</span>
+                </h1>
+                <p class="lede">Feed it a photo and it lifts the subject off its background, or draw something
+                  yourself. Either way it comes back as an ASCII plate drawn in the same glyph ramp as the rest
+                  of this site.</p>
+              </div>
+              <ol class="pipeline">
+                <li><span class="n">01</span><span class="t">SOURCE</span><span class="d">A photo from this device, or marks you draw yourself</span></li>
+                <li><span class="n">02</span><span class="t">MATTE</span><span class="d">Subject lifted off its background, tuned with one slider</span></li>
+                <li><span class="n">03</span><span class="t">PLATE</span><span class="d">Ramp, palette and density &mdash; out as PNG or raw text</span></li>
+              </ol>
+            </div>
+            <div class="pick">
+                <button type="button" class="card" id="go-upload">
+                  <span class="tag">[01] SOURCE.PHOTO</span>
+                  <h2>Upload a photo</h2>
+                  <p>Background removed on-device, with a sensitivity slider for when it guesses wrong.</p>
+                  <span class="go">CHOOSE FILE <i aria-hidden="true"></i></span>
+                </button>
+                <button type="button" class="card" id="go-doodle">
+                  <span class="tag">[02] SOURCE.HAND</span>
+                  <h2>Start doodling</h2>
+                  <p>Pen, eraser, stroke weight. Works with a finger. Heavier strokes come back denser.</p>
+                  <span class="go">OPEN CANVAS <i aria-hidden="true"></i></span>
+                </button>
+              </div>
+
+            <section class="panel specimen">
+              <div class="head"><span>SPECIMEN.LIBRARY</span><b id="spec-count">01 / 02</b></div>
+              <div class="stage" id="spec-stage">
+                <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                <canvas id="spec-canvas" aria-label="ASCII specimen"></canvas>
+              </div>
+              <div class="rail">
+                <span id="spec-label">MANTA / 112 &times; 75</span>
+                <span class="nav">
+                  <button type="button" id="spec-prev" aria-label="Previous specimen">&larr;</button>
+                  <button type="button" id="spec-next" aria-label="Next specimen">&rarr;</button>
+                </span>
+              </div>
+            </section>
+          </div>
+
+          <div class="strip">
+            <div><span class="k">PROCESSING</span><span class="v">IN&#8209;BROWSER <em>ONLY</em></span></div>
+            <div><span class="k">NETWORK REQUESTS</span><span class="v">00</span></div>
+            <div><span class="k">GLYPH RAMPS</span><span class="v" id="strip-ramps">05</span></div>
+            <div><span class="k">PALETTES</span><span class="v" id="strip-palettes">04</span></div>
+          </div>
+
+          <div class="ramp-strip" id="ramp-strip"></div>
+        </section>
+
+        <!-- 01 · photo -->
+        <section class="view" id="view-upload" hidden>
+          <div class="crumbs"><b class="on">01 SOURCE</b><span>&#8250;</span><b id="crumb-matte">02 MATTE</b><span>&#8250;</span><b>03 PLATE</b><i class="spacer" aria-hidden="true"></i><span id="crumb-note">DROP AN IMAGE TO BEGIN</span></div>
+          <div class="work">
+            <div class="panel">
+              <div class="head"><span>[01] SOURCE.PHOTO</span><b id="src-badge">EMPTY</b></div>
+              <div id="drop" class="drop" role="button" tabindex="0" aria-label="Drop or choose an image">
+                <span class="k">DROP ZONE / IMG</span>
+                <span class="t">Drop an image here</span>
+                <span class="s">or tap to browse &middot; PNG / JPG / WEBP &middot; 12 MB max</span>
+              </div>
+              <p class="err" id="drop-err" hidden></p>
+              <div class="pad" id="src-preview" hidden>
+                <div class="frame"><span class="dim" id="src-dim">—</span><canvas id="src-canvas"></canvas></div>
+                <div class="btns"><button type="button" class="btn" id="replace">Replace image</button>
+                  <button type="button" class="btn" id="upload-cancel">Start over</button></div>
+              </div>
+              <input type="file" id="file" accept="image/*" hidden>
+            </div>
+
+            <div class="panel">
+              <div class="head"><span>[02] MATTE.AUTO</span><b id="matte-badge">STANDBY</b></div>
+              <div class="pad">
+                <div class="frame checker matte-frame">
+                  <canvas id="matte-canvas"></canvas>
+                  <div class="overlay" id="matte-overlay">
+                    <div class="rings" id="matte-rings" hidden>
+                      <i class="a"></i><i class="b"></i><span id="prog-pct">0%</span>
+                    </div>
+                    <span id="matte-msg">AWAITING SOURCE</span>
+                    <div class="track" id="prog-track" hidden><i id="prog-bar"></i></div>
+                  </div>
+                </div>
+                <label class="field" style="margin-top:14px">
+                  <span class="row"><span>SENSITIVITY</span><b id="tol-label">0.45</b></span>
+                  <input type="range" id="tol" min="0" max="100" step="1" value="45" disabled>
+                  <span class="hint">Nudge if the matte ate part of the subject, or left background behind.</span>
+                </label>
+                <div class="btns">
+                  <button type="button" class="btn primary" id="to-output" disabled>Generate ASCII &#8594;</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel tel-panel">
+              <div class="head"><span>[03] TELEMETRY</span><b id="tel-badge">IDLE</b></div>
+              <div class="pad">
+                <div class="tel">
+                  <div>
+                    <div class="field" style="margin-bottom:8px"><span class="row"><span>SUBJECT TONE</span><b id="tel-peak">—</b></span></div>
+                    <div class="histo" id="histo" aria-hidden="true"></div>
+                  </div>
+                  <div>
+                    <div class="rows">
+                      <div><span>SOURCE</span><b id="tel-dims">—</b></div>
+                      <div><span>SUBJECT COVERAGE</span><b class="hot" id="tel-cov">—</b></div>
+                      <div><span>MATTE TOLERANCE</span><b id="tel-tol">0.45</b></div>
+                      <div><span>EST. GRID</span><b id="tel-grid">—</b></div>
+                      <div><span>PIPELINE</span><b>CANVAS / LOCAL</b></div>
+                    </div>
+                    <div class="bar" style="margin-top:12px"><i id="tel-cov-bar"></i></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 02 · doodle -->
+        <section class="view" id="view-doodle" hidden>
+          <div class="crumbs"><b class="on">01 DRAW</b><span>&#8250;</span><b>02 PLATE</b><i class="spacer" aria-hidden="true"></i><span>PEN PRESSURE IGNORED &middot; WEIGHT DRIVES DENSITY</span></div>
+          <div class="work work-doodle">
+            <div class="panel wide">
+              <div class="head"><span>[01] SOURCE.HAND</span><b id="doodle-badge">EMPTY</b></div>
+              <div class="pad">
+                <div class="frame doodle-frame">
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <canvas id="doodle-canvas" aria-label="Drawing canvas"></canvas>
+                </div>
+                <div class="tools">
+                  <button type="button" class="chip on" id="tool-pen">PEN</button>
+                  <button type="button" class="chip" id="tool-eraser">ERASER</button>
+                  <span class="weight"><span>WEIGHT</span><input type="range" id="weight" min="2" max="46" step="1" value="14"><b id="weight-label">14</b></span>
+                  <button type="button" class="chip" id="doodle-clear">CLEAR</button>
+                </div>
+                <div class="btns">
+                  <button type="button" class="btn primary" id="doodle-go" disabled>Generate ASCII &#8594;</button>
+                  <button type="button" class="btn" id="doodle-cancel">Start over</button>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="head"><span>[02] NOTES</span><b>HOW IT READS</b></div>
+              <div class="pad">
+                <div class="rows" style="margin-bottom:14px">
+                  <div><span>MARKS</span><b id="doodle-marks">NONE</b></div>
+                  <div><span>WEIGHT</span><b class="hot" id="doodle-weight">14 PX</b></div>
+                  <div><span>CANVAS</span><b>680 &times; 510</b></div>
+                </div>
+                <p class="field hint" style="margin:0 0 12px">Only the marks matter — empty canvas becomes empty
+                  space, so you get a clean silhouette with no matte step. Thick, overlapping strokes read as
+                  dense glyphs; thin ones read as edges.</p>
+                <p class="field hint" style="margin:0">Touch and stylus both work, and two-finger scroll still
+                  moves the page.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 03 · output -->
+        <section class="view" id="view-output" hidden>
+          <div class="crumbs"><b>01 SOURCE</b><span>&#8250;</span><b>02 MATTE</b><span>&#8250;</span><b class="on">03 PLATE</b><i class="spacer" aria-hidden="true"></i><span id="crumb-out">—</span></div>
+          <div class="out">
+            <div class="panel">
+              <div class="head"><span>[03] ASCII.PLATE</span><b id="plate-badge">—</b></div>
+              <div class="pad">
+                <div class="plate">
+                  <i class="lead lx" aria-hidden="true"></i><i class="lead ly" aria-hidden="true"></i>
+                  <span class="stamp" id="plate-stamp">—</span>
+                  <canvas id="out-canvas"></canvas>
+                </div>
+                <div class="btns">
+                  <button type="button" class="btn primary" id="dl-png">Download PNG</button>
+                  <button type="button" class="btn" id="copy-text">Copy ASCII text</button>
+                  <button type="button" class="btn" id="out-back">Adjust source</button>
+                  <button type="button" class="btn" id="out-restart">Start over</button>
+                  <span class="copied" id="copied" hidden>COPIED</span>
+                </div>
+                <textarea class="raw" id="raw" readonly aria-label="Raw ASCII output"></textarea>
+              </div>
+            </div>
+
+            <div class="panel side">
+              <div class="head"><span>[04] PARAMETERS</span><b>LIVE</b></div>
+              <div class="pad stack">
+                <label class="field">
+                  <span class="row"><span>DETAIL</span><b id="cols-label">96 COL</b></span>
+                  <input type="range" id="cols" min="32" max="200" step="2" value="96">
+                </label>
+                <label class="field">
+                  <span class="row"><span>EDGE SENSITIVITY</span><b id="edge-label">0.55</b></span>
+                  <input type="range" id="edge" min="0" max="100" step="1" value="55">
+                </label>
+                <label class="field">
+                  <span class="row"><span>CELL SIZE</span><b id="cell-label">9 PX</b></span>
+                  <input type="range" id="cell" min="5" max="18" step="1" value="9">
+                </label>
+                <div class="field">
+                  <span class="row"><span>GLYPH RAMP</span></span>
+                  <div class="opts" id="ramp-opts"></div>
+                </div>
+                <div class="field">
+                  <span class="row"><span>PALETTE</span></span>
+                  <div class="opts" id="palette-opts"></div>
+                </div>
+                <div class="field">
+                  <span class="row"><span>OPTIONS</span></span>
+                  <div class="opts">
+                    <button type="button" id="opt-invert">INVERT TONE</button>
+                    <button type="button" id="opt-scan" class="on">SCANLINES</button>
+                  </div>
+                </div>
+                <div class="field">
+                  <span class="row"><span>PLATE READOUT</span></span>
+                  <div class="rows">
+                    <div><span>GLYPHS SET</span><b id="out-filled">—</b></div>
+                    <div><span>EDGE GLYPHS</span><b class="hot" id="out-edge">—</b></div>
+                    <div><span>FILL RATIO</span><b id="out-ratio">—</b></div>
+                  </div>
+                </div>
+                <button type="button" class="btn" id="rerender">Re-render</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span class="signal"><i aria-hidden="true"></i>SIGNAL_?</span>
+    <span class="ticker" aria-hidden="true"><span>
+      <span>IMAGE_TO_ASCII / LOCAL ONLY &middot; <b>NO UPLOAD, NO STORAGE</b> &middot; 05 GLYPH RAMPS &middot; 04 PALETTES &middot; SPECIMEN LIBRARY 02 &middot; DRAWN WITH CANVAS + TYPED ARRAYS</span>
+      <span>IMAGE_TO_ASCII / LOCAL ONLY &middot; <b>NO UPLOAD, NO STORAGE</b> &middot; 05 GLYPH RAMPS &middot; 04 PALETTES &middot; SPECIMEN LIBRARY 02 &middot; DRAWN WITH CANVAS + TYPED ARRAYS</span>
+    </span></span>
+
+    <div class="music-easter" id="music">
+    <button type="button" class="music-front" aria-label="Reveal hidden playlist">
+      <span class="disc" aria-hidden="true"><i></i><b></b></span>
+      <span class="tag">SIGNAL_?</span>
+    </button>
+    <section class="music-back" aria-label="Hidden signal playlist" inert aria-hidden="true">
+      <div class="bar"><span class="music-eyebrow">NOW.PLAYING / HIDDEN SIGNAL</span><button type="button" class="music-close" aria-label="Close player">&times;</button></div>
+      <div class="music-body">
+        <span class="album" aria-hidden="true"><i></i><b></b></span>
+        <div class="track-data">
+          <div class="track-heading" aria-live="polite" aria-atomic="true">
+            <span class="music-track-position">01 / 03</span>
+            <strong><span class="music-track-title">Track 01</span> &mdash; <span class="music-track-artist">Ether</span></strong>
+          </div>
+          <div class="track-progress" aria-hidden="true"><i></i></div>
+          <div class="track-controls">
+            <button type="button" class="track-prev" aria-label="Previous track">&larr;</button>
+            <button type="button" class="play-toggle" aria-label="Play">&#9654;</button>
+            <button type="button" class="track-next" aria-label="Next track">&rarr;</button>
+            <span class="track-time">00:00 / 00:00</span>
+          </div>
+        </div>
+      </div>
+      <audio class="playlist-audio" preload="metadata" hidden></audio>
+    </section>
+  </div>
+  </footer>
+</div>
+
+<script type="module">
+import {
+  RAMPS, PALETTES, validateFile, loadImage, toWorking, buildMask, maskedCanvas,
+  buildGrid, gridToText, renderGrid, downloadCanvas, gridFromMap, histogram, countGlyphs
+} from "./files/ascii-generator.js";
+
+const $ = (id) => document.getElementById(id);
+const desk = $("desk");
+
+/* ---------- theme (shared key with the front page) ---------- */
+const THEME_KEY = "asteria-theme";
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+const themeLabel = document.querySelector(".theme-label");
+const applyTheme = (dark) => {
+  desk.classList.toggle("dark", dark);
+  themeLabel.textContent = dark ? "LIGHT" : "DARK";
+  if (state.grid) paint();
+  paintSpecimen();
+};
+document.querySelector(".theme-toggle").addEventListener("click", () => {
+  const dark = !desk.classList.contains("dark");
+  localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+  applyTheme(dark);
+});
+systemDark.addEventListener("change", (event) => {
+  if (!localStorage.getItem(THEME_KEY)) applyTheme(event.matches);
+});
+
+/* ---------- state ---------- */
+const state = {
+  view: "choose",
+  source: null,
+  mask: null,
+  origin: "photo",
+  tolerance: 0.45,
+  grid: null,
+  params: { cols: 96, edge: 0.55, cell: 9, ramp: "signal", palette: "signal", invert: false, scan: true },
+};
+
+const views = { choose: $("view-choose"), upload: $("view-upload"), doodle: $("view-doodle"), output: $("view-output") };
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const wipe = $("wipe");
+let viewTimer = 0;
+
+const runWipe = () => {
+  const sheet = document.querySelector(".sheet");
+  wipe.style.setProperty("--wipe-to", (sheet.clientHeight || 600) + "px");
+  wipe.classList.remove("run");
+  void wipe.offsetWidth;
+  wipe.classList.add("run");
+};
+
+const swapView = (name) => {
+  state.view = name;
+  Object.entries(views).forEach(([key, node]) => {
+    node.classList.remove("leaving", "entering");
+    node.hidden = key !== name;
+  });
+  const next = views[name];
+  if (!reducedMotion.matches) {
+    next.classList.add("entering");
+    next.addEventListener("animationend", () => next.classList.remove("entering"), { once: true });
+    runWipe();
+  }
+  $("status-text").textContent =
+    name === "choose" ? "IDLE" : name === "output" ? "PLATE" : name === "doodle" ? "DRAWING" : "SOURCE";
+  clearInterval(specimenTimer);
+  if (name === "choose") { paintSpecimen(); startSpecimenCycle(); }
+  window.scrollTo({ top: 0, behavior: reducedMotion.matches ? "auto" : "smooth" });
+  requestAnimationFrame(() => window.updateMusicPin?.());
+};
+
+const setView = (name) => {
+  const current = Object.entries(views).find(([, node]) => !node.hidden);
+  clearTimeout(viewTimer);
+  if (!current || current[0] === name || reducedMotion.matches) { swapView(name); return; }
+  current[1].classList.add("leaving");
+  viewTimer = setTimeout(() => swapView(name), 165);
+};
+
+/* ---------- specimen library (entry-state hero) ---------- */
+let specimens = [];
+let specimenIndex = 0;
+let specimenTimer = 0;
+
+const paintSpecimen = () => {
+  const specimen = specimens[specimenIndex];
+  if (!specimen) return;
+  const stage = $("spec-stage");
+  const availableWidth = Math.max(120, stage.clientWidth - 34);
+  const availableHeight = Math.max(120, stage.clientHeight - 34);
+  // Pre-baked maps have very different proportions (the jellyfish is 64×150).
+  // Always use square cells so nothing is ever deformed — just fit inside the stage.
+  const cell = Math.max(2, Math.min(availableWidth / specimen.grid.cols, availableHeight / specimen.grid.rows));
+  const canvas = $("spec-canvas");
+  renderGrid(specimen.grid, {
+    canvas,
+    paletteKey: desk.classList.contains("dark") ? "deepwater" : "signal",
+    cell,
+    cellH: cell,
+    scanlines: true,
+  });
+  canvas.style.width = Math.round(specimen.grid.cols * cell) + "px";
+  canvas.style.height = Math.round(specimen.grid.rows * cell) + "px";
+  $("spec-label").textContent = specimen.label + " / " + specimen.grid.cols + " × " + specimen.grid.rows;
+  $("spec-count").textContent =
+    String(specimenIndex + 1).padStart(2, "0") + " / " + String(specimens.length).padStart(2, "0");
+};
+const stepSpecimen = (delta) => {
+  if (!specimens.length) return;
+  specimenIndex = (specimenIndex + delta + specimens.length) % specimens.length;
+  paintSpecimen();
+};
+function startSpecimenCycle() {
+  clearInterval(specimenTimer);
+  specimenTimer = setInterval(() => { if (!views.choose.hidden) stepSpecimen(1); }, 6200);
+}
+$("spec-prev").addEventListener("click", () => { stepSpecimen(-1); startSpecimenCycle(); });
+$("spec-next").addEventListener("click", () => { stepSpecimen(1); startSpecimenCycle(); });
+$("spec-stage").addEventListener("click", () => { stepSpecimen(1); startSpecimenCycle(); });
+window.addEventListener("resize", () => { if (!views.choose.hidden) paintSpecimen(); });
+if (typeof ResizeObserver === "function") {
+  let specimenFrame = 0;
+  new ResizeObserver(() => {
+    cancelAnimationFrame(specimenFrame);
+    specimenFrame = requestAnimationFrame(() => { if (!views.choose.hidden) paintSpecimen(); });
+  }).observe($("spec-stage"));
+}
+
+(async () => {
+  try {
+    const [{ NAUTICAL_CREATURE_MAPS }, { ASCII_PORTRAIT_MAPS, ASCII_PORTRAIT_DIMENSIONS }] = await Promise.all([
+      import("./files/nautical-creature-data.js"),
+      import("./files/ascii-portrait-data.js"),
+    ]);
+    specimens = [
+      { label: "MANTA", grid: gridFromMap(NAUTICAL_CREATURE_MAPS.manta, "signal") },
+      { label: "NAUTICAL PLATE", grid: gridFromMap({
+        columns: ASCII_PORTRAIT_DIMENSIONS.columns,
+        rows: ASCII_PORTRAIT_DIMENSIONS.rows,
+        density: ASCII_PORTRAIT_MAPS.nautical.luminance,
+        edges: ASCII_PORTRAIT_MAPS.nautical.edges,
+      }, "signal") },
+    ];
+    paintSpecimen();
+    startSpecimenCycle();
+  } catch (error) {
+    console.warn("Specimen library unavailable", error);
+    $("spec-label").textContent = "LIBRARY UNAVAILABLE";
+  }
+})();
+
+/* ramp strip on the entry screen */
+const rampStrip = $("ramp-strip");
+Object.entries(RAMPS).forEach(([, ramp]) => {
+  const cell = document.createElement("div");
+  const k = document.createElement("span");
+  k.className = "k";
+  k.textContent = ramp.label;
+  const g = document.createElement("span");
+  g.className = "g";
+  g.textContent = ramp.density.trim().split("").join(" ");
+  cell.append(k, g);
+  rampStrip.appendChild(cell);
+});
+$("strip-ramps").textContent = String(Object.keys(RAMPS).length).padStart(2, "0");
+$("strip-palettes").textContent = String(Object.keys(PALETTES).length).padStart(2, "0");
+
+/* ---------- navigation ---------- */
+$("go-upload").addEventListener("click", () => {
+  setView("upload");
+  setTimeout(() => $("file").click(), reducedMotion.matches ? 0 : 280);
+});
+$("go-doodle").addEventListener("click", () => { setView("doodle"); setTimeout(initDoodle, 20); });
+$("upload-cancel").addEventListener("click", resetAll);
+$("doodle-cancel").addEventListener("click", resetAll);
+$("out-restart").addEventListener("click", resetAll);
+$("out-back").addEventListener("click", () => setView(state.origin === "photo" ? "upload" : "doodle"));
+
+function resetAll() {
+  state.source = null; state.mask = null; state.grid = null;
+  $("src-preview").hidden = true;
+  $("drop").hidden = false;
+  $("drop-err").hidden = true;
+  $("src-badge").textContent = "EMPTY";
+  setMatteState("idle");
+  $("crumb-matte").classList.remove("on");
+  $("crumb-note").textContent = "DROP AN IMAGE TO BEGIN";
+  $("file").value = "";
+  resetTelemetry();
+  clearDoodle();
+  setView("choose");
+}
+
+// idle → working → ready all happen in the same frame; only the overlay changes.
+function setMatteState(mode, progress) {
+  const overlay = $("matte-overlay");
+  const working = mode === "working";
+  $("matte-rings").hidden = !working;
+  $("prog-track").hidden = !working;
+  overlay.hidden = mode === "ready";
+  $("matte-msg").textContent = working ? "REMOVING BACKGROUND / LOCAL" : "AWAITING SOURCE";
+  $("matte-badge").textContent = mode === "ready" ? "READY" : working ? "WORKING" : "STANDBY";
+  $("tol").disabled = mode === "idle";
+  $("to-output").disabled = mode !== "ready";
+  if (working && typeof progress === "number") {
+    const pct = Math.round(progress * 100) + "%";
+    $("prog-pct").textContent = pct;
+    $("prog-bar").style.width = pct;
+  }
+  if (mode === "idle") {
+    const canvas = $("matte-canvas");
+    canvas.getContext("2d")?.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+/* ---------- telemetry ---------- */
+const histoNode = $("histo");
+const histoBars = Array.from({ length: 28 }, () => {
+  const bar = document.createElement("i");
+  bar.style.height = "2%";
+  histoNode.appendChild(bar);
+  return bar;
+});
+function resetTelemetry() {
+  histoBars.forEach((bar) => { bar.style.height = "2%"; bar.classList.remove("peak"); });
+  ["tel-dims", "tel-cov", "tel-grid", "tel-peak"].forEach((id) => { $(id).textContent = "—"; });
+  $("tel-cov-bar").style.width = "0%";
+  $("tel-badge").textContent = "IDLE";
+}
+function updateTelemetry() {
+  if (!state.source) return;
+  const { bins, coverage } = histogram(state.source, state.mask, 28);
+  let peakIndex = 0;
+  bins.forEach((value, index) => { if (value > bins[peakIndex]) peakIndex = index; });
+  histoBars.forEach((bar, index) => {
+    bar.style.height = Math.max(2, bins[index] * 100) + "%";
+    bar.classList.toggle("peak", index === peakIndex);
+  });
+  const cellW = state.source.width / state.params.cols;
+  const rows = Math.floor(state.source.height / (cellW / 0.55));
+  $("tel-dims").textContent = state.source.width + " × " + state.source.height + " PX";
+  $("tel-cov").textContent = (coverage * 100).toFixed(1) + "%";
+  $("tel-cov-bar").style.width = Math.min(100, coverage * 100) + "%";
+  $("tel-grid").textContent = state.params.cols + " × " + rows;
+  $("tel-peak").textContent = "PEAK " + Math.round((peakIndex + 0.5) / 28 * 100) + "%";
+  $("tel-tol").textContent = state.tolerance.toFixed(2);
+  $("tel-badge").textContent = "LIVE";
+}
+
+/* ---------- flow A: photo ---------- */
+const drop = $("drop");
+const fileInput = $("file");
+$("replace").addEventListener("click", () => fileInput.click());
+drop.addEventListener("click", () => fileInput.click());
+drop.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" || event.key === " ") { event.preventDefault(); fileInput.click(); }
+});
+["dragenter", "dragover"].forEach((type) => drop.addEventListener(type, (event) => {
+  event.preventDefault(); drop.classList.add("hot");
+}));
+["dragleave", "dragend"].forEach((type) => drop.addEventListener(type, () => drop.classList.remove("hot")));
+drop.addEventListener("drop", (event) => {
+  event.preventDefault(); drop.classList.remove("hot");
+  const file = event.dataTransfer?.files?.[0];
+  if (file) acceptFile(file);
+});
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files?.[0];
+  if (file) acceptFile(file);
+});
+
+const showError = (message) => {
+  const node = $("drop-err");
+  node.textContent = "⚠ " + message;
+  node.hidden = !message;
+};
+
+async function acceptFile(file) {
+  const problem = validateFile(file);
+  if (problem) { showError(problem); return; }
+  showError("");
+  try {
+    const image = await loadImage(file);
+    state.origin = "photo";
+    state.source = toWorking(image);
+    drop.hidden = true;
+    $("src-preview").hidden = false;
+    $("src-badge").textContent = "LOADED";
+    const canvas = $("src-canvas");
+    canvas.width = state.source.width; canvas.height = state.source.height;
+    canvas.getContext("2d").drawImage(state.source, 0, 0);
+    $("src-dim").textContent = state.source.width + " × " + state.source.height + " PX";
+    $("crumb-note").textContent = "MATTE RUNNING";
+    await runMatte();
+  } catch (error) {
+    showError(error.message || "Could not read that image");
+  }
+}
+
+let matteToken = 0;
+async function runMatte() {
+  if (!state.source) return;
+  const token = ++matteToken;
+  setMatteState("working", 0);
+  $("crumb-matte").classList.add("on");
+  const setProgress = (value) => setMatteState("working", value);
+  const mask = await buildMask(state.source, state.tolerance, setProgress);
+  if (token !== matteToken) return;
+  state.mask = mask;
+  const preview = maskedCanvas(state.source, mask);
+  const canvas = $("matte-canvas");
+  canvas.width = preview.width; canvas.height = preview.height;
+  canvas.getContext("2d").drawImage(preview, 0, 0);
+  setMatteState("ready");
+  $("crumb-note").textContent = "MATTE READY — ADJUST OR GENERATE";
+  updateTelemetry();
+}
+
+let tolTimer = 0;
+$("tol").addEventListener("input", (event) => {
+  state.tolerance = Number(event.target.value) / 100;
+  $("tol-label").textContent = state.tolerance.toFixed(2);
+  $("tel-tol").textContent = state.tolerance.toFixed(2);
+  clearTimeout(tolTimer);
+  tolTimer = setTimeout(runMatte, 180);
+});
+
+$("to-output").addEventListener("click", () => { state.origin = "photo"; generate(); });
+
+/* ---------- flow B: doodle ---------- */
+const doodle = $("doodle-canvas");
+const doodleCtx = doodle.getContext("2d");
+let drawing = false;
+let hasStrokes = false;
+let tool = "pen";
+let weight = 14;
+let last = null;
+
+function initDoodle() {
+  if (doodle.width !== 680) { doodle.width = 680; doodle.height = 510; }
+  clearDoodle();
+}
+function clearDoodle() {
+  if (!doodle.width) return;
+  doodleCtx.clearRect(0, 0, doodle.width, doodle.height);
+  hasStrokes = false;
+  $("doodle-go").disabled = true;
+  $("doodle-badge").textContent = "EMPTY";
+  $("doodle-marks").textContent = "NONE";
+}
+const doodlePoint = (event) => {
+  const rect = doodle.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) / rect.width * doodle.width,
+    y: (event.clientY - rect.top) / rect.height * doodle.height,
+  };
+};
+const strokeInk = () => desk.classList.contains("dark") ? "#dff7ff" : "#12222c";
+doodle.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+  doodle.setPointerCapture?.(event.pointerId);
+  drawing = true;
+  last = doodlePoint(event);
+  paintStroke(last, last);
+});
+doodle.addEventListener("pointermove", (event) => {
+  if (!drawing) return;
+  event.preventDefault();
+  const next = doodlePoint(event);
+  paintStroke(last, next);
+  last = next;
+});
+["pointerup", "pointercancel", "pointerleave"].forEach((type) =>
+  doodle.addEventListener(type, () => { drawing = false; last = null; }));
+
+function paintStroke(from, to) {
+  doodleCtx.globalCompositeOperation = tool === "eraser" ? "destination-out" : "source-over";
+  doodleCtx.strokeStyle = strokeInk();
+  doodleCtx.lineWidth = weight;
+  doodleCtx.lineCap = "round";
+  doodleCtx.lineJoin = "round";
+  doodleCtx.beginPath();
+  doodleCtx.moveTo(from.x, from.y);
+  doodleCtx.lineTo(to.x, to.y);
+  doodleCtx.stroke();
+  doodleCtx.globalCompositeOperation = "source-over";
+  if (tool === "pen") {
+    hasStrokes = true;
+    $("doodle-go").disabled = false;
+    $("doodle-badge").textContent = "MARKS ON CANVAS";
+    $("doodle-marks").textContent = "PRESENT";
+  }
+}
+$("tool-pen").addEventListener("click", () => {
+  tool = "pen"; $("tool-pen").classList.add("on"); $("tool-eraser").classList.remove("on");
+});
+$("tool-eraser").addEventListener("click", () => {
+  tool = "eraser"; $("tool-eraser").classList.add("on"); $("tool-pen").classList.remove("on");
+});
+$("weight").addEventListener("input", (event) => {
+  weight = Number(event.target.value);
+  $("weight-label").textContent = String(weight);
+  $("doodle-weight").textContent = weight + " PX";
+});
+$("doodle-clear").addEventListener("click", clearDoodle);
+$("doodle-go").addEventListener("click", () => {
+  if (!hasStrokes) return;
+  state.origin = "doodle";
+  state.source = doodle;
+  state.mask = null;
+  generate();
+});
+
+/* ---------- output ---------- */
+const rampOpts = $("ramp-opts");
+const paletteOpts = $("palette-opts");
+Object.entries(RAMPS).forEach(([key, ramp]) => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = ramp.label;
+  if (key === state.params.ramp) button.classList.add("on");
+  button.addEventListener("click", () => {
+    state.params.ramp = key;
+    [...rampOpts.children].forEach((child) => child.classList.toggle("on", child === button));
+    build();
+  });
+  rampOpts.appendChild(button);
+});
+Object.entries(PALETTES).forEach(([key, palette]) => {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = palette.label;
+  if (key === state.params.palette) button.classList.add("on");
+  button.addEventListener("click", () => {
+    state.params.palette = key;
+    [...paletteOpts.children].forEach((child) => child.classList.toggle("on", child === button));
+    paint();
+  });
+  paletteOpts.appendChild(button);
+});
+
+const bind = (id, label, format, apply) => {
+  $(id).addEventListener("input", (event) => {
+    const value = Number(event.target.value);
+    apply(value);
+    $(label).textContent = format(value);
+    build();
+  });
+};
+bind("cols", "cols-label", (v) => v + " COL", (v) => { state.params.cols = v; });
+bind("edge", "edge-label", (v) => (v / 100).toFixed(2), (v) => { state.params.edge = v / 100; });
+$("cell").addEventListener("input", (event) => {
+  state.params.cell = Number(event.target.value);
+  $("cell-label").textContent = state.params.cell + " PX";
+  paint();
+});
+$("opt-invert").addEventListener("click", () => {
+  state.params.invert = !state.params.invert;
+  $("opt-invert").classList.toggle("on", state.params.invert);
+  build();
+});
+$("opt-scan").addEventListener("click", () => {
+  state.params.scan = !state.params.scan;
+  $("opt-scan").classList.toggle("on", state.params.scan);
+  paint();
+});
+$("rerender").addEventListener("click", build);
+
+function generate() {
+  setView("output");
+  build();
+}
+
+function build() {
+  if (!state.source) return;
+  state.grid = buildGrid(state.source, state.mask, {
+    cols: state.params.cols,
+    edge: state.params.edge,
+    rampKey: state.params.ramp,
+    invert: state.params.invert,
+  });
+  paint();
+}
+
+function paint() {
+  if (!state.grid) return;
+  renderGrid(state.grid, {
+    canvas: $("out-canvas"),
+    paletteKey: state.params.palette,
+    cell: state.params.cell,
+    scanlines: state.params.scan,
+  });
+  $("raw").value = gridToText(state.grid);
+  const counts = countGlyphs(state.grid);
+  $("plate-badge").textContent = state.grid.cols + " × " + state.grid.rows;
+  $("plate-stamp").textContent = (state.origin === "photo" ? "SRC.PHOTO" : "SRC.HAND") +
+    " / " + RAMPS[state.params.ramp].label;
+  $("out-filled").textContent = counts.filled.toLocaleString();
+  $("out-edge").textContent = counts.edge.toLocaleString();
+  $("out-ratio").textContent = Math.round(counts.filled / counts.total * 100) + "%";
+  $("crumb-out").textContent = RAMPS[state.params.ramp].label + " / " +
+    PALETTES[state.params.palette].label + " / " + state.grid.cols + " COL";
+}
+
+$("dl-png").addEventListener("click", () => {
+  if (!state.grid) return;
+  const background = desk.classList.contains("dark") ? "#060d14" : "#e8eef1";
+  const canvas = renderGrid(state.grid, {
+    paletteKey: state.params.palette,
+    cell: Math.max(12, state.params.cell * 1.6),
+    scanlines: state.params.scan,
+    background,
+  });
+  downloadCanvas(canvas, "ascii-creature.png");
+});
+$("copy-text").addEventListener("click", async () => {
+  if (!state.grid) return;
+  try {
+    await navigator.clipboard.writeText(gridToText(state.grid));
+  } catch {
+    $("raw").select();
+    document.execCommand?.("copy");
+  }
+  const flag = $("copied");
+  flag.hidden = false;
+  setTimeout(() => { flag.hidden = true; }, 1600);
+});
+
+/* ---------- hidden signal player ---------- */
+const music = $("music");
+const musicFront = music.querySelector(".music-front");
+const musicBack = music.querySelector(".music-back");
+const musicClose = music.querySelector(".music-close");
+const musicAudio = music.querySelector(".playlist-audio");
+const compact = window.matchMedia("(max-width:1180px)");
+let musicPlaying = false;
+
+// The chip lives on the footer line, so idle it simply scrolls away with the page.
+// Once it is open or playing on phone/tablet it pins to the screen so the controls
+// stay reachable while scrolling.
+const updateMusicPin = () => {
+  const pinned = compact.matches && (musicPlaying || music.classList.contains("open"));
+  music.classList.toggle("pinned", pinned);
+};
+window.updateMusicPin = updateMusicPin;
+window.addEventListener("resize", updateMusicPin);
+compact.addEventListener("change", updateMusicPin);
+musicAudio.addEventListener("play", () => { musicPlaying = true; updateMusicPin(); });
+musicAudio.addEventListener("pause", () => { musicPlaying = false; updateMusicPin(); });
+
+const setMusicOpen = (open) => {
+  music.classList.toggle("open", open);
+  musicFront.inert = open;
+  musicFront.setAttribute("aria-hidden", String(open));
+  musicBack.inert = !open;
+  musicBack.setAttribute("aria-hidden", String(!open));
+  updateMusicPin();
+  try { (open ? musicClose : musicFront).focus({ preventScroll: true }); } catch {}
+};
+try {
+  const { createPlaylistPlayer } = await import("./files/playlist-player.js?v=4");
+  createPlaylistPlayer({
+    root: music,
+    onOpenChange: setMusicOpen,
+    tracks: [
+      { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
+      { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
+      { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
+    ]
+  });
+} catch (error) {
+  console.warn("Playlist unavailable", error);
+}
+
+applyTheme(localStorage.getItem(THEME_KEY) ? localStorage.getItem(THEME_KEY) === "dark" : systemDark.matches);
+$("tol-label").textContent = state.tolerance.toFixed(2);
+updateMusicPin();
+desk.dataset.appReady = "true";
+</script>
+</body>
+</html>
