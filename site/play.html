@@ -159,8 +159,9 @@
 .confirm-modal[hidden]{display:none}
 .confirm-box{width:min(360px,100%);border:1px solid var(--pink);background:var(--hint-bg);
   backdrop-filter:blur(8px);padding:20px}
-.confirm-msg{margin:0 0 18px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:var(--ink)}
-.confirm-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.confirm-msg{margin:0 0 18px;font-family:"JetBrains Mono",ui-monospace,"Courier New",monospace;
+  font-size:12px;line-height:1.6;letter-spacing:.02em;color:var(--ink)}
+.confirm-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 
 .frame{position:relative;display:grid;place-items:center;border:1px solid var(--cyan);background:var(--slot)}
 .frame canvas{display:block;width:auto;height:auto;max-width:100%;max-height:26vh}
@@ -403,7 +404,7 @@
 
   <header class="top">
     <div class="lead">
-      <a class="back" href="./index.html"><span aria-hidden="true">&#8592;</span><span>INDEX</span></a>
+      <a class="back" href="./index.html"><span aria-hidden="true">&#8592;</span><span id="back-label">INDEX</span></a>
       <span class="sep" aria-hidden="true"></span>
       <b>PLAY</b>
       <em>/ ASCII_CREATURE_GEN</em>
@@ -855,6 +856,9 @@ const swapView = (name) => {
   }
   $("status-text").textContent =
     name === "choose" ? "IDLE" : name === "output" ? "PLATE" : name === "doodle" ? "DRAWING" : "SOURCE";
+  // The back link only actually leaves to index.html from the entry view;
+  // everywhere else it returns here in-page, so its label should say so.
+  $("back-label").textContent = name === "choose" ? "INDEX" : "PLAY";
   clearInterval(specimenTimer);
   if (name === "choose") { paintSpecimen(); startSpecimenCycle(); }
   window.scrollTo({ top: 0, behavior: reducedMotion.matches ? "auto" : "smooth" });
