@@ -106,7 +106,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .side .marks i{display:block;height:1px;width:14px;background:var(--line)}
 .side .marks i:nth-child(2){width:22px;background:var(--cyan)}
 
-.cols{flex:1 1 auto;display:grid;grid-template-columns:500px minmax(0,1fr) 330px;min-width:0}
+.cols{flex:1 1 auto;display:grid;grid-template-columns:500px minmax(0,1fr) 330px;grid-template-rows:minmax(0,1fr);min-width:0}
 
 .intro{display:flex;flex-direction:column;gap:40px;padding:60px var(--gutter) 268px}
 .eyebrow{font-size:9.5px;letter-spacing:.24em;color:var(--pink);margin-bottom:18px}
@@ -127,7 +127,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 
 /* artifact */
 .stage{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:22px;padding:36px 20px 48px;touch-action:none;cursor:grab}
+  gap:22px;padding:36px 20px 48px}
 .stage:active{cursor:grabbing}
 .stage>*:not(.ascii-layer){position:relative;z-index:1}
 .stage .caption{display:flex;gap:14px;align-items:center;font-size:9.5px;letter-spacing:.2em;color:var(--cyan);
@@ -151,7 +151,8 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .desk.dark .reticle .cx{background:linear-gradient(90deg,transparent,rgba(82,220,255,.5),transparent)}
 .desk.dark .reticle .cy{background:linear-gradient(rgba(82,220,255,.5),transparent 70%)}
 .slot{position:relative;width:336px;height:336px;max-width:82vw;max-height:82vw;
-  border:1px solid var(--cyan);background:var(--slot);display:grid;place-items:center}
+  border:1px solid var(--cyan);background:var(--slot);display:grid;place-items:center;
+  touch-action:none;cursor:grab}
 .desk.dark .slot{box-shadow:0 0 34px rgba(82,220,255,.18),inset 0 0 44px rgba(82,220,255,.09)}
 .slot canvas{display:block;width:100%;height:100%}
 .slot .bracket{position:absolute;width:20px;height:20px}
@@ -312,7 +313,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .side{flex:0 0 auto;flex-direction:row;justify-content:space-between;padding:10px 20px;
     border-right:0;border-bottom:1px solid var(--line)}
   .side .build,.side .geo{writing-mode:horizontal-tb;transform:none}
-  .cols{grid-template-columns:1fr}
+  .cols{grid-template-columns:1fr;grid-template-rows:none}
   .index{border-left:0;border-top:1px solid var(--line);grid-template-rows:auto}
   .row{min-height:96px}
   .ascii-layer{inset:-20px 0 0;opacity:.5}
@@ -766,6 +767,12 @@ requestModelRender = () => { if (reducedMotion) requestAnimationFrame(animateMod
 
 stage.addEventListener("pointerdown", (event) => {
   if (event.target.closest("button")) return;
+  // Rotation must originate inside the model box, so touches elsewhere on
+  // the stage (e.g. mobile scrolling) are left alone. Once started, the
+  // drag may continue outside the box via pointer capture.
+  const box = modelShell.getBoundingClientRect();
+  if (event.clientX < box.left || event.clientX > box.right ||
+      event.clientY < box.top || event.clientY > box.bottom) return;
   dragging = true;
   lastX = event.clientX;
   lastY = event.clientY;
@@ -829,13 +836,18 @@ const centerRadarInGap = () => {
   const reach = desk.querySelector(".reach-note");
   const radar = musicTrinkets.querySelector(".radar");
   if (!reach || !radar) return;
-  const reachRect = reach.getBoundingClientRect();
-  const playerRect = musicBack.getBoundingClientRect();
+  // Baseline to a known transform so the measured radar position (and the
+  // resulting delta) don't depend on any transform already applied.
+  musicTrinkets.style.transform = "translateY(0px)";
+  // Open/closed differ only by transform, so the player's layout offset
+  // gives its final (settled) top even while it is animating open — this
+  // lets the radar slide straight to centre in one continuous motion.
+  const parent = musicBack.offsetParent || music;
+  const playerTop = parent.getBoundingClientRect().top + musicBack.offsetTop;
+  const reachBottom = reach.getBoundingClientRect().bottom;
   const radarRect = radar.getBoundingClientRect();
-  const delta = (reachRect.bottom + playerRect.top) / 2 - (radarRect.top + radarRect.height / 2);
-  let currentTy = 0;
-  try { currentTy = new DOMMatrixReadOnly(getComputedStyle(musicTrinkets).transform).m42; } catch (error) {}
-  musicTrinkets.style.transform = `translateY(${currentTy + delta}px)`;
+  const delta = (reachBottom + playerTop) / 2 - (radarRect.top + radarRect.height / 2);
+  musicTrinkets.style.transform = `translateY(${delta}px)`;
 };
 const setMusicOpen = (open) => {
   music.classList.toggle("open", open);
@@ -844,7 +856,7 @@ const setMusicOpen = (open) => {
   musicBack.inert = !open;
   musicBack.setAttribute("aria-hidden", String(!open));
   focusMusicControl(open ? musicClose : musicFront);
-  if (open) window.setTimeout(centerRadarInGap, 460);
+  if (open) centerRadarInGap();
   else if (musicTrinkets) musicTrinkets.style.transform = "";
 };
 window.addEventListener("resize", () => { if (music.classList.contains("open")) centerRadarInGap(); });
