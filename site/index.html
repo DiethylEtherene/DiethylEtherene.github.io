@@ -439,46 +439,39 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 }
 
 /* ---------- everything down to the model on one screen ---------- */
+/* phones + portrait tablets: scrolling single column with the MENU */
 @media (max-width:700px) and (min-height:600px),(max-width:1180px) and (orientation:portrait) and (min-height:600px){
-  html,body{height:100%;overflow:hidden}
-  .desk{height:100dvh;min-height:0;overflow:hidden}
-  .body{flex:1 1 auto;min-height:0}
   .side{display:none}
-  .cols{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden}
+  .cols{display:flex;flex-direction:column}
   .menu{display:flex}
   .menu-note{display:flex}
   .index{display:none}
 
-  .top{flex:0 0 auto;padding:10px 66px 10px var(--gutter);gap:5px 12px}
-  .top .who b{font-size:11.5px}
-  .top .who span{font-size:8.5px}
-  .readouts{font-size:9px}
+  .top{padding:11px 66px 11px var(--gutter);gap:6px 12px}
+  .top .who b{font-size:12px}
+  .top .who span{font-size:9px}
+  .readouts{font-size:9.5px}
   .top .theme-toggle{display:none}
 
-  .intro{flex:0 0 auto;min-height:0;padding:14px var(--gutter) 0;gap:10px}
-  .eyebrow{margin-bottom:9px}
-  .name{font-size:clamp(38px,12.4vw,56px);line-height:.8}
-  .lede{margin-top:12px;font-size:13.5px;line-height:1.4}
-  .menu-note{margin-top:10px!important}
-  .transmit .rule{margin-bottom:0}
-  .transmit .links a,.transmit .links span{min-height:34px;font-size:10.5px}
+  .intro{padding:24px var(--gutter) 0;gap:18px}
+  .eyebrow{margin-bottom:12px}
+  .name{font-size:clamp(50px,15vw,74px);line-height:.8}
+  .lede{margin-top:18px;font-size:15.5px;line-height:1.45;max-width:none}
+  .menu-note{margin-top:14px!important}
+  .transmit .rule{margin-bottom:2px}
+  .transmit .links a,.transmit .links span{min-height:42px;font-size:11.5px}
   .reach-note{display:none}
 
-  .stage{flex:1 1 auto;min-height:0;padding:0 var(--gutter) 6px;gap:8px;justify-content:center}
-  .stage .caption{font-size:8.5px;transform:none;margin-bottom:10px}
-  .reticle{width:auto;height:min(74vw,34vh);aspect-ratio:1;min-height:0}
+  .stage{padding:22px var(--gutter) 40px;gap:16px}
+  .stage .caption{font-size:9px;transform:none;margin-bottom:12px}
+  .reticle{width:min(370px,86vw);height:auto;aspect-ratio:1}
   .slot{width:66%;height:66%;max-width:none;max-height:none}
   .slot .dim{top:-16px}
-  .modes{margin-top:12px}
-  .modes button{min-height:38px;padding:0 14px}
+  .modes{margin-top:14px}
+  .modes button{min-height:42px;padding:0 18px}
 
   .foot .signal{display:none}
-  .foot nav a{min-height:46px}
-}
-
-/* phones: lift the artefact block (caption, rings, model, ASCII, hint) as a unit */
-@media (max-width:700px) and (min-height:600px){
-  .stage .caption,.stage .reticle{transform:translateY(-14px)}
+  .foot nav a{min-height:52px}
 }
 
 /* big phones / phablets: fill the extra height instead of leaving it blank */
@@ -716,6 +709,11 @@ let updateModelTheme = () => {};
 
 const applyTheme = (dark) => {
   desk.classList.toggle("dark", dark);
+  // Match the page background behind the .desk (overscroll bounce, iOS
+  // safe-area insets) so no white bars show at the top/bottom on mobile.
+  const pageBg = dark ? "#060d14" : "#e8eef1";
+  document.documentElement.style.backgroundColor = pageBg;
+  document.body.style.backgroundColor = pageBg;
   themeButtons.forEach((button) => {
     button.setAttribute("aria-pressed", String(dark));
     const label = button.querySelector(".theme-toggle-label");
