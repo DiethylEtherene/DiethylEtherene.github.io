@@ -213,6 +213,31 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .ticker span{display:flex;gap:44px;white-space:nowrap;animation:marquee 26s linear infinite}
 .ticker b{color:var(--mint);font-weight:400}
 
+/* mobile menu (phones + tablets on the one-screen layout) */
+.menu{display:none;flex-direction:column;align-items:flex-end;gap:12px;position:relative}
+.menu-theme{border-left:0;padding:0;min-height:34px;font-size:9px}
+.name-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.menu-toggle{display:grid;justify-items:end;gap:6px;padding:0;border:0;background:none;color:var(--ink);
+  font:inherit;font-family:"JetBrains Mono",ui-monospace,monospace;cursor:pointer}
+.menu-toggle span{font-size:7px;letter-spacing:.2em;color:var(--muted)}
+.menu-toggle i{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.menu-toggle i b{display:block;width:26px;height:1px;background:var(--cyan)}
+.menu-toggle i b:nth-child(2){width:17px;background:var(--pink)}
+.menu[data-open="true"] .menu-toggle i b{background:var(--pink)}
+.menu[data-open="true"] .menu-toggle span{color:var(--pink)}
+.menu-panel{position:absolute;top:calc(100% + 12px);right:0;width:min(286px,calc(100vw - var(--gutter) * 2));z-index:21;
+  border:1px solid var(--line);background:var(--hint-bg);backdrop-filter:blur(10px)}
+.menu-head{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;
+  border-bottom:1px solid var(--line);font-size:9px;letter-spacing:.22em;color:var(--muted)}
+.menu-head b{color:var(--pink);font-weight:400}
+.menu-panel a{display:flex;align-items:center;gap:12px;min-height:50px;padding:0 14px;
+  border-bottom:1px solid var(--line);font-size:9px;letter-spacing:.18em;color:var(--muted)}
+.menu-panel a em{font-style:normal;font-size:15px;letter-spacing:-.02em;color:var(--ink);
+  font-family:Helvetica,Arial,sans-serif}
+.menu-panel a:last-of-type{border-bottom:0}
+.menu-note{display:none;align-items:center;gap:8px;margin:0;font-size:9px;letter-spacing:.16em;color:var(--muted)}
+.menu-note b{color:var(--pink);font-weight:400}
+
 /* music easter egg */
 .music-easter{position:absolute;left:116px;bottom:100px;z-index:4}
 .music-trinkets{position:absolute;left:0;bottom:96px;display:flex;align-items:flex-end;gap:22px;pointer-events:none;
@@ -306,9 +331,11 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .readouts>*{border-left:0;padding:0}
   .theme-toggle{border-left:0;padding:0}
 }
-@media (max-width:1180px){
-  body{overflow:auto}
+@media (max-width:700px),(max-width:1180px) and (orientation:portrait){
+  body{overflow:auto;overflow-x:hidden}
   .desk{height:auto;min-height:100dvh}
+  .intro{padding:48px var(--gutter) 52px;gap:32px}
+  .transmit{margin-top:0!important}
   .body{flex-direction:column}
   .side{flex:0 0 auto;flex-direction:row;justify-content:space-between;padding:10px 20px;
     border-right:0;border-bottom:1px solid var(--line)}
@@ -316,16 +343,196 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .cols{grid-template-columns:1fr;grid-template-rows:none}
   .index{border-left:0;border-top:1px solid var(--line);grid-template-rows:auto}
   .row{min-height:96px}
-  .ascii-layer{inset:-20px 0 0;opacity:.5}
+  .ascii-layer{inset:auto;opacity:.5}
+  .stage{overflow:hidden}
   .deco,.music-trinkets{display:none}
   .stage{padding:24px 20px 44px}
   .desk{--model-shift:0px}
-  .reticle{width:min(430px,88vw);height:min(430px,88vw)}
-  .slot{width:min(336px,69vw);height:min(336px,69vw)}
+  .reticle{width:min(430px,84vw);height:min(430px,84vw)}
+  .reticle .ring{width:109%;height:109%}
+  .reticle .ring2{width:94%;height:94%}
+  .slot{width:min(336px,64vw);height:min(336px,64vw);touch-action:pan-y}
   .slot .scale{display:none}
-  .music-easter{position:relative;left:auto;bottom:auto;margin:0 20px 28px;height:62px}
-  .foot{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:8px 0}
+  .music-easter{position:fixed;left:auto;right:10px;top:10px;bottom:auto;margin:0;height:auto;z-index:20}  .music-front{position:relative;width:46px;height:46px;background:var(--hint-bg);backdrop-filter:blur(4px)}
+  .music-front:hover{transform:none}
+  .music-front .disc{width:22px;height:22px}
+  .music-front .disc i{inset:4px}
+  .music-front .tag{bottom:3px;font-size:5.5px}
+  .music-back{position:fixed;left:auto;right:10px;top:auto;bottom:64px;transform-origin:100% 100%;
+    width:min(300px,calc(100vw - 20px));background:var(--hint-bg);backdrop-filter:blur(8px)}
+  .top{padding-right:66px}
+  .foot{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:0;order:9}
+  .foot .signal{min-height:52px;padding:0 24px 0 var(--gutter)}
+  .foot nav{flex:1 1 auto}
+  .foot nav a{min-height:52px;padding:0 24px}
   .ticker{display:none}
+}
+@media (max-width:700px) and (hover:none),(max-width:1180px) and (orientation:portrait) and (hover:none){
+  .transmit .links{gap:0}
+  .transmit .links a,.transmit .links span{display:flex;align-items:center;min-height:44px;
+    border-bottom:1px solid var(--line)}
+  .transmit .links span{border-bottom:0;color:var(--muted)}
+  .modes button{min-height:44px;padding:0 18px}
+  .track-controls button{width:36px;height:36px;font-size:11px}
+  .music-close{width:32px;height:32px;font-size:16px}
+  .row .go{opacity:1;transform:none}
+}
+
+/* ---------- phones ---------- */
+@media (max-width:700px){
+  .desk{--gutter:22px;min-height:0}
+  .scanlines{display:none}
+  .desk.dark .vignette{box-shadow:inset 0 0 90px rgba(0,0,0,.6)}
+
+  .top{padding:11px 66px 11px var(--gutter);gap:8px 14px}
+  .top .who{flex-direction:column;align-items:flex-start;gap:3px}
+  .top .who b{font-size:12px;letter-spacing:.2em}
+  .top .who span{font-size:9.5px;letter-spacing:.18em}
+  .readouts{flex:1 1 100%;justify-content:space-between;align-items:center;gap:10px;font-size:9.5px}
+  .readouts>*:last-child{padding-right:0}
+  .theme-toggle{min-height:34px;font-size:9.5px}
+
+  .side{padding:7px var(--gutter);font-size:8.5px}
+  .side .marks{display:none}
+
+  .intro{padding:26px var(--gutter) 34px;gap:20px}
+  .eyebrow{margin-bottom:12px}
+  .name{font-size:clamp(50px,15.5vw,74px);line-height:.8;letter-spacing:-.06em}
+  .lede{margin-top:18px;font-size:15.5px;line-height:1.45;max-width:none}
+  .transmit .rule{margin-bottom:2px}
+  .transmit .links{gap:0}
+  .transmit .links a,.transmit .links span{display:flex;align-items:center;min-height:38px;font-size:11.5px;
+    border-bottom:1px solid var(--line)}
+  .transmit .links span{border-bottom:0;color:var(--muted)}
+  .reach-note{margin-top:12px!important;line-height:1.5!important}
+
+  .stage{padding:10px var(--gutter) 34px;gap:14px}
+  .stage .caption{transform:none;margin-bottom:12px;font-size:9px}
+  .ascii-layer{opacity:.5}
+  .reticle{width:min(370px,86vw);height:min(370px,86vw)}
+  .slot{width:min(250px,58vw);height:min(250px,58vw);touch-action:pan-y}  .slot .dim{font-size:8px}
+  .slot .drag-hint{bottom:-26px;font-size:8.5px}
+  .modes{transform:none;gap:10px}
+  .modes button{min-height:40px;padding:0 16px;font-size:10px}
+
+  .index .head{padding:0 var(--gutter)}
+  .row{min-height:88px;padding:18px var(--gutter);gap:8px}
+  .row .title{font-size:26px}
+  .row .go{opacity:1;transform:none}
+
+  .music-back{width:min(300px,calc(100vw - 20px))}
+  .top{padding-right:66px}
+
+  .foot .signal{width:100%;padding:14px var(--gutter);border-right:0;border-bottom:1px solid var(--line)}
+  .foot nav{width:100%;display:grid;grid-template-columns:repeat(3,1fr)}
+  .foot nav a{justify-content:center;padding:0;border-left:1px solid var(--line)}
+  .foot nav a:last-child{border-right:0}
+}
+@media (max-width:700px) and (hover:none){
+  .row:hover{background:none}
+  .row:hover:before{transform:scaleY(0)}
+}
+@media (max-width:380px){
+  .desk{--gutter:16px}
+  .name{font-size:46px}
+  .row .title{font-size:23px}
+}
+
+/* ---------- everything down to the model on one screen ---------- */
+@media (max-width:700px) and (min-height:700px),(max-width:1180px) and (orientation:portrait) and (min-height:700px){
+  html,body{height:100%;overflow:hidden}
+  .desk{height:100dvh;min-height:0;overflow:hidden}
+  .body{flex:1 1 auto;min-height:0}
+  .side{display:none}
+  .cols{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden}
+  .menu{display:flex}
+  .menu-note{display:flex}
+  .index{display:none}
+
+  .top{flex:0 0 auto;padding:10px 66px 10px var(--gutter);gap:5px 12px}
+  .top .who b{font-size:11.5px}
+  .top .who span{font-size:8.5px}
+  .readouts{font-size:9px}
+  .top .theme-toggle{display:none}
+
+  .intro{flex:0 0 auto;min-height:0;padding:14px var(--gutter) 0;gap:10px}
+  .eyebrow{margin-bottom:9px}
+  .name{font-size:clamp(38px,12.4vw,56px);line-height:.8}
+  .lede{margin-top:12px;font-size:13.5px;line-height:1.4}
+  .menu-note{margin-top:10px!important}
+  .transmit .rule{margin-bottom:0}
+  .transmit .links a,.transmit .links span{min-height:34px;font-size:10.5px}
+  .reach-note{display:none}
+
+  .stage{flex:1 1 auto;min-height:0;padding:0 var(--gutter) 6px;gap:8px;justify-content:center}
+  .stage .caption{font-size:8.5px;transform:none;margin-bottom:10px}
+  .reticle{width:min(74vw,34vh);height:min(74vw,34vh)}
+  .slot{width:66%;height:66%;max-width:none;max-height:none}
+  .slot .dim{top:-16px}
+  .modes{margin-top:12px}
+  .modes button{min-height:38px;padding:0 14px}
+
+  .foot .signal{display:none}
+  .foot nav a{min-height:46px}
+}
+
+/* phones: lift the artefact block (caption, rings, model, ASCII, hint) as a unit */
+@media (max-width:700px) and (min-height:700px){
+  .stage .caption,.stage .reticle{transform:translateY(-14px)}
+}
+
+/* big phones / phablets: fill the extra height instead of leaving it blank */
+@media (min-width:481px) and (max-width:700px) and (min-height:860px){
+  .intro{padding:24px var(--gutter) 0;gap:18px}
+  .eyebrow{margin-bottom:14px}
+  .name{font-size:clamp(58px,10.5vw,76px);line-height:.82}
+  .lede{margin-top:20px;font-size:16.5px;line-height:1.5;max-width:440px}
+  .menu-note{font-size:10px;margin-top:16px!important}
+  .transmit .links a,.transmit .links span{min-height:44px;font-size:12px}
+  .menu-toggle i b{width:32px}
+  .menu-toggle i b:nth-child(2){width:21px}
+  .stage{gap:12px;padding-bottom:12px}
+  .stage .caption{font-size:9.5px;margin-bottom:14px}
+  .reticle{width:min(72vw,38vh);height:min(72vw,38vh)}
+  .modes button{min-height:44px;padding:0 18px}
+  .foot nav a{min-height:54px}
+}
+
+/* tablets on the one-screen layout get room to breathe */
+@media (min-width:701px) and (max-width:1180px) and (orientation:portrait) and (min-height:700px){
+  .top{padding:0 66px 0 var(--gutter);flex:0 0 56px}
+  .top .who{flex-direction:row;align-items:baseline;gap:14px}
+  .top .who b{font-size:12px}
+  .top .who span{font-size:10px}
+  .readouts{font-size:10.5px}
+
+  .intro{padding:30px var(--gutter) 0;gap:18px}
+  .name{font-size:clamp(64px,8.2vw,92px);line-height:.82}
+  .lede{margin-top:22px;font-size:17px;line-height:1.5;max-width:520px}
+  .menu-note{font-size:10px;margin-top:16px!important}
+  .transmit{font-size:11px}
+  .transmit .rule{margin-bottom:6px}
+  .transmit .links{flex-direction:row;gap:26px}
+  .transmit .links a,.transmit .links span{min-height:42px;font-size:11.5px;border-bottom:0}
+  .menu-toggle{gap:9px}
+  .menu-toggle span{font-size:9px}
+  .menu-toggle i{gap:7px}
+  .menu-toggle i b{width:46px;height:2px}
+  .menu-toggle i b:nth-child(2){width:30px}
+
+  .stage{padding:0 var(--gutter) 12px;gap:14px}
+  .stage .caption{font-size:9.5px;transform:translateY(-30px);margin-bottom:0}
+  .reticle{width:min(52vw,40vh);height:min(52vw,40vh)}
+  .modes button{min-height:42px;padding:0 18px}
+
+  .foot .signal{display:flex;min-height:56px}
+  .foot nav{flex:0 0 auto;display:flex;width:auto}
+  .foot nav a{min-height:56px;padding:0 24px;justify-content:flex-start}
+}
+/* short landscape (phones on their side): let the desktop layout scroll */
+@media (orientation:landscape) and (max-height:560px){
+  body{overflow:auto;overflow-x:hidden}
+  .desk{height:auto;min-height:0}
 }
 @media (prefers-reduced-motion:reduce){
   .radar .sweep,.bars i,.album,.music-front .disc,.reticle .ring,.reticle .ring2,.ticker span,.status i,.foot .signal i{animation:none}
@@ -374,12 +581,32 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
       <section class="intro">
         <div>
           <div class="eyebrow">&#9656; IDENTITY.LOCKED</div>
-          <h1 class="name" style="font-family:Helvetica,Arial,sans-serif">
-            <span class="ghost g1" aria-hidden="true">Asteria<br>Wang</span>
-            <span class="ghost g2" aria-hidden="true">Asteria<br>Wang</span>
-            <span class="real">Asteria<br>Wang</span>
-          </h1>
+          <div class="name-row">
+            <h1 class="name" style="font-family:Helvetica,Arial,sans-serif">
+              <span class="ghost g1" aria-hidden="true">Asteria<br>Wang</span>
+              <span class="ghost g2" aria-hidden="true">Asteria<br>Wang</span>
+              <span class="real">Asteria<br>Wang</span>
+            </h1>
+            <div class="menu" id="menu" data-open="false">
+              <button type="button" class="theme-toggle menu-theme" aria-pressed="false" aria-label="Switch colour theme">
+                <span class="theme-toggle-label">THEME // LIGHT</span>
+                <i><b></b></i>
+              </button>
+              <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-panel" aria-label="Open section menu">
+                <i><b></b><b></b><b></b></i>
+                <span>MENU</span>
+              </button>
+              <div class="menu-panel" id="menu-panel" hidden>
+                <div class="menu-head"><span>NAV.INDEX</span><b>04</b></div>
+                <a href="#work"><span>[01]</span><em>Selected work</em></a>
+                <a href="#research"><span>[02]</span><em>Research</em></a>
+                <a href="#illustration"><span>[03]</span><em>Illustration</em></a>
+                <a href="#lab"><span>[04]</span><em>Lab</em></a>
+              </div>
+            </div>
+          </div>
           <p class="lede" style="font-family:Helvetica,Arial,sans-serif">First-year Design Engineering at Imperial. I build things &mdash; hardware, software, drawings &mdash; and publish what I learn.</p>
+          <p class="menu-note" style="margin-top:14px"><b>&#9656;</b> ALL WORK LIVES IN THE MENU &mdash; TOP RIGHT.</p>
         </div>
         <div class="transmit" style="margin-top:auto">
           <div class="rule"><i></i>TRANSMIT<i></i></div>
@@ -483,27 +710,50 @@ const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matc
 /* ---------- theme ---------- */
 const THEME_KEY = "asteria-theme";
 const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
-const themeButton = desk.querySelector(".theme-toggle");
-const themeLabel = desk.querySelector(".theme-toggle-label");
+const themeButtons = [...desk.querySelectorAll(".theme-toggle")];
 let asciiController = { setTheme() {}, destroy() {} };
 let updateModelTheme = () => {};
 
 const applyTheme = (dark) => {
   desk.classList.toggle("dark", dark);
-  themeButton.setAttribute("aria-pressed", String(dark));
-  themeLabel.textContent = dark ? "THEME // DARK" : "THEME // LIGHT";
+  themeButtons.forEach((button) => {
+    button.setAttribute("aria-pressed", String(dark));
+    const label = button.querySelector(".theme-toggle-label");
+    if (label) label.textContent = dark ? "THEME // DARK" : "THEME // LIGHT";
+  });
   asciiController.setTheme(dark ? "dark" : "light");
   updateModelTheme();
 };
 const stored = localStorage.getItem(THEME_KEY);
 applyTheme(stored ? stored === "dark" : systemDark.matches);
-themeButton.addEventListener("click", () => {
+themeButtons.forEach((button) => button.addEventListener("click", () => {
   const dark = !desk.classList.contains("dark");
   localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
   applyTheme(dark);
-});
+}));
 systemDark.addEventListener("change", (event) => {
   if (!localStorage.getItem(THEME_KEY)) applyTheme(event.matches);
+});
+
+/* ---------- phone section menu ---------- */
+const menu = document.querySelector("#menu");
+const menuToggle = menu.querySelector(".menu-toggle");
+const menuPanel = menu.querySelector("#menu-panel");
+let closeMusicPanel = () => {};
+const setMenuOpen = (open) => {
+  menu.dataset.open = String(open);
+  menuToggle.setAttribute("aria-expanded", String(open));
+  menuPanel.hidden = !open;
+  if (open) closeMusicPanel();
+};
+setMenuOpen(false);
+menuToggle.addEventListener("click", () => setMenuOpen(menu.dataset.open !== "true"));
+menuPanel.addEventListener("click", (event) => { if (event.target.closest("a")) setMenuOpen(false); });
+document.addEventListener("pointerdown", (event) => {
+  if (menu.dataset.open === "true" && !event.target.closest("#menu")) setMenuOpen(false);
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && menu.dataset.open === "true") { setMenuOpen(false); menuToggle.focus(); }
 });
 
 /* ---------- ascii artwork ---------- */
@@ -520,6 +770,35 @@ try {
 } catch (error) {
   console.warn("ASCII background unavailable", error);
 }
+
+/* In the stacked (tablet/phone) layouts the ASCII patch is centred on the
+   model box and sized up, instead of bleeding off the desktop stage. */
+const asciiLayer = desk.querySelector(".ascii-layer");
+const stackedLayout = window.matchMedia("(max-width:1180px)");
+const pinAsciiToModel = () => {
+  if (!asciiLayer) return;
+  if (!stackedLayout.matches) { asciiLayer.removeAttribute("style"); return; }
+  const stageBox = stage.getBoundingClientRect();
+  const modelBox = modelShell.getBoundingClientRect();
+  if (!stageBox.width || !modelBox.width) return;
+  const phone = window.innerWidth <= 480;
+  const bigPhone = window.innerWidth > 480 && window.innerWidth <= 700;
+  let size = Math.round(Math.min(modelBox.width * 3.1, stageBox.width * 1.4, stageBox.height * 1.9));
+  if (bigPhone) size = Math.round(size * .86);
+  const nudgeX = bigPhone ? size * .025 : (window.innerWidth > 700 ? size * .05 : 0);
+  const nudgeY = bigPhone ? size * -.02 : (phone ? size * .005 : 0);
+  const centreX = modelBox.left - stageBox.left + modelBox.width / 2 + nudgeX;
+  const centreY = modelBox.top - stageBox.top + modelBox.height / 2 + nudgeY;
+  asciiLayer.style.width = `${size}px`;
+  asciiLayer.style.height = `${size}px`;
+  asciiLayer.style.left = `${Math.round(centreX - size / 2)}px`;
+  asciiLayer.style.top = `${Math.round(centreY - size / 2)}px`;
+  asciiLayer.style.right = "auto";
+  asciiLayer.style.bottom = "auto";
+};
+pinAsciiToModel();
+window.addEventListener("resize", pinAsciiToModel);
+new ResizeObserver(pinAsciiToModel).observe(stage);
 
 /* ---------- desk tidy model ---------- */
 let THREE = null;
@@ -786,6 +1065,10 @@ stage.addEventListener("pointermove", (event) => {
   lastY = event.clientY;
   paintModel();
 });
+if (window.matchMedia("(hover:none)").matches) {
+  const hint = modelShell.querySelector(".drag-hint");
+  if (hint) hint.innerHTML = "<i></i>SWIPE TO ROTATE";
+}
 stage.addEventListener("pointerup", () => { dragging = false; });
 stage.addEventListener("pointercancel", () => { dragging = false; });
 
@@ -851,6 +1134,7 @@ const centerRadarInGap = () => {
 };
 const setMusicOpen = (open) => {
   music.classList.toggle("open", open);
+  if (open) setMenuOpen(false);
   musicFront.inert = open;
   musicFront.setAttribute("aria-hidden", String(open));
   musicBack.inert = !open;
@@ -860,6 +1144,7 @@ const setMusicOpen = (open) => {
   else if (musicTrinkets) musicTrinkets.style.transform = "";
 };
 window.addEventListener("resize", () => { if (music.classList.contains("open")) centerRadarInGap(); });
+closeMusicPanel = () => { if (music.classList.contains("open")) musicClose.click(); };
 try {
   const { createPlaylistPlayer } = await import("./files/playlist-player.js");
   createPlaylistPlayer({
