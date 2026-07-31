@@ -126,9 +126,13 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .transmit .links span{color:var(--ink)}
 .link-row{display:flex;align-items:center;gap:10px}
 .link-row>a,.link-row>span{flex:1 1 auto;min-width:0}
-.copy-btn{flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;padding:0;border:1px solid var(--line);
+.copy-btn{position:relative;flex:0 0 auto;display:grid;place-items:center;width:26px;height:26px;padding:0;border:1px solid var(--line);
   background:var(--btn);color:var(--muted);cursor:pointer;transition:color .18s,border-color .18s}
 .copy-btn:hover{color:var(--pink);border-color:var(--cyan)}
+.copy-btn::after{content:"COPIED";position:absolute;bottom:calc(100% + 6px);right:0;z-index:5;padding:3px 6px;
+  font-size:8px;letter-spacing:.16em;color:var(--mint);background:var(--hint-bg);border:1px solid var(--mint);
+  white-space:nowrap;opacity:0;transform:translateY(3px);pointer-events:none;transition:opacity .18s,transform .18s}
+.copy-btn.copied::after{opacity:1;transform:none}
 .copy-btn svg{width:13px;height:13px;display:block}
 .copy-btn .ic-check{display:none}
 .copy-btn.copied{color:var(--mint);border-color:var(--mint)}
