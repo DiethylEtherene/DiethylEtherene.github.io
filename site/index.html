@@ -131,15 +131,15 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .stage:active{cursor:grabbing}
 .stage>*:not(.ascii-layer){position:relative;z-index:1}
 .stage .caption{display:flex;gap:14px;align-items:center;font-size:9.5px;letter-spacing:.2em;color:var(--cyan);
-  transform:translate(var(--model-shift),-20px)}
+  transform:translate(var(--model-shift),-36px)}
 .stage .caption i{display:block;width:26px;height:1px;background:var(--cyan)}
 .reticle{position:relative;display:grid;place-items:center;width:430px;height:430px;max-width:100%;transform:translateX(var(--model-shift))}
-.reticle .ring{position:absolute;width:430px;height:430px;border-radius:50%;
+.reticle .ring{position:absolute;width:470px;height:470px;border-radius:50%;
   border:1px dashed rgba(13,126,166,.42);animation:spin 26s linear infinite}
 .desk.dark .reticle .ring{border-color:rgba(82,220,255,.35)}
 .reticle .ring b{position:absolute;left:calc(50% - 4px);top:-4px;display:block;width:8px;height:8px;border-radius:50%;background:var(--pink)}
 .desk.dark .reticle .ring b{background:var(--mint);box-shadow:0 0 10px var(--mint)}
-.reticle .ring2{position:absolute;width:372px;height:372px;border-radius:50%;
+.reticle .ring2{position:absolute;width:406px;height:406px;border-radius:50%;
   border:1px dotted rgba(255,43,141,.4);animation:spin 17s linear infinite reverse}
 .reticle .ring2 b{position:absolute;left:calc(50% - 3px);top:-3px;display:block;width:6px;height:6px;
   border-radius:50%;background:var(--cyan)}
@@ -216,7 +216,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .music-easter{position:absolute;left:116px;bottom:100px;z-index:4}
 .music-trinkets{position:absolute;left:0;bottom:96px;display:flex;align-items:flex-end;gap:22px;pointer-events:none;
   transition:transform .42s cubic-bezier(.16,1,.3,1)}
-.music-easter.open .music-trinkets{transform:translateY(-32px)}
+.music-easter.open .music-trinkets{transform:translateY(-48px)}
 .radar{position:relative;display:block;width:54px;height:54px;border:1px solid var(--line);border-radius:50%;overflow:hidden}
 .radar i{position:absolute;display:block;background:var(--line)}
 .radar .r1{inset:12px;border:1px solid var(--line);border-radius:50%;background:none}
