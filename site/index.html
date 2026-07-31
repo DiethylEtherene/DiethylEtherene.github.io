@@ -380,6 +380,12 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .music-front .tag{bottom:3px;font-size:5.5px}
   .music-back{position:fixed;left:auto;right:10px;top:10px;bottom:auto;transform-origin:100% 0%;
     width:min(300px,calc(100vw - 20px));background:var(--hint-bg);backdrop-filter:blur(8px)}
+  /* While playing or open, drop out of fixed positioning and scroll with
+     the page (see the JS comment above updateMusicPin for why). .desk is
+     position:relative and part of the normal document flow, so this keeps
+     the same top/right offsets but they now move with scroll. */
+  .music-easter.is-flowing{position:absolute}
+  .music-easter.is-flowing .music-back{position:absolute}
   .top{padding-right:66px}
   .foot{flex-wrap:wrap;height:auto;flex:0 0 auto;padding:0;order:9}
   .foot .signal{min-height:52px;padding:0 24px 0 var(--gutter)}
@@ -1189,6 +1195,16 @@ const centerRadarInGap = () => {
   const delta = (reachBottom + playerTop) / 2 - (radarRect.top + radarRect.height / 2);
   musicTrinkets.style.transform = `translateY(${delta}px)`;
 };
+// On mobile the chip/panel is pinned (fixed) only while fully idle: not
+// playing AND not open. The moment the user opens it or starts playback,
+// it drops into normal document flow and scrolls with the page — that's
+// what fixes it against iOS's buggy fixed-position repaint, and it means
+// pausing alone (with the panel still open) does not snap it back to the
+// pinned corner; only pausing *and* closing does.
+let isMusicPlaying = false;
+const updateMusicPin = () => {
+  music.classList.toggle("is-flowing", isMusicPlaying || music.classList.contains("open"));
+};
 const setMusicOpen = (open) => {
   music.classList.toggle("open", open);
   if (open) setMenuOpen(false);
@@ -1199,6 +1215,7 @@ const setMusicOpen = (open) => {
   focusMusicControl(open ? musicClose : musicFront);
   if (open) centerRadarInGap();
   else if (musicTrinkets) musicTrinkets.style.transform = "";
+  updateMusicPin();
 };
 window.addEventListener("resize", () => { if (music.classList.contains("open")) centerRadarInGap(); });
 closeMusicPanel = () => { if (music.classList.contains("open")) musicClose.click(); };
@@ -1207,6 +1224,7 @@ try {
   createPlaylistPlayer({
     root: music,
     onOpenChange: setMusicOpen,
+    onPlayStateChange: (isPlaying) => { isMusicPlaying = isPlaying; updateMusicPin(); },
     tracks: [
       { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
       { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },

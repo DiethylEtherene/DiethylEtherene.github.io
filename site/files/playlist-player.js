@@ -30,7 +30,7 @@ export function formatTime(seconds) {
   return `${String(minutes).padStart(2, "0")}:${String(remainder).padStart(2, "0")}`;
 }
 
-export function createPlaylistPlayer({ root, tracks, audio: suppliedAudio, onOpenChange = () => {} } = {}) {
+export function createPlaylistPlayer({ root, tracks, audio: suppliedAudio, onOpenChange = () => {}, onPlayStateChange = () => {} } = {}) {
   if (!root || typeof root.querySelector !== "function") {
     throw new TypeError("A playlist root element is required");
   }
@@ -70,6 +70,7 @@ export function createPlaylistPlayer({ root, tracks, audio: suppliedAudio, onOpe
     elements[".track-prev"].setAttribute("aria-label", `Previous: ${previous.title}`);
     elements[".track-next"].setAttribute("aria-label", `Next: ${next.title}`);
     root.classList[state.hasError ? "add" : "remove"]("has-error");
+    onPlayStateChange(isPlaying);
   }
 
   function loadCurrentTrack() {
