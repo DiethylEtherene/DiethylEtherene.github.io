@@ -153,6 +153,15 @@
 .err{margin:0 16px 16px;padding:10px 12px;border:1px solid var(--pink);font-size:10px;
   letter-spacing:.14em;color:var(--pink)}
 
+/* leaving a view with unsaved doodle/plate work asks first */
+.confirm-modal{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(6,13,20,.55);backdrop-filter:blur(2px)}
+.confirm-modal[hidden]{display:none}
+.confirm-box{width:min(360px,100%);border:1px solid var(--pink);background:var(--hint-bg);
+  backdrop-filter:blur(8px);padding:20px}
+.confirm-msg{margin:0 0 18px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.55;color:var(--ink)}
+.confirm-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+
 .frame{position:relative;display:grid;place-items:center;border:1px solid var(--cyan);background:var(--slot)}
 .frame canvas{display:block;width:auto;height:auto;max-width:100%;max-height:26vh}
 .frame .dim{position:absolute;left:0;top:-19px;font-size:9px;letter-spacing:.18em;color:var(--muted)}
@@ -712,6 +721,16 @@
     </section>
   </div>
   </footer>
+
+  <div class="confirm-modal" id="confirm-modal" hidden>
+    <div class="confirm-box">
+      <p class="confirm-msg" id="confirm-msg"></p>
+      <div class="confirm-actions">
+        <button type="button" class="btn" id="confirm-cancel">Keep working</button>
+        <button type="button" class="btn primary" id="confirm-discard">Discard &amp; leave</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -751,10 +770,65 @@ const state = {
   tolerance: 0.45,
   keepBackground: false,
   grid: null,
+  downloaded: false,
   params: { cols: 96, edge: 0.55, cell: 9, ramp: "signal", palette: "signal", invert: false, scan: true },
 };
 
 const views = { choose: $("view-choose"), upload: $("view-upload"), doodle: $("view-doodle"), output: $("view-output") };
+
+/* ---------- leaving with unsaved work ---------- */
+// Doodle: any pen marks not yet turned into a plate. Output: a generated
+// plate that hasn't been downloaded yet (any parameter change invalidates a
+// prior download, since the on-screen result no longer matches the file).
+function hasUnsavedWork() {
+  if (state.view === "doodle") return hasStrokes;
+  if (state.view === "output") return !!state.grid && !state.downloaded;
+  return false;
+}
+
+const confirmModal = $("confirm-modal");
+const confirmMsgNode = $("confirm-msg");
+const confirmDiscardBtn = $("confirm-discard");
+const confirmCancelBtn = $("confirm-cancel");
+let confirmResolve = null;
+function askDiscard(message) {
+  confirmMsgNode.textContent = message;
+  confirmModal.hidden = false;
+  try { confirmDiscardBtn.focus({ preventScroll: true }); } catch {}
+  return new Promise((resolve) => { confirmResolve = resolve; });
+}
+function closeConfirm(result) {
+  confirmModal.hidden = true;
+  if (confirmResolve) { confirmResolve(result); confirmResolve = null; }
+}
+confirmDiscardBtn.addEventListener("click", () => closeConfirm(true));
+confirmCancelBtn.addEventListener("click", () => closeConfirm(false));
+confirmModal.addEventListener("click", (event) => { if (event.target === confirmModal) closeConfirm(false); });
+document.addEventListener("keydown", (event) => {
+  if (!confirmModal.hidden && event.key === "Escape") closeConfirm(false);
+});
+
+// The header "back" link only leaves the site from the entry view; from any
+// in-progress view it returns to the entry view instead (in-page), asking
+// first if there's unsaved doodle/plate work.
+document.querySelector(".back").addEventListener("click", (event) => {
+  if (state.view === "choose") return;
+  event.preventDefault();
+  if (!hasUnsavedWork()) { resetAll(); return; }
+  const message = state.view === "doodle"
+    ? "Your doodle hasn't been turned into a plate yet. Leave and discard it?"
+    : "This plate hasn't been downloaded yet. Leave and discard it?";
+  askDiscard(message).then((discard) => { if (discard) resetAll(); });
+});
+
+// Actually leaving the page (closing the tab, a real navigation, etc.) gets
+// the browser's own confirmation — it cannot be styled, but it's the only
+// mechanism for a genuine unload.
+window.addEventListener("beforeunload", (event) => {
+  if (!hasUnsavedWork()) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 const wipe = $("wipe");
 let viewTimer = 0;
@@ -1277,6 +1351,9 @@ if (typeof ResizeObserver === "function") {
 
 function paint() {
   if (!state.grid) return;
+  // Any repaint (parameter change, rerender, theme swap) means the on-screen
+  // plate no longer matches whatever was last downloaded.
+  state.downloaded = false;
   const canvas = $("out-canvas");
   renderGrid(state.grid, {
     canvas,
@@ -1307,6 +1384,7 @@ $("dl-png").addEventListener("click", () => {
     background,
   });
   downloadCanvas(canvas, "ascii-creature.png");
+  state.downloaded = true;
 });
 $("copy-text").addEventListener("click", async () => {
   if (!state.grid) return;
