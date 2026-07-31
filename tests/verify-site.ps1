@@ -63,11 +63,12 @@ foreach ($requiredMarkup in @(
   'import("./files/three.module.min.js")',
   'import("./files/STLLoader.js")',
   './files/asu-desk-tidy.stl',
-  'import("./files/playlist-player.js")',
   'aria-live="polite"'
 )) {
   Assert-SiteCondition ($index.Contains($requiredMarkup)) "index.html is missing required markup: $requiredMarkup"
 }
+# playlist-player.js is imported with an optional cache-busting ?v= suffix.
+Assert-SiteCondition ($index -match [regex]::Escape('import("./files/playlist-player.js') + '(\?v=\d+)?"\)') "index.html must import playlist-player.js."
 
 # Hidden-signal player accessibility: closed front exposed, closed back inert.
 $frontPattern = '(?is)<button\b(?=[^>]*\btype\s*=\s*"button")(?=[^>]*\bclass\s*=\s*"[^"]*\bmusic-front\b[^"]*")(?=[^>]*\baria-label\s*=\s*"Reveal hidden playlist")[^>]*>'

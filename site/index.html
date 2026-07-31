@@ -1225,7 +1225,7 @@ const setMusicOpen = (open) => {
 window.addEventListener("resize", () => { if (music.classList.contains("open")) centerRadarInGap(); });
 closeMusicPanel = () => { if (music.classList.contains("open")) musicClose.click(); };
 try {
-  const { createPlaylistPlayer } = await import("./files/playlist-player.js");
+  const { createPlaylistPlayer } = await import("./files/playlist-player.js?v=2");
   createPlaylistPlayer({
     root: music,
     onOpenChange: setMusicOpen,
