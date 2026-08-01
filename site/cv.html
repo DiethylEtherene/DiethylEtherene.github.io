@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="CV — Asteria Wang, MEng Design Engineering, Imperial College London.">
+<meta name="theme-color" content="#e8eef1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060d14" media="(prefers-color-scheme: dark)">
+<title>CV / Asteria Wang</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./files/subpage.css">
+<style>
+.sheet{display:flex;flex-direction:column;gap:22px}
+
+.cv{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,320px);gap:20px 30px;
+  grid-template-areas:"head head" "preview aside";grid-template-rows:auto minmax(0,1fr);
+  flex:1 1 auto;min-height:0}
+.cv .head{grid-area:head;display:flex;flex-direction:column;gap:16px;min-width:0}
+.cv .preview{grid-area:preview;min-width:0;min-height:0;display:flex;flex-direction:column}
+.cv .aside{grid-area:aside;min-width:0;display:flex;flex-direction:column;gap:16px}
+
+h1{margin:0;font-size:clamp(40px,5vw,76px);line-height:.84;letter-spacing:-.055em;font-weight:400;position:relative}
+h1 .ghost{position:absolute;left:0;top:0;pointer-events:none}
+h1 .g1{color:var(--pink);opacity:.26;transform:translate(-3px,2px)}
+h1 .g2{color:var(--cyan);opacity:.24;transform:translate(3px,-2px)}
+.desk.dark h1 .g1{opacity:.46}
+.desk.dark h1 .g2{opacity:.4}
+h1 .real{position:relative}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border:1px solid var(--line);
+  background:var(--panel)}
+.strip>div{display:flex;flex-direction:column;gap:5px;padding:11px 15px;border-left:1px solid var(--line)}
+.strip>div:first-child{border-left:0}
+.strip .k{font-size:9px;letter-spacing:.2em;color:var(--muted)}
+.strip .v{font-size:13.5px;letter-spacing:.02em;color:var(--ink)}
+.strip .v em{font-style:normal;color:var(--cyan)}
+
+.frame{position:relative;flex:1 1 auto;min-height:320px;border:1px solid var(--cyan);background:var(--slot);
+  display:flex;flex-direction:column;overflow:hidden}
+.frame .bk{position:absolute;width:16px;height:16px;z-index:1;pointer-events:none}
+.frame .b1{left:-1px;top:-1px;border-left:2px solid var(--mint);border-top:2px solid var(--mint)}
+.frame .b2{right:-1px;top:-1px;border-right:2px solid var(--mint);border-top:2px solid var(--mint)}
+.frame .b3{left:-1px;bottom:-1px;border-left:2px solid var(--mint);border-bottom:2px solid var(--mint)}
+.frame .b4{right:-1px;bottom:-1px;border-right:2px solid var(--mint);border-bottom:2px solid var(--mint)}
+.frame iframe{flex:1 1 auto;width:100%;border:0;background:#fff}
+.frame .fallback{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:24px;text-align:center;font-size:9.5px;letter-spacing:.18em;color:var(--muted)}
+.frame .fallback b{font-weight:400;color:var(--cyan);font-size:10.5px}
+.desk.dark .frame{box-shadow:0 0 30px rgba(82,220,255,.14),inset 0 0 40px rgba(82,220,255,.06)}
+
+.panel{display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel);min-width:0}
+.panel>.head-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:38px;
+  padding:0 14px;border-bottom:1px solid var(--line);font-size:9.5px;letter-spacing:.2em;color:var(--muted)}
+.panel>.head-row b{font-weight:400;color:var(--pink)}
+.panel .pad{padding:16px;display:flex;flex-direction:column;gap:14px}
+.panel p{margin:0;font-family:Helvetica,Arial,sans-serif;font-size:12.5px;line-height:1.6;color:var(--muted)}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;
+  border:1px solid var(--line);background:var(--btn);color:var(--ink);
+  font:700 10px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.14em;text-transform:uppercase;
+  cursor:pointer;text-decoration:none;transition:border-color .18s,background .18s,color .18s}
+.btn:hover{border-color:var(--cyan)}
+.btn.primary{border-color:var(--pink);background:var(--pink);color:#fff}
+.desk.dark .btn.primary{color:#060d14;box-shadow:0 0 14px rgba(255,60,159,.34)}
+.btns{display:flex;flex-direction:column;gap:8px}
+
+@media (max-width:1180px){
+  .cv{grid-template-columns:minmax(0,1fr) minmax(240px,290px);gap:16px 24px}
+}
+@media (max-width:860px){
+  .cv{grid-template-columns:minmax(0,1fr);grid-template-areas:"head" "preview" "aside";
+    grid-template-rows:auto auto auto}
+  .frame{min-height:60vh}
+}
+@media (max-width:700px){
+  .sheet{gap:16px}
+  .frame{min-height:52vh}
+  .strip>div{border-left:0;border-top:1px solid var(--line)}
+  .strip>div:first-child{border-top:0}
+}
+</style>
+</head>
+<body>
+<div class="desk" id="desk">
+  <div class="deco" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+
+  <header class="top">
+    <div class="lead">
+      <a class="back" href="./index.html"><span aria-hidden="true">&#8592;</span><span>INDEX</span></a>
+      <span class="sep" aria-hidden="true"></span>
+      <b>CV</b>
+      <em>/ DOCUMENT.RECORD</em>
+    </div>
+    <div class="readouts">
+      <span class="status"><i></i><span>ON FILE</span></span>
+      <button type="button" class="theme-toggle" aria-label="Toggle colour scheme">
+        <i aria-hidden="true"><b></b></i><span class="theme-label">DARK</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="body">
+    <aside class="side" aria-hidden="true">
+      <span class="build">CV / 01</span>
+      <span class="marks"><i></i><i></i><i></i></span>
+      <span class="geo">PDF &middot; 01 PAGE</span>
+    </aside>
+
+    <div class="flow">
+      <div class="eyebrow-bar">
+        <span>&#9673; DOCUMENT.RECORD</span>
+        <i aria-hidden="true"></i>
+        <span class="note">One page, kept current. Download for anything formal, or read it right here.</span>
+      </div>
+
+      <main class="sheet">
+        <div class="cv">
+          <div class="head">
+            <h1>
+              <span class="ghost g1" aria-hidden="true">CV</span>
+              <span class="ghost g2" aria-hidden="true">CV</span>
+              <span class="real">CV</span>
+            </h1>
+            <div class="strip">
+              <div><span class="k">FORMAT</span><span class="v">PDF <em>&middot; 1 page</em></span></div>
+              <div><span class="k">FOCUS</span><span class="v">Design Eng <em>&middot; CAD &middot; Prototyping</em></span></div>
+              <div><span class="k">BASE</span><span class="v">London, UK</span></div>
+            </div>
+          </div>
+
+          <div class="preview">
+            <div class="frame">
+              <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+              <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+              <iframe src="./files/asteria-wang-cv.pdf" title="Asteria Wang — CV">
+                <div class="fallback">
+                  <b>PREVIEW UNAVAILABLE</b>
+                  <span>Your browser can&rsquo;t show the PDF inline &mdash; use the buttons to open or download it.</span>
+                </div>
+              </iframe>
+            </div>
+          </div>
+
+          <div class="aside">
+            <div class="panel">
+              <div class="head-row"><span>GET A COPY</span><b>PDF</b></div>
+              <div class="pad">
+                <p>Same file as the preview &mdash; no extra formatting, safe to attach directly to an application.</p>
+                <div class="btns">
+                  <a class="btn primary" href="./files/asteria-wang-cv.pdf" download="Asteria-Wang-CV.pdf">Download PDF</a>
+                  <a class="btn" href="./files/asteria-wang-cv.pdf" target="_blank" rel="noreferrer">Open in new tab</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span class="signal"><i aria-hidden="true"></i>SIGNAL_?</span>
+    <span class="ticker" aria-hidden="true"><span>
+      <span>DOCUMENT.RECORD &middot; <b>MENG DESIGN ENGINEERING / IMPERIAL</b> &middot; CV KEPT CURRENT &middot; PDF &middot; 01 PAGE</span>
+      <span>DOCUMENT.RECORD &middot; <b>MENG DESIGN ENGINEERING / IMPERIAL</b> &middot; CV KEPT CURRENT &middot; PDF &middot; 01 PAGE</span>
+    </span></span>
+
+    <div class="music-easter" id="music">
+    <button type="button" class="music-front" aria-label="Reveal hidden playlist">
+      <span class="disc" aria-hidden="true"><i></i><b></b></span>
+      <span class="tag">SIGNAL_?</span>
+    </button>
+    <section class="music-back" aria-label="Hidden signal playlist" inert aria-hidden="true">
+      <div class="bar"><span class="music-eyebrow">NOW.PLAYING / HIDDEN SIGNAL</span><button type="button" class="music-close" aria-label="Close player">&times;</button></div>
+      <div class="music-body">
+        <span class="album" aria-hidden="true"><i></i><b></b></span>
+        <div class="track-data">
+          <div class="track-heading" aria-live="polite" aria-atomic="true">
+            <span class="music-track-position">01 / 03</span>
+            <strong><span class="music-track-title">Track 01</span> &mdash; <span class="music-track-artist">Ether</span></strong>
+          </div>
+          <div class="track-progress" aria-hidden="true"><i></i></div>
+          <div class="track-controls">
+            <button type="button" class="track-prev" aria-label="Previous track">&larr;</button>
+            <button type="button" class="play-toggle" aria-label="Play">&#9654;</button>
+            <button type="button" class="track-next" aria-label="Next track">&rarr;</button>
+            <span class="track-time">00:00 / 00:00</span>
+          </div>
+        </div>
+      </div>
+      <audio class="playlist-audio" preload="metadata" hidden></audio>
+    </section>
+  </div>
+  </footer>
+</div>
+
+<script type="module">
+const desk = document.getElementById("desk");
+
+/* ---------- theme (shared key with the front page) ---------- */
+const THEME_KEY = "asteria-theme";
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+const themeLabel = document.querySelector(".theme-label");
+const applyTheme = (dark) => {
+  desk.classList.toggle("dark", dark);
+  themeLabel.textContent = dark ? "LIGHT" : "DARK";
+};
+document.querySelector(".theme-toggle").addEventListener("click", () => {
+  const dark = !desk.classList.contains("dark");
+  localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+  applyTheme(dark);
+});
+systemDark.addEventListener("change", (event) => {
+  if (!localStorage.getItem(THEME_KEY)) applyTheme(event.matches);
+});
+
+/* ---------- hidden signal player ---------- */
+const music = document.getElementById("music");
+const musicFront = music.querySelector(".music-front");
+const musicBack = music.querySelector(".music-back");
+const musicClose = music.querySelector(".music-close");
+const musicAudio = music.querySelector(".playlist-audio");
+const compact = window.matchMedia("(max-width:1180px)");
+let musicPlaying = false;
+
+const updateMusicPin = () => {
+  const inUse = musicPlaying || music.classList.contains("open");
+  music.classList.toggle("pinned", compact.matches && inUse);
+  const flowing = compact.matches && !inUse;
+  music.style.transform = flowing ? "translateY(" + -Math.round(window.scrollY) + "px)" : "";
+};
+window.addEventListener("scroll", updateMusicPin, { passive: true });
+window.addEventListener("resize", updateMusicPin);
+compact.addEventListener("change", updateMusicPin);
+musicAudio.addEventListener("play", () => { musicPlaying = true; updateMusicPin(); });
+musicAudio.addEventListener("pause", () => { musicPlaying = false; updateMusicPin(); });
+
+const setMusicOpen = (open) => {
+  music.classList.toggle("open", open);
+  musicFront.inert = open;
+  musicFront.setAttribute("aria-hidden", String(open));
+  musicBack.inert = !open;
+  musicBack.setAttribute("aria-hidden", String(!open));
+  updateMusicPin();
+  try { (open ? musicClose : musicFront).focus({ preventScroll: true }); } catch {}
+};
+try {
+  const [{ createPlaylistPlayer }, { attachMusicContinuity }] = await Promise.all([
+    import("./files/playlist-player.js?v=4"),
+    import("./files/music-continuity.js"),
+  ]);
+  const tracks = [
+    { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
+    { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
+    { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
+  ];
+  const player = createPlaylistPlayer({ root: music, onOpenChange: setMusicOpen, tracks });
+  attachMusicContinuity({ player, audio: musicAudio, tracks });
+} catch (error) {
+  console.warn("Playlist unavailable", error);
+}
+
+applyTheme(localStorage.getItem(THEME_KEY) ? localStorage.getItem(THEME_KEY) === "dark" : systemDark.matches);
+updateMusicPin();
+</script>
+</body>
+</html>
