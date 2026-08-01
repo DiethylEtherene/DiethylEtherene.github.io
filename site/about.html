@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="About Asteria Wang — first-year MEng Design Engineering student at Imperial College London.">
+<meta name="theme-color" content="#e8eef1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060d14" media="(prefers-color-scheme: dark)">
+<title>About / Asteria Wang</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./files/subpage.css">
+<style>
+/* about.html — identity page. Two columns on desktop: dossier left, portrait +
+   transmit right. The sheet scrolls internally (tablet+) like play.html. */
+.sheet{display:flex;flex-direction:column;gap:22px}
+
+.about{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,27%);gap:16px 30px;align-items:stretch;
+  grid-template-areas:"head aside" "main aside" "main contact";
+  grid-template-rows:auto minmax(0,1fr) min-content;flex:1 1 auto;min-height:0}
+.about .head{grid-area:head;display:flex;flex-direction:column;gap:16px;min-width:0}
+.about .main{grid-area:main;display:flex;flex-direction:column;gap:16px;min-width:0}
+.about .aside{grid-area:aside;min-width:0;display:flex;flex-direction:column;gap:16px}
+.about .contact{grid-area:contact;min-width:0;display:flex;flex-direction:column;justify-content:flex-end}
+
+h1{margin:0;font-size:clamp(40px,5vw,76px);line-height:.84;letter-spacing:-.055em;font-weight:400;position:relative}
+h1 .ghost{position:absolute;left:0;top:0;pointer-events:none}
+h1 .g1{color:var(--pink);opacity:.26;transform:translate(-3px,2px)}
+h1 .g2{color:var(--cyan);opacity:.24;transform:translate(3px,-2px)}
+.desk.dark h1 .g1{opacity:.46}
+.desk.dark h1 .g2{opacity:.4}
+h1 .real{position:relative}
+
+/* spec strip — same vocabulary as the generator readout */
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border:1px solid var(--line);
+  background:var(--panel)}
+.strip>div{display:flex;flex-direction:column;gap:5px;padding:11px 15px;border-left:1px solid var(--line)}
+.strip>div:first-child{border-left:0}
+.strip .k{font-size:9px;letter-spacing:.2em;color:var(--muted)}
+.strip .v{font-size:13.5px;letter-spacing:.02em;color:var(--ink)}
+.strip .v em{font-style:normal;color:var(--cyan)}
+
+/* numbered dossier blocks — they stretch to eat the leftover column height */
+.blocks{display:flex;flex-direction:column;border-top:1px solid var(--line);flex:1 1 auto;min-height:0}
+.block{display:grid;grid-template-columns:56px minmax(0,1fr);gap:0 16px;padding:15px 0;
+  align-content:center;flex:1 1 auto;border-bottom:1px solid var(--line)}
+.block .n{font-size:9.5px;letter-spacing:.2em;color:var(--pink);padding-top:4px}
+.block h2{margin:0 0 7px;font-size:11px;letter-spacing:.22em;font-weight:400;color:var(--muted)}
+.block p{margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14.2px;line-height:1.62;
+  color:var(--ink);text-wrap:pretty;max-width:70ch}
+.desk.dark .block p{color:#d8ece6}
+.block p+p{margin-top:11px}
+
+/* portrait placeholder */
+.portrait{display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel);
+  margin:0;width:100%;max-width:250px}
+.portrait .plate{position:relative;aspect-ratio:4/5;display:grid;place-items:center;background:var(--slot);
+  overflow:hidden}
+.portrait .plate img{width:100%;height:100%;object-fit:cover;display:block}
+.portrait .cross{position:absolute;background:var(--line)}
+.portrait .cx{left:16px;right:16px;top:50%;height:1px;opacity:.45}
+.portrait .cy{top:16px;bottom:16px;left:50%;width:1px;opacity:.45}
+.portrait .bk{position:absolute;width:16px;height:16px;pointer-events:none}
+.portrait .b1{left:11px;top:11px;border-left:1px solid var(--mint);border-top:1px solid var(--mint)}
+.portrait .b2{right:11px;top:11px;border-right:1px solid var(--mint);border-top:1px solid var(--mint)}
+.portrait .b3{left:11px;bottom:11px;border-left:1px solid var(--mint);border-bottom:1px solid var(--mint)}
+.portrait .b4{right:11px;bottom:11px;border-right:1px solid var(--mint);border-bottom:1px solid var(--mint)}
+.portrait .hint{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;
+  text-align:center;padding:0 20px;font-size:9px;letter-spacing:.2em;color:var(--muted)}
+.portrait .hint b{font-weight:400;color:var(--cyan);font-size:10px}
+.portrait .rail{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:34px;
+  padding:0 11px;border-top:1px solid var(--line);font-size:9px;letter-spacing:.18em;color:var(--muted)}
+.portrait .rail b{font-weight:400;color:var(--cyan)}
+
+/* transmit block, lifted from the front page */
+.transmit{font-size:11px;letter-spacing:.13em}
+.transmit .rule{display:flex;align-items:center;gap:10px;color:var(--muted);margin-bottom:14px}
+.transmit .rule i{flex:1 1 auto;height:1px;background:var(--line)}
+.transmit .links{display:flex;flex-direction:column;gap:12px}
+.transmit .links span{color:var(--ink)}
+.link-row{display:flex;align-items:center;gap:8px;min-width:0}
+.link-row>a,.link-row>span{flex:0 1 auto;min-width:0}
+.copy-btn{display:grid;place-items:center;width:24px;height:24px;padding:0;border:1px solid var(--line);
+  background:transparent;color:var(--muted);cursor:pointer;flex:0 0 auto}
+.copy-btn:hover{border-color:var(--cyan);color:var(--cyan)}
+.copy-btn svg{width:13px;height:13px}
+.copy-btn .ic-check{display:none}
+.copy-btn.done{border-color:var(--mint);color:var(--mint)}
+.copy-btn.done .ic-copy{display:none}
+.copy-btn.done .ic-check{display:block}
+.cjk{font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}
+.reach{margin:16px 0 0;font-size:9.5px;line-height:1.6;letter-spacing:.16em;color:var(--muted)}
+.reach b{color:var(--pink);font-weight:400}
+
+/* jump index — fills the slack under the portrait */
+.jump{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;border:1px solid var(--line);
+  background:var(--panel)}
+.jump .jhead{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:30px;
+  padding:0 12px;border-bottom:1px solid var(--line);font-size:9px;letter-spacing:.2em;color:var(--muted)}
+.jump .jhead b{font-weight:400;color:var(--pink)}
+.jump a{display:flex;align-items:center;gap:10px;flex:1 1 auto;min-height:34px;padding:6px 12px;
+  border-top:1px solid var(--line);color:var(--ink);font-size:9px;letter-spacing:.18em}
+.jump a:first-of-type{border-top:0}
+.jump a .t{flex:1 1 auto;font-family:Helvetica,Arial,sans-serif;font-size:13px;letter-spacing:0}
+.jump a i{font-style:normal;color:var(--cyan)}
+.jump a:hover{color:var(--pink);background:var(--slot)}
+.jump a:hover i{color:var(--pink)}
+
+/* onward link */
+.onward{display:flex;align-items:center;gap:12px;padding:14px 0 0;border-top:1px solid var(--line);
+  font-size:9.5px;letter-spacing:.2em;color:var(--muted);flex-wrap:wrap}
+.onward a{color:var(--cyan)}
+.onward a:hover{color:var(--pink)}
+.onward i{flex:1 1 40px;height:1px;background:var(--line);min-width:20px}
+
+@media (min-width:861px){
+  /* the spec strip absorbs slack under the heading rather than leaving a gap */
+  .about .head{justify-content:space-between}
+  .strip>div{padding:14px 15px}
+  .onward{padding-top:16px}
+}
+@media (max-width:1180px){
+  .about{grid-template-columns:minmax(0,1fr) minmax(220px,30%);gap:16px 24px}
+}
+/* narrow: photo rides just under the heading, before the long copy */
+@media (max-width:860px){
+  .about{grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"head" "aside" "main" "contact";
+    grid-template-rows:auto auto auto auto}
+  .portrait{max-width:200px}
+}
+/* tablet band: the portrait and the jump index share one row, TRANSMIT runs
+   horizontally at the bottom — keeps the whole page on one screen */
+@media (min-width:701px) and (max-width:860px){
+  .about{gap:14px}
+  .about .aside{flex-direction:row;align-items:flex-start;gap:18px}
+  .portrait{flex:0 0 auto;max-width:160px}
+  .jump{flex:1 1 auto;align-self:stretch}
+  .jump a{min-height:34px}
+  .blocks,.block{flex:0 0 auto}
+  .block{padding:10px 0;grid-template-columns:46px minmax(0,1fr);gap:0 14px}
+  .block p{font-size:13.6px;line-height:1.58;max-width:88ch}
+  .block h2{margin-bottom:5px}
+  .about .main{align-self:start}
+  .about .contact{justify-content:flex-start}
+  .transmit .rule{margin-bottom:9px}
+  .transmit .links{flex-direction:row;align-items:center;gap:12px 26px;flex-wrap:wrap}
+  .reach{margin-top:9px}
+}
+@media (max-width:700px){
+  .sheet{gap:16px}
+  .blocks,.block{flex:0 0 auto}
+  /* the jump index drops to the very bottom, under TRANSMIT */
+  .about{grid-template-areas:"head" "portrait" "main" "contact" "jump"}
+  .about .aside{display:contents}
+  .portrait{grid-area:portrait;justify-self:center}
+  .jump{grid-area:jump;flex:0 0 auto}
+  .jump a{min-height:42px}
+  .about{gap:14px}
+  .about .head,.about .main{gap:14px}
+  .portrait{max-width:168px;margin-left:auto;margin-right:auto}
+  .portrait .plate{aspect-ratio:1/1}
+  .portrait .hint{font-size:8px;gap:5px;padding:0 10px}
+  .portrait .hint b{font-size:9px}
+  .block{grid-template-columns:minmax(0,1fr);gap:0}
+  .block .n{padding:0 0 7px}
+  .block p{font-size:14px;line-height:1.58}
+  .strip>div{border-left:0;border-top:1px solid var(--line)}
+  .strip>div:first-child{border-top:0}
+  .transmit .links{gap:0}
+  .transmit .links a,.transmit .links .link-row{min-height:42px;display:flex;align-items:center;
+    border-bottom:1px solid var(--line)}
+}
+</style>
+</head>
+<body>
+<div class="desk" id="desk">
+  <div class="deco" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+
+  <header class="top">
+    <div class="lead">
+      <a class="back" href="./index.html"><span aria-hidden="true">&#8592;</span><span>INDEX</span></a>
+      <span class="sep" aria-hidden="true"></span>
+      <b>ABOUT</b>
+      <em>/ IDENTITY.EXPANDED</em>
+    </div>
+    <div class="readouts">
+      <span class="status"><i></i><span>ON RECORD</span></span>
+      <button type="button" class="theme-toggle" aria-label="Toggle colour scheme">
+        <i aria-hidden="true"><b></b></i><span class="theme-label">DARK</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="body">
+    <aside class="side" aria-hidden="true">
+      <span class="build">ABOUT / 01</span>
+      <span class="marks"><i></i><i></i><i></i></span>
+      <span class="geo">LONDON &middot; IMPERIAL</span>
+    </aside>
+
+    <div class="flow">
+      <div class="eyebrow-bar">
+        <span>&#9673; IDENTITY.EXPANDED</span>
+        <i aria-hidden="true"></i>
+        <span class="note">Design engineer in training — sketchbook on one side, CAD file on the other.</span>
+      </div>
+
+      <main class="sheet">
+        <div class="about">
+          <div class="head">
+            <h1>
+              <span class="ghost g1" aria-hidden="true">About</span>
+              <span class="ghost g2" aria-hidden="true">About</span>
+              <span class="real">About</span>
+            </h1>
+
+            <div class="strip">
+              <div><span class="k">COURSE</span><span class="v">MEng <em>Design Engineering</em></span></div>
+              <div><span class="k">YEAR</span><span class="v">01 <em>/ 04</em></span></div>
+              <div><span class="k">BASE</span><span class="v">London, UK</span></div>
+              <div><span class="k">PRIOR</span><span class="v">Concord College</span></div>
+            </div>
+          </div>
+
+          <div class="main">
+            <div class="blocks">
+              <section class="block">
+                <span class="n">01</span>
+                <div>
+                  <h2>INTRO</h2>
+                  <p>I&rsquo;m a first-year MEng Design Engineering student at Imperial College London, having previously studied Maths, Further Maths, Chemistry and an EPQ at Concord College. I like that the course doesn&rsquo;t make me choose between the sketchbook and the CAD file &mdash; drawing something because it looks right, then figuring out why it actually works. A year in, it&rsquo;s already opened up more directions than I expected.</p>
+                </div>
+              </section>
+              <section class="block">
+                <span class="n">02</span>
+                <div>
+                  <h2>WHAT I DO</h2>
+                  <p>Most of what I work on comes back to one question: how people actually move through or use something, not just what looks efficient on paper. That&rsquo;s shown up in a factory floor layout I reworked this summer, a desk organiser I designed and 3D-printed from scratch &mdash; the model spinning on the front page &mdash; and helping other students think through their own design projects.</p>
+                </div>
+              </section>
+              <section class="block">
+                <span class="n">03</span>
+                <div>
+                  <h2>OUTSIDE OF COURSEWORK</h2>
+                  <p>Outside of that, I draw, world-build for original characters, and mess around with 3D modelling &mdash; sometimes replicating game artifacts just to see if I can nail them. This site is also vibecoded: I directed the design and built it with Claude, which turned out to be its own kind of design process.</p>
+                </div>
+              </section>
+            </div>
+
+            <div class="onward" hidden>
+              <span>NEXT</span>
+              <a href="./index.html#work">SELECTED WORK</a>
+              <i aria-hidden="true"></i>
+              <a href="./play.html">PLAY / ASCII_CREATURE_GEN &#8599;</a>
+            </div>
+          </div>
+
+          <div class="aside">
+            <figure class="portrait">
+              <div class="plate">
+                <i class="cross cx" aria-hidden="true"></i>
+                <i class="cross cy" aria-hidden="true"></i>
+                <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                <!-- swap this hint for <img src="./files/portrait.jpg" alt="Asteria Wang"> -->
+                <span class="hint"><b>PORTRAIT / PENDING</b><span>4:5 PLATE &middot; DROP A PHOTO HERE</span></span>
+              </div>
+              <figcaption class="rail"><span>SUBJECT_01</span><b>ASTERIA WANG</b></figcaption>
+            </figure>
+
+            <nav class="jump" aria-label="Elsewhere on the site">
+              <div class="jhead"><span>JUMP.TO</span><b>04</b></div>
+              <a href="./index.html#work"><span>[01]</span><span class="t">Selected work</span><i aria-hidden="true">&#8599;</i></a>
+              <a href="./index.html#academic"><span>[02]</span><span class="t">Academic</span><i aria-hidden="true">&#8599;</i></a>
+              <a href="./index.html#illustration"><span>[03]</span><span class="t">Illustration</span><i aria-hidden="true">&#8599;</i></a>
+              <a href="./index.html#lab"><span>[04]</span><span class="t">Lab</span><i aria-hidden="true">&#8599;</i></a>
+            </nav>
+          </div>
+
+          <div class="contact">
+            <div class="transmit">
+              <div class="rule"><i></i>TRANSMIT<i></i></div>
+              <div class="links">
+                <div class="link-row">
+                  <a href="mailto:Asteria0526@gmail.com">asteria0526@gmail.com</a>
+                  <button type="button" class="copy-btn" data-copy="asteria0526@gmail.com" aria-label="Copy email address"><svg class="ic-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></button>
+                </div>
+                <a href="https://github.com/DiethylEtherene" target="_blank" rel="noreferrer">github/@DiethylEtherene &#8599;</a>
+                <div class="link-row">
+                  <span><span class="cjk">&#24494;&#20449;</span> IthinkitsAsu</span>
+                  <button type="button" class="copy-btn" data-copy="IthinkitsAsu" aria-label="Copy WeChat ID"><svg class="ic-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><svg class="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg></button>
+                </div>
+              </div>
+              <p class="reach"><b>&#9656;</b> IF YOU&rsquo;D LIKE TO REACH OUT,<br>PLEASE EMAIL ME.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span class="signal"><i aria-hidden="true"></i>SIGNAL_?</span>
+    <span class="ticker" aria-hidden="true"><span>
+      <span>IDENTITY.EXPANDED &middot; <b>MENG DESIGN ENGINEERING / YEAR 01</b> &middot; IMPERIAL COLLEGE LONDON &middot; PRIOR: CONCORD COLLEGE &middot; DRAWING, WORLD-BUILDING, 3D &middot; THIS SITE WAS VIBECODED</span>
+      <span>IDENTITY.EXPANDED &middot; <b>MENG DESIGN ENGINEERING / YEAR 01</b> &middot; IMPERIAL COLLEGE LONDON &middot; PRIOR: CONCORD COLLEGE &middot; DRAWING, WORLD-BUILDING, 3D &middot; THIS SITE WAS VIBECODED</span>
+    </span></span>
+
+    <div class="music-easter" id="music">
+    <button type="button" class="music-front" aria-label="Reveal hidden playlist">
+      <span class="disc" aria-hidden="true"><i></i><b></b></span>
+      <span class="tag">SIGNAL_?</span>
+    </button>
+    <section class="music-back" aria-label="Hidden signal playlist" inert aria-hidden="true">
+      <div class="bar"><span class="music-eyebrow">NOW.PLAYING / HIDDEN SIGNAL</span><button type="button" class="music-close" aria-label="Close player">&times;</button></div>
+      <div class="music-body">
+        <span class="album" aria-hidden="true"><i></i><b></b></span>
+        <div class="track-data">
+          <div class="track-heading" aria-live="polite" aria-atomic="true">
+            <span class="music-track-position">01 / 03</span>
+            <strong><span class="music-track-title">Track 01</span> &mdash; <span class="music-track-artist">Ether</span></strong>
+          </div>
+          <div class="track-progress" aria-hidden="true"><i></i></div>
+          <div class="track-controls">
+            <button type="button" class="track-prev" aria-label="Previous track">&larr;</button>
+            <button type="button" class="play-toggle" aria-label="Play">&#9654;</button>
+            <button type="button" class="track-next" aria-label="Next track">&rarr;</button>
+            <span class="track-time">00:00 / 00:00</span>
+          </div>
+        </div>
+      </div>
+      <audio class="playlist-audio" preload="metadata" hidden></audio>
+    </section>
+  </div>
+  </footer>
+</div>
+
+<script type="module">
+const desk = document.getElementById("desk");
+
+/* ---------- theme (shared key with the front page) ---------- */
+const THEME_KEY = "asteria-theme";
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+const themeLabel = document.querySelector(".theme-label");
+const applyTheme = (dark) => {
+  desk.classList.toggle("dark", dark);
+  themeLabel.textContent = dark ? "LIGHT" : "DARK";
+};
+document.querySelector(".theme-toggle").addEventListener("click", () => {
+  const dark = !desk.classList.contains("dark");
+  localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+  applyTheme(dark);
+});
+systemDark.addEventListener("change", (event) => {
+  if (!localStorage.getItem(THEME_KEY)) applyTheme(event.matches);
+});
+
+/* ---------- copy buttons ---------- */
+document.querySelectorAll(".copy-btn").forEach((button) => {
+  button.addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(button.dataset.copy); } catch {}
+    button.classList.add("done");
+    setTimeout(() => button.classList.remove("done"), 1500);
+  });
+});
+
+/* ---------- hidden signal player ---------- */
+const music = document.getElementById("music");
+const musicFront = music.querySelector(".music-front");
+const musicBack = music.querySelector(".music-back");
+const musicClose = music.querySelector(".music-close");
+const musicAudio = music.querySelector(".playlist-audio");
+const compact = window.matchMedia("(max-width:1180px)");
+let musicPlaying = false;
+
+const updateMusicPin = () => {
+  const inUse = musicPlaying || music.classList.contains("open");
+  music.classList.toggle("pinned", compact.matches && inUse);
+  const flowing = compact.matches && !inUse;
+  music.style.transform = flowing ? "translateY(" + -Math.round(window.scrollY) + "px)" : "";
+};
+window.addEventListener("scroll", updateMusicPin, { passive: true });
+window.addEventListener("resize", updateMusicPin);
+compact.addEventListener("change", updateMusicPin);
+musicAudio.addEventListener("play", () => { musicPlaying = true; updateMusicPin(); });
+musicAudio.addEventListener("pause", () => { musicPlaying = false; updateMusicPin(); });
+
+const setMusicOpen = (open) => {
+  music.classList.toggle("open", open);
+  musicFront.inert = open;
+  musicFront.setAttribute("aria-hidden", String(open));
+  musicBack.inert = !open;
+  musicBack.setAttribute("aria-hidden", String(!open));
+  updateMusicPin();
+  try { (open ? musicClose : musicFront).focus({ preventScroll: true }); } catch {}
+};
+try {
+  const [{ createPlaylistPlayer }, { attachMusicContinuity }] = await Promise.all([
+    import("./files/playlist-player.js?v=4"),
+    import("./files/music-continuity.js"),
+  ]);
+  const tracks = [
+    { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
+    { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
+    { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
+  ];
+  const player = createPlaylistPlayer({ root: music, onOpenChange: setMusicOpen, tracks });
+  attachMusicContinuity({ player, audio: musicAudio, tracks });
+} catch (error) {
+  console.warn("Playlist unavailable", error);
+}
+
+applyTheme(localStorage.getItem(THEME_KEY) ? localStorage.getItem(THEME_KEY) === "dark" : systemDark.matches);
+updateMusicPin();
+</script>
+</body>
+</html>
