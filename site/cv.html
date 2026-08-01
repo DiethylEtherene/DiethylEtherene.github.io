@@ -39,16 +39,14 @@ h1 .real{position:relative}
 .strip .v em{font-style:normal;color:var(--cyan)}
 
 .frame{position:relative;flex:1 1 auto;min-height:320px;border:1px solid var(--cyan);background:var(--slot);
-  display:flex;flex-direction:column;overflow:hidden}
+  display:flex;align-items:center;justify-content:center;overflow:hidden;padding:20px}
 .frame .bk{position:absolute;width:16px;height:16px;z-index:1;pointer-events:none}
 .frame .b1{left:-1px;top:-1px;border-left:2px solid var(--mint);border-top:2px solid var(--mint)}
 .frame .b2{right:-1px;top:-1px;border-right:2px solid var(--mint);border-top:2px solid var(--mint)}
 .frame .b3{left:-1px;bottom:-1px;border-left:2px solid var(--mint);border-bottom:2px solid var(--mint)}
 .frame .b4{right:-1px;bottom:-1px;border-right:2px solid var(--mint);border-bottom:2px solid var(--mint)}
-.frame iframe{flex:1 1 auto;width:100%;border:0;background:#fff}
-.frame .fallback{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:10px;padding:24px;text-align:center;font-size:9.5px;letter-spacing:.18em;color:var(--muted)}
-.frame .fallback b{font-weight:400;color:var(--cyan);font-size:10.5px}
+.frame img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;
+  box-shadow:0 4px 24px rgba(0,0,0,.22)}
 .desk.dark .frame{box-shadow:0 0 30px rgba(82,220,255,.14),inset 0 0 40px rgba(82,220,255,.06)}
 
 .panel{display:flex;flex-direction:column;border:1px solid var(--line);background:var(--panel);min-width:0}
@@ -135,12 +133,7 @@ h1 .real{position:relative}
             <div class="frame">
               <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
               <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
-              <iframe src="./files/asteria-wang-cv.pdf" title="Asteria Wang — CV">
-                <div class="fallback">
-                  <b>PREVIEW UNAVAILABLE</b>
-                  <span>Your browser can&rsquo;t show the PDF inline &mdash; use the buttons to open or download it.</span>
-                </div>
-              </iframe>
+              <img src="./files/asteria-wang-cv-preview.png" alt="Asteria Wang — CV, page 1 of 1" loading="lazy">
             </div>
           </div>
 
@@ -148,7 +141,6 @@ h1 .real{position:relative}
             <div class="panel">
               <div class="head-row"><span>GET A COPY</span><b>PDF</b></div>
               <div class="pad">
-                <p>Same file as the preview &mdash; no extra formatting, safe to attach directly to an application.</p>
                 <div class="btns">
                   <a class="btn primary" href="./files/asteria-wang-cv.pdf" download="Asteria-Wang-CV.pdf">Download PDF</a>
                   <a class="btn" href="./files/asteria-wang-cv.pdf" target="_blank" rel="noreferrer">Open in new tab</a>
