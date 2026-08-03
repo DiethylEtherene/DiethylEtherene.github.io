@@ -214,6 +214,21 @@ a.pl.game:hover .mark b{color:var(--pink)}
 .modes button.active{border-color:var(--pink);background:var(--pink);color:#fff}
 .desk.dark .modes button.active{color:#060d14;box-shadow:0 0 14px rgba(255,60,159,.4)}
 
+/* Desktop only: the controls move into a rail down the left of the plate so
+   the model box can take the whole width. The plate column grows, but every
+   entry's plate still ends flush on the same right edge, so the page keeps its
+   alignment. Guarded - unqualified, a fixed column here collapses the copy in
+   the single-column layouts. */
+@media (min-width:1181px){
+  #e02{grid-template-columns:minmax(0,1fr) 500px}
+  #e02 .plate{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px 14px;align-content:start}
+  #e02 .plate>.pl.model{grid-column:2;grid-row:1 / span 2}
+  #e02 .plate>.modes{grid-column:1;grid-row:1;flex-direction:column;align-self:start;gap:8px}
+  #e02 .plate>.modes button{flex:0 0 auto;min-height:32px}
+  #e02 .plate>.pl-rail{grid-column:1;grid-row:2;align-self:start;flex-direction:column;
+    align-items:flex-start;justify-content:flex-start;gap:6px;padding:10px;min-height:0;line-height:1.5}
+}
+
 /* onward */
 .onward{display:flex;align-items:center;gap:12px;padding:16px 0 0;border-top:1px solid var(--line);
   font-size:9.5px;letter-spacing:.2em;color:var(--muted);flex-wrap:wrap}
