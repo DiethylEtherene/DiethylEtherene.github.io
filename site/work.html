@@ -46,12 +46,10 @@ h1 .real{position:relative}
 .entry{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px 34px;
   grid-template-areas:"head plate" "tags plate" "body plate" "foot plate";
   align-content:start;padding:30px 0 34px;border-top:1px solid var(--rule)}
-/* The model is the one plate you can actually handle, so it gets a wider
-   column - but ONLY on desktop. Unguarded, this fixed second column survives
-   into the single-column layouts and crushes the copy column to zero. */
-@media (min-width:1181px){
-  #e02{grid-template-columns:minmax(0,1fr) 430px}
-}
+/* every entry keeps the same plate column so the four records stay on one
+   rhythm; the model is enlarged inside its plate instead - see
+   modelViewportTarget - rather than by widening the column and throwing the
+   page's left/right balance out */
 .entry:first-child{border-top:0;padding-top:4px}
 .desk.dark .entry{border-top-color:var(--line)}
 
@@ -597,10 +595,6 @@ const modelStatus = modelShell.querySelector(".model-status");
 let renderer, scene, camera, root, opaqueMaterial, clearMaterial, THREE;
 let wireMix = 0, wireTarget = 0;
 let dragging = false, lastX = 0, lastY = 0, lastFrame = performance.now();
-/* once the visitor has taken hold of the model, the idle spin stops for good -
-   otherwise it drifts out of whatever orientation they just chose */
-let userRotated = false;
-
 /* Orientation is held as a quaternion rather than a pair of Euler angles.
    With rotation.x/rotation.y the yaw axis collapses onto the view axis once
    the pitch approaches vertical - gimbal lock - and whole ranges of angles
@@ -697,7 +691,7 @@ const frame = (time) => {
   const delta = Math.min(time - lastFrame, 32);
   lastFrame = time;
   if (root) {
-    if (!dragging && !reducedMotion && !userRotated) {
+    if (!dragging && !reducedMotion) {
       // post-multiply: spins about the model's own vertical, clockwise from above
       idleQuat.setFromAxisAngle(yAxis, -delta * .012 * DEG);
       root.quaternion.multiply(idleQuat);
@@ -756,10 +750,12 @@ const loadModel = async () => {
       const percent = Math.min(99, Math.round(progress.loaded / progress.total * 100));
       modelStatus.textContent = `Loading hero_shot / ${percent}%`;
     });
-    geometry.rotateX(-Math.PI / 2);
-    // that alone leaves the muzzle pointing down; swing it round to point
-    // right. The spin axis is unchanged - still the vertical.
-    geometry.rotateZ(Math.PI / 2);
+    /* In the STL, Z is the barrel (muzzle at +Z), Y is the gun's vertical and
+       X is the thin side-to-side axis - so the side profile is the YZ plane.
+       One quarter turn about Y lays that profile flat to camera with the
+       muzzle to the right, and leaves the gun's own vertical on the spin
+       axis, so the idle turntable sweeps horizontally without bobbing. */
+    geometry.rotateY(Math.PI / 2);
     geometry.center();
     geometry.computeVertexNormals();
     geometry.computeBoundingSphere();
@@ -788,7 +784,8 @@ const loadModel = async () => {
     dragEuler = new THREE.Euler(0, 0, 0, "XYZ");
     idleQuat = new THREE.Quaternion();
     yAxis = new THREE.Vector3(0, 1, 0);
-    root.quaternion.setFromEuler(new THREE.Euler(30 * DEG, 0, 0, "XYZ"));
+    // rest pose: straight side-on, muzzle right, no pitch
+    root.quaternion.identity();
     scene.add(root);
 
     modelStatus.remove();
@@ -800,7 +797,6 @@ const loadModel = async () => {
       // start a rotation (same guard the front page uses)
       if (event.target.closest("button")) return;
       dragging = true;
-      userRotated = true;
       lastX = event.clientX;
       lastY = event.clientY;
       modelShell.setPointerCapture(event.pointerId);
