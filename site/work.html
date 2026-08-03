@@ -1,0 +1,954 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Selected work — Asteria Wang. Four featured design engineering projects, 2024–2026.">
+<meta name="theme-color" content="#e8eef1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#060d14" media="(prefers-color-scheme: dark)">
+<title>Work / Asteria Wang</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./files/subpage.css">
+<style>
+/* work.html — featured projects. Unlike about.html this page is a scrolling
+   column: the sheet scrolls internally while header and footer stay put.
+
+   The four entries carry wildly different media (six images / a 3D model /
+   nothing at all), so every entry uses the SAME two-column record grid and
+   the right-hand plate always carries something real: hero image, model
+   viewer, restriction marker, or the constraint stack. Nothing collapses,
+   so nothing reads as a missing asset. */
+.sheet{display:flex;flex-direction:column;gap:26px}
+
+h1{margin:0;font-size:clamp(40px,5vw,76px);line-height:.84;letter-spacing:-.055em;font-weight:400;position:relative}
+h1 .ghost{position:absolute;left:0;top:0;pointer-events:none}
+h1 .g1{color:var(--pink);opacity:.26;transform:translate(-3px,2px)}
+h1 .g2{color:var(--cyan);opacity:.24;transform:translate(3px,-2px)}
+.desk.dark h1 .g1{opacity:.46}
+.desk.dark h1 .g2{opacity:.4}
+h1 .real{position:relative}
+
+.masthead{display:flex;flex-direction:column;gap:16px}
+
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));border:1px solid var(--line);
+  background:var(--panel)}
+.strip>div{display:flex;flex-direction:column;gap:5px;padding:12px 15px;border-left:1px solid var(--line)}
+.strip>div:first-child{border-left:0}
+.strip .k{font-size:9px;letter-spacing:.2em;color:var(--muted)}
+.strip .v{font-size:13.5px;letter-spacing:.02em;color:var(--ink)}
+.strip .v em{font-style:normal;color:var(--cyan)}
+
+/* ---------- record ---------- */
+.records{display:flex;flex-direction:column}
+.entry{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px 34px;
+  grid-template-areas:"head plate" "tags plate" "body plate" "foot plate";
+  align-content:start;padding:30px 0 34px;border-top:1px solid var(--rule)}
+/* The model is the one plate you can actually handle, so it gets a wider
+   column - but ONLY on desktop. Unguarded, this fixed second column survives
+   into the single-column layouts and crushes the copy column to zero. */
+@media (min-width:1181px){
+  #e02{grid-template-columns:minmax(0,1fr) 430px}
+}
+.entry:first-child{border-top:0;padding-top:4px}
+.desk.dark .entry{border-top-color:var(--line)}
+
+.entry .rec-head{grid-area:head;display:flex;align-items:baseline;gap:8px 18px;flex-wrap:wrap}
+.entry .n{font-size:10px;letter-spacing:.2em;color:var(--pink)}
+.entry h2{margin:0;flex:1 1 320px;min-width:0;font-family:Helvetica,Arial,sans-serif;font-weight:400;
+  font-size:clamp(21px,2.3vw,30px);line-height:1.14;letter-spacing:-.022em;color:var(--ink);text-wrap:pretty}
+.entry .stamp{display:flex;align-items:center;gap:10px;font-size:9px;letter-spacing:.18em;color:var(--muted);
+  white-space:nowrap}
+.entry .stamp i{display:block;width:1px;height:10px;background:var(--line)}
+.tags{grid-area:tags}
+.entry .stamp b{font-weight:400;color:var(--cyan)}
+
+.entry .rec-body{grid-area:body;display:flex;flex-direction:column;gap:16px;min-width:0}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin:0;padding:0;list-style:none;align-content:start}
+.tags li{padding:5px 10px;border:1px solid var(--line);background:var(--panel);
+  font-size:8.5px;letter-spacing:.18em;color:var(--muted)}
+.prose{margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14.6px;line-height:1.68;color:var(--ink);
+  max-width:74ch;text-wrap:pretty}
+.desk.dark .prose{color:#d8ece6}
+.prose+.prose{margin-top:-4px}
+
+.entry .rec-foot{grid-area:foot;display:flex;align-items:center;gap:12px 16px;flex-wrap:wrap}
+.outcome{display:inline-flex;align-items:center;gap:9px;padding:7px 12px;border:1px solid var(--mint);
+  font-size:9px;letter-spacing:.18em;color:var(--mint)}
+.action{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid var(--line);
+  background:var(--btn);font-size:9px;letter-spacing:.18em;color:var(--cyan)}
+.action:hover{border-color:var(--pink);color:var(--pink)}
+.action[hidden]{display:none}
+a.pl-rail:hover{border-color:var(--cyan)}
+a.pl-rail:hover b{color:var(--pink)}
+
+/* ---------- the plate: one slot, four different jobs ---------- */
+.plate{grid-area:plate;display:flex;flex-direction:column;gap:12px;min-width:0;align-self:start}
+.pl{position:relative;display:grid;place-items:center;border:1px solid var(--line);background:var(--slot);
+  overflow:hidden}
+.pl>.bk{position:absolute;width:15px;height:15px;pointer-events:none;z-index:2}
+.pl>.b1{left:8px;top:8px;border-left:1px solid var(--mint);border-top:1px solid var(--mint)}
+.pl>.b2{right:8px;top:8px;border-right:1px solid var(--mint);border-top:1px solid var(--mint)}
+.pl>.b3{left:8px;bottom:8px;border-left:1px solid var(--mint);border-bottom:1px solid var(--mint)}
+.pl>.b4{right:8px;bottom:8px;border-right:1px solid var(--mint);border-bottom:1px solid var(--mint)}
+.pl>.cross{position:absolute;background:var(--line);z-index:1;pointer-events:none}
+.pl>.cx{left:14px;right:14px;top:50%;height:1px;opacity:.4}
+.pl>.cy{top:14px;bottom:14px;left:50%;width:1px;opacity:.4}
+.pl img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;display:block}
+.pl .mark{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:6px;
+  text-align:center;padding:0 18px;font-size:8.5px;letter-spacing:.2em;color:var(--muted)}
+.pl .mark b{font-weight:400;font-size:9.5px;color:var(--cyan)}
+.pl-rail{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:28px;padding:0 11px;
+  border:1px solid var(--line);background:var(--panel);font-size:8.5px;letter-spacing:.18em;color:var(--muted)}
+.pl-rail b{font-weight:400;color:var(--cyan)}
+.pl-rail.sealed b{color:var(--pink)}
+
+/* 03 — restriction marker. Diagonal hatch says "withheld", not "missing". */
+.pl.sealed{aspect-ratio:4/5;
+  background:repeating-linear-gradient(-45deg,transparent 0 9px,var(--wash) 9px 10px),var(--slot)}
+.pl.sealed .mark b{color:var(--pink)}
+
+/* 04 — no assets exist, so the plate carries the constraint stack from the
+   narrative instead: four demands pulling against one another. */
+.stack{position:relative;z-index:2;display:flex;flex-direction:column;width:100%;align-self:stretch}
+.stack li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:11px;align-items:center;
+  padding:13px 14px;border-top:1px solid var(--line);font-size:9px;letter-spacing:.18em;color:var(--ink)}
+.stack li:first-child{border-top:0}
+.stack li span{color:var(--pink);font-size:8.5px}
+.stack li em{font-style:normal;display:block;font-family:Helvetica,Arial,sans-serif;font-size:12.5px;
+  letter-spacing:0;color:var(--muted);margin-top:3px}
+.pl.stackplate{display:block;background:var(--panel)}
+
+/* Entries whose material is landscape A3 (portfolio sheets, PDF boards) can't
+   live in a 300px side plate — they take the full column width instead, two
+   sheets to a row, and the entry drops its right-hand plate entirely. */
+.entry.wide{grid-template-columns:minmax(0,1fr) minmax(0,3fr);
+  grid-template-areas:"head head" "tags tags" "body body" "frames plate" "foot foot"}
+.entry.wide .plate{align-self:start}
+/* Wide entries: the copy runs full width above the media, then the media row
+   is one big A3 sheet with its supporting sheets stacked in a narrow column to
+   its left. The thumb column stretches to the sheet's height, so the two
+   always bottom-align regardless of viewport or caption length. */
+.entry.wide .frames{max-width:none;align-self:start;gap:14px;
+  grid-template-columns:minmax(0,1fr);grid-auto-rows:auto}
+.entry.wide .frames.two{grid-template-columns:minmax(0,1fr);grid-auto-rows:auto;
+  align-content:space-between}
+.entry.wide .frames.two .pl.a3{aspect-ratio:297/210;flex:0 0 auto}
+.entry.wide .frames.two .pl.game{aspect-ratio:16/9;flex:0 0 auto}
+.entry.wide .frames .pl.a3{aspect-ratio:297/210;flex:0 0 auto}
+.entry.wide .frames .pl.game{aspect-ratio:16/9;flex:0 0 auto}
+.entry.wide .frame{min-height:0}
+/* the game plate is 16:9 and the thumb column is three 297:210 sheets, so the
+   two columns are proportioned to end level rather than stretched */
+@media (min-width:861px){
+  #e03.entry.wide{grid-template-columns:minmax(0,1fr) minmax(0,3.8fr)}
+}
+/* the copy runs full width here, so it sets in two columns rather than
+   leaving half the row empty next to a 74ch measure */
+.entry.wide .rec-body{display:block;columns:2;column-gap:40px}
+.entry.wide .prose{max-width:none}
+.entry.wide .prose+.prose{margin-top:12px}
+.frames.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.frames{grid-area:frames;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;
+  max-width:820px;margin-top:2px}
+.frame{display:flex;flex-direction:column;gap:7px;min-width:0;margin:0}
+.frame figcaption{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  font-size:8.5px;letter-spacing:.18em;color:var(--muted)}
+.frame figcaption b{font-weight:400;color:var(--cyan)}
+.pl.a3{aspect-ratio:297/210}
+button.pl{padding:0;font:inherit;color:inherit;width:100%;cursor:zoom-in}
+button.pl:hover{border-color:var(--cyan)}
+button.pl:hover .mark b{color:var(--pink)}
+
+/* full-screen sheet viewer — the A3 boards are unreadable at strip size */
+.viewer{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;gap:14px;
+  padding:clamp(16px,4vh,44px) clamp(16px,4vw,54px);background:var(--hint-bg);backdrop-filter:blur(8px)}
+.viewer[open]{display:flex}
+.viewer .vbar{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  font-size:9px;letter-spacing:.2em;color:var(--muted)}
+.viewer .vbar b{font-weight:400;color:var(--cyan)}
+.viewer .vclose{display:flex;align-items:center;gap:9px;padding:7px 12px;border:1px solid var(--line);
+  background:var(--btn);color:var(--pink);font:inherit;font-size:9px;letter-spacing:.18em;cursor:pointer}
+.viewer .vclose:hover{border-color:var(--pink)}
+.viewer .vstage{flex:1 1 auto;min-height:0;display:grid;place-items:center}
+.viewer .vstage .pl{width:min(100%,calc((100vh - 150px) * 297 / 210));max-width:100%;max-height:100%}
+.viewer .vstage img{object-fit:contain}
+a.pl.game{cursor:pointer;text-decoration:none}
+.pl-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.pl-links a{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:34px;
+  padding:0 12px;border:1px solid var(--line);background:var(--panel);
+  font-size:8.5px;letter-spacing:.18em;color:var(--muted)}
+.pl-links a b{font-weight:400;color:var(--cyan)}
+.pl-links a:hover{border-color:var(--pink);color:var(--pink)}
+.pl-links a:hover b{color:var(--pink)}
+a.pl.game:hover{border-color:var(--pink)}
+a.pl.game:hover .mark b{color:var(--pink)}
+.pl.game{aspect-ratio:16/9;border-color:var(--cyan)}
+.pl.game .mark b{color:var(--mint)}
+
+/* 02 — model viewer slot, same pattern as the front page */
+.pl.model{aspect-ratio:1/1;border-color:var(--cyan);touch-action:none;cursor:grab}
+.desk.dark .pl.model{box-shadow:0 0 30px rgba(82,220,255,.14),inset 0 0 40px rgba(82,220,255,.07)}
+.pl.model:active{cursor:grabbing}
+.pl.model canvas{position:relative;z-index:1;display:block;width:100%;height:100%}
+.pl.model[data-ready="true"] .model-status{display:none}
+.model-status{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);padding:7px 9px;
+  border:1px solid var(--line);background:var(--hint-bg);color:var(--muted);font-size:8.5px;letter-spacing:.14em;
+  text-transform:uppercase;white-space:nowrap}
+.pl.model .drag-hint{position:absolute;z-index:3;left:50%;bottom:10px;transform:translateX(-50%);
+  display:none;align-items:center;gap:8px;padding:4px 9px;border:1px solid var(--line);background:var(--hint-bg);
+  font-size:8px;letter-spacing:.2em;color:var(--pink);white-space:nowrap;pointer-events:none}
+.pl.model[data-ready="true"] .drag-hint{display:flex}
+.pl.model .drag-hint i{display:block;width:14px;height:1px;background:var(--pink);opacity:.6}
+.pl-expand{position:absolute;z-index:4;right:8px;top:8px;display:flex;align-items:center;gap:7px;
+  padding:5px 9px;border:1px solid var(--line);background:var(--hint-bg);color:var(--cyan);
+  font:inherit;font-size:8px;letter-spacing:.18em;cursor:zoom-in}
+.pl-expand:hover{border-color:var(--pink);color:var(--pink)}
+.viewer .vstage .pl.model{width:min(100%,calc((100vh - 150px)));height:auto;max-width:100%;max-height:100%;
+  aspect-ratio:1/1}
+.modes{display:flex;gap:7px}
+.modes button{flex:1 1 auto;padding:6px 10px;border:1px solid var(--line);background:var(--btn);color:var(--ink);
+  font:700 9px/1 "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;transition:background .18s,color .18s,border-color .18s}
+.modes button:hover{border-color:var(--cyan)}
+.modes button.active{border-color:var(--pink);background:var(--pink);color:#fff}
+.desk.dark .modes button.active{color:#060d14;box-shadow:0 0 14px rgba(255,60,159,.4)}
+
+/* onward */
+.onward{display:flex;align-items:center;gap:12px;padding:16px 0 0;border-top:1px solid var(--line);
+  font-size:9.5px;letter-spacing:.2em;color:var(--muted);flex-wrap:wrap}
+.onward a{color:var(--cyan)}
+.onward a:hover{color:var(--pink)}
+.onward i{flex:1 1 40px;height:1px;background:var(--line);min-width:20px}
+
+.pl.hero{aspect-ratio:4/5}
+
+@media (max-width:1180px){
+  .entry{grid-template-columns:minmax(0,1fr) 250px;gap:18px 26px}
+}
+@media (max-width:860px){
+  .sheet{gap:22px}
+  .entry{grid-template-columns:minmax(0,1fr);
+    grid-template-areas:"head" "tags" "plate" "body" "foot";gap:16px}
+  .entry.wide{grid-template-columns:minmax(0,1fr);grid-template-rows:none;
+    grid-template-areas:"head" "tags" "plate" "body" "frames" "foot"}
+  .entry.wide .rec-body{display:flex;columns:auto}
+  .entry.wide .plate{max-width:420px;height:auto}
+  .plate{max-width:280px}
+  .pl.model{max-width:280px}
+  .entry .stamp{width:100%}
+}
+/* tablet band: the plate is too narrow to stand alone, so the copy runs
+   alongside it rather than under it */
+@media (min-width:701px) and (max-width:860px){
+  .entry{grid-template-columns:minmax(0,38%) minmax(0,1fr);gap:16px 22px;
+    grid-template-areas:"head head" "tags tags" "plate body" "foot foot"}
+  .entry.wide{grid-template-columns:minmax(0,38%) minmax(0,1fr);grid-template-rows:none;
+    grid-template-areas:"head head" "tags tags" "plate body" "frames frames" "foot foot"}
+  .entry.wide .rec-body{display:flex;columns:auto}
+  .plate,.entry.wide .plate,.pl.model{max-width:none}
+  #e04 .pl.sealed{aspect-ratio:2/1}
+  .entry.wide .plate{height:auto}
+  .prose{font-size:14px;line-height:1.62}
+  .entry.wide .frames{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:auto}
+}
+@media (max-width:700px){
+  .sheet{gap:18px}
+  .entry{padding:24px 0 26px}
+  .entry h2{flex-basis:100%;font-size:22px}
+  .plate{max-width:none}
+  /* left full-bleed, the square model box eats the whole phone screen */
+  .pl.model{max-width:290px}
+  /* the restricted marker carries no image, so it needs no image-sized box */
+  #e04 .pl.sealed{aspect-ratio:2/1}
+  .prose{font-size:14.4px;line-height:1.64}
+  .frames,.frames.two{grid-template-columns:minmax(0,1fr);gap:16px}
+  .strip>div{border-left:0;border-top:1px solid var(--line)}
+  .strip>div:first-child{border-top:0}
+  .action,.outcome{min-height:40px}
+}
+</style>
+</head>
+<body>
+<div class="desk" id="desk">
+  <div class="deco" aria-hidden="true"><i class="tl"></i><i class="tr"></i><i class="bl"></i><i class="br"></i></div>
+
+  <header class="top">
+    <div class="lead">
+      <a class="back" href="./index.html"><span aria-hidden="true">&#8592;</span><span>INDEX</span></a>
+      <span class="sep" aria-hidden="true"></span>
+      <b>WORK</b>
+      <em>/ SELECTED</em>
+    </div>
+    <div class="readouts">
+      <span class="status"><i></i><span>04 ON FILE</span></span>
+      <button type="button" class="theme-toggle" aria-label="Toggle colour scheme">
+        <i aria-hidden="true"><b></b></i><span class="theme-label">DARK</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="body">
+    <aside class="side" aria-hidden="true">
+      <span class="build">WORK / 01</span>
+      <span class="marks"><i></i><i></i><i></i></span>
+      <span class="geo">04 ITEMS</span>
+    </aside>
+
+    <div class="flow">
+      <div class="eyebrow-bar">
+        <span>&#9673; SELECTED.WORK</span>
+        <i aria-hidden="true"></i>
+      </div>
+
+      <main class="sheet">
+        <div class="masthead">
+          <h1>
+            <span class="ghost g1" aria-hidden="true">Selected work</span>
+            <span class="ghost g2" aria-hidden="true">Selected work</span>
+            <span class="real">Selected work</span>
+          </h1>
+          <div class="strip">
+            <div><span class="k">ITEMS</span><span class="v">04 <em>/ selected</em></span></div>
+            <div><span class="k">SPAN</span><span class="v">2024 &mdash; 2026</span></div>
+            <div><span class="k">TOOLS</span><span class="v">Fusion 360 <em>&middot; 3D print</em></span></div>
+          </div>
+        </div>
+
+        <div class="records">
+
+          <article class="entry wide" id="e01">
+            <div class="rec-head">
+              <span class="n">[01]</span>
+              <h2>CleanShift &mdash; transformational footwear</h2>
+              <span class="stamp">SEP &ndash; DEC 2025<i aria-hidden="true"></i><b>SOLO</b></span>
+            </div>
+
+            <ul class="tags">
+              <li>USER RESEARCH</li><li>MORPHOLOGICAL ANALYSIS</li><li>PROTOTYPING</li>
+            </ul>
+
+            <div class="rec-body">
+              <p class="prose">A shoe that carries its own overshoe. People who move between muddy ground and clean indoor floors &mdash; arctic field researchers, post-earthquake rescue crews, delivery drivers &mdash; either change footwear constantly or track the outside in. CleanShift&rsquo;s cover folds into pouches on the side of the shoe, rolls out over the sole, and pulls tight with a drawstring, so you walk in without taking anything off.</p>
+              <p class="prose">I sketched fifteen mechanisms, scored them, and took three forward. Idea 3 died on the print bed &mdash; I modelled the sliding sole in Fusion 360, printed it, and found the tolerance had to be either loose enough to rattle or tight enough to squeeze mud out the sides. The one that survived was the one I could prove: I timed the fold with a reusable shower cap standing in for the cover, and it came in under the fifteen-second target I&rsquo;d set.</p>
+            </div>
+
+            <div class="plate">
+              <button type="button" class="pl a3">
+                <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                <img src="./files/work/cleanshift-render.jpg" alt="CleanShift final render sheet" loading="lazy" decoding="async">
+              </button>
+              <div class="pl-rail"><span>CLEANSHIFT</span><b>04 SHEETS</b></div>
+            </div>
+
+            <div class="frames">
+              <figure class="frame">
+                <button type="button" class="pl a3">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/cleanshift-storyboard.jpg" alt="Manga storyboard spread" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>STORYBOARD SPREAD</span><b>A3</b></figcaption>
+              </figure>
+              <figure class="frame">
+                <button type="button" class="pl a3">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/cleanshift-prototype.jpg" alt="Printed sliding sole prototype" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>LO-FI PROTOTYPE</span><b>A3</b></figcaption>
+              </figure>
+              <figure class="frame">
+                <button type="button" class="pl a3">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/cleanshift-fifteen.jpg" alt="Fifteen mechanism ideas sheet" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>FIFTEEN MECHANISMS</span><b>A3</b></figcaption>
+              </figure>
+            </div>
+
+            <div class="rec-foot">
+              <a class="action" href="./files/work/cleanshift-process.pdf" target="_blank" rel="noreferrer">READ THE FULL PROCESS &mdash; 26PP PDF <span aria-hidden="true">&#8599;</span></a>
+            </div>
+          </article>
+
+          <article class="entry" id="e02">
+            <div class="rec-head">
+              <span class="n">[02]</span>
+              <h2>Hero Shot replica</h2>
+              <span class="stamp">2024<i aria-hidden="true"></i><b>A-LEVEL EPQ</b></span>
+            </div>
+
+            <ul class="tags">
+              <li>CAD</li><li>SECTIONING FOR PRINT</li><li>FUNCTIONAL BUILD</li>
+            </ul>
+
+            <div class="rec-body">
+              <p class="prose">My extended project: a replica of the Hero Shot from Splatoon 3 &mdash; modelled from scratch, sectioned for printing, and semi-built into a working water gun. Modelling it was the obvious half. The harder half is that game weapons are drawn by artists who never have to fit anything inside them, so I had to break the model into printable sections, put the split lines where the form would hide them rather than across a visible face, and find room for real internals inside a shell whose proportions were already fixed by the source. Getting components to physically fit inside a shape that was never designed to hold them turned out to be the actual engineering problem.</p>
+            </div>
+
+            <div class="rec-foot">
+              <span class="outcome">&#9673; GRADED A* &mdash; EXTENDED PROJECT QUALIFICATION</span>
+            </div>
+
+            <div class="plate">
+              <div class="pl model" id="model-shell" data-mode="auto" data-ready="loading" role="img" aria-label="Interactive 3D model of the Hero Shot replica">
+                <canvas aria-hidden="true"></canvas>
+                <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                <span class="model-status">Loading hero_shot / 0%</span>
+                <span class="drag-hint"><i></i>DRAG TO ROTATE</span>
+                <button type="button" class="pl-expand" id="model-expand">ENLARGE <span aria-hidden="true">&#8599;</span></button>
+              </div>
+              <div class="modes" id="modes">
+                <button type="button" class="active" data-model-mode="auto">Auto</button>
+                <button type="button" data-model-mode="solid">Solid</button>
+                <button type="button" data-model-mode="wire">Wire</button>
+              </div>
+              <div class="pl-rail"><span>HERO_SHOT / SECTIONED</span><b>247K TRIANGLES</b></div>
+            </div>
+          </article>
+
+          <article class="entry wide" id="e03">
+            <div class="rec-head">
+              <span class="n">[03]</span>
+              <h2>ACE workshop induction redesign</h2>
+              <span class="stamp">2025 &ndash; 26<i aria-hidden="true"></i><b>TEAM OF 4</b></span>
+            </div>
+
+            <ul class="tags">
+              <li>USER RESEARCH</li><li>SERVICE DESIGN</li><li>PROTOTYPE BUILD</li>
+            </ul>
+
+            <div class="rec-body">
+              <p class="prose">The induction you have to clear before using the ACE workshops wasn&rsquo;t landing, so we mapped the whole thing end to end &mdash; interviews, observation, journey mapping &mdash; to find where students were actually getting stuck. What came out was a scenario-based induction with knowledge checks built into it, plus evaluation criteria and a rollout path for the next academic year. Four of us worked the research and the system design. I built the game.</p>
+            </div>
+
+            <div class="plate">
+              <a class="pl game" href="https://diethyletherene.github.io/Asu-s-guide-to-the-ACE-workshop/" target="_blank" rel="noreferrer">
+                <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                <span class="mark"><b>&#9673; PLAYABLE BUILD</b><span>OPEN THE GAME &#8599;</span></span>
+              </a>
+              <div class="pl-links">
+                <a href="./files/work/ace-discovery-report.pdf" target="_blank" rel="noreferrer"><span>DISCOVERY REPORT</span><b>PDF &#8599;</b></a>
+                <a href="./files/work/ace-delivery-report.pdf" target="_blank" rel="noreferrer"><span>DELIVERY REPORT</span><b>PDF &#8599;</b></a>
+              </div>
+            </div>
+
+            <div class="frames">
+              <figure class="frame">
+                <button type="button" class="pl a3">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/ace-board-01.jpg" alt="ACE research and journey map board" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>RESEARCH &amp; JOURNEY MAP</span><b>A3</b></figcaption>
+              </figure>
+              <figure class="frame">
+                <button type="button" class="pl a3">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/ace-board-02.jpg" alt="ACE induction system board" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>INDUCTION SYSTEM</span><b>A3</b></figcaption>
+              </figure>
+              <figure class="frame">
+                <button type="button" class="pl a3">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/ace-board-03.jpg" alt="ACE evaluation and rollout board" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>EVALUATION &amp; ROLLOUT</span><b>A3</b></figcaption>
+              </figure>
+            </div>
+          </article>
+
+          <article class="entry" id="e04">
+            <div class="rec-head">
+              <span class="n">[04]</span>
+              <h2>Entia &mdash; home test packaging</h2>
+              <span class="stamp">JAN &ndash; MAR 2026<i aria-hidden="true"></i><b>TEAM PROJECT</b></span>
+            </div>
+
+            <ul class="tags">
+              <li>PACKAGING</li><li>COST CONSTRAINTS</li><li>CONCEPT DEVELOPMENT</li>
+            </ul>
+
+            <div class="rec-body">
+              <p class="prose">Entia&rsquo;s founder brought a set of live problems with his home blood-testing product to a student society &mdash; packaging, the test itself, data security &mdash; and people applied to whichever strand they wanted. I took packaging. The constraint stack was the interesting part: protect a delicate device, present well enough for a medical product, ship and store efficiently, stay inside a real cost target. Those pull against each other constantly, so most of the work was deciding what to trade, and where.</p>
+            </div>
+
+            <div class="rec-foot">
+              <span class="outcome">&#9673; SELECTED BY ENTIA FOR USE IN FUTURE PRODUCTION</span>
+            </div>
+
+            <div class="plate">
+              <div class="pl sealed">
+                <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                <span class="mark"><b>&#9673; RESTRICTED</b><span>NO DRAWINGS SHOWN</span></span>
+              </div>
+              <div class="pl-rail sealed"><span>ENTIA</span><b>WITHHELD</b></div>
+            </div>
+          </article>
+
+        </div>
+
+        <div class="onward">
+          <span>NEXT</span>
+          <a href="./about.html">ABOUT / IDENTITY.EXPANDED</a>
+          <i aria-hidden="true"></i>
+          <a href="./play.html">PLAY / ASCII_CREATURE_GEN &#8599;</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span class="signal"><i aria-hidden="true"></i>SIGNAL_?</span>
+    <span class="ticker" aria-hidden="true"><span>
+      <span>SELECTED.WORK &middot; <b>CLEANSHIFT / HERO SHOT / ACE / ENTIA</b> &middot; FUSION 360 &middot; 3D PRINTED &middot; OPEN TO INTERNSHIPS</span>
+      <span>SELECTED.WORK &middot; <b>CLEANSHIFT / HERO SHOT / ACE / ENTIA</b> &middot; FUSION 360 &middot; 3D PRINTED &middot; OPEN TO INTERNSHIPS</span>
+    </span></span>
+
+    <div class="music-easter" id="music">
+    <button type="button" class="music-front" aria-label="Reveal hidden playlist">
+      <span class="disc" aria-hidden="true"><i></i><b></b></span>
+      <span class="tag">SIGNAL_?</span>
+    </button>
+    <section class="music-back" aria-label="Hidden signal playlist" inert aria-hidden="true">
+      <div class="bar"><span class="music-eyebrow">NOW.PLAYING / HIDDEN SIGNAL</span><button type="button" class="music-close" aria-label="Close player">&times;</button></div>
+      <div class="music-body">
+        <span class="album" aria-hidden="true"><i></i><b></b></span>
+        <div class="track-data">
+          <div class="track-heading" aria-live="polite" aria-atomic="true">
+            <span class="music-track-position">01 / 03</span>
+            <strong><span class="music-track-title">Track 01</span> &mdash; <span class="music-track-artist">Ether</span></strong>
+          </div>
+          <div class="track-progress" aria-hidden="true"><i></i></div>
+          <div class="track-controls">
+            <button type="button" class="track-prev" aria-label="Previous track">&larr;</button>
+            <button type="button" class="play-toggle" aria-label="Play">&#9654;</button>
+            <button type="button" class="track-next" aria-label="Next track">&rarr;</button>
+            <span class="track-time">00:00 / 00:00</span>
+          </div>
+        </div>
+      </div>
+      <audio class="playlist-audio" preload="metadata" hidden></audio>
+    </section>
+  </div>
+  </footer>
+
+  <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="Sheet viewer">
+    <div class="vbar">
+      <span id="viewer-title">SHEET</span>
+      <button type="button" class="vclose" id="viewer-close">CLOSE <span aria-hidden="true">&times;</span></button>
+    </div>
+    <div class="vstage" id="viewer-stage"></div>
+  </div>
+</div>
+
+<script type="module">
+const desk = document.getElementById("desk");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+
+/* ---------- theme (shared key with the front page) ---------- */
+const THEME_KEY = "asteria-theme";
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+const themeLabel = document.querySelector(".theme-label");
+let syncModelTheme = () => {};
+const applyTheme = (dark) => {
+  desk.classList.toggle("dark", dark);
+  themeLabel.textContent = dark ? "LIGHT" : "DARK";
+  syncModelTheme();
+};
+document.querySelector(".theme-toggle").addEventListener("click", () => {
+  const dark = !desk.classList.contains("dark");
+  localStorage.setItem(THEME_KEY, dark ? "dark" : "light");
+  applyTheme(dark);
+});
+systemDark.addEventListener("change", (event) => {
+  if (!localStorage.getItem(THEME_KEY)) applyTheme(event.matches);
+});
+
+/* ---------- hero shot viewer (entry 02) ----------
+   This STL carries per-facet colour (eight groups), so the model renders in
+   its real palette rather than the flat material the mockup assumed. The tank
+   is moulded in translucent white with lettering embossed on its inner face,
+   so faces in the bright-neutral colour groups are split into a second,
+   see-through mesh - drawn opaque, that embossing is sealed inside a solid block.
+   The STL is 12MB, so it is only fetched once the entry nears the viewport. */
+const modelShell = document.getElementById("model-shell");
+const modelStatus = modelShell.querySelector(".model-status");
+let renderer, scene, camera, root, opaqueMaterial, clearMaterial, THREE;
+let wireMix = 0, wireTarget = 0;
+let dragging = false, lastX = 0, lastY = 0, lastFrame = performance.now();
+/* once the visitor has taken hold of the model, the idle spin stops for good -
+   otherwise it drifts out of whatever orientation they just chose */
+let userRotated = false;
+
+/* Orientation is held as a quaternion rather than a pair of Euler angles.
+   With rotation.x/rotation.y the yaw axis collapses onto the view axis once
+   the pitch approaches vertical - gimbal lock - and whole ranges of angles
+   become unreachable. Composing camera-relative increments instead makes every
+   orientation reachable, which is the point of a model you can pick up. */
+const DEG = Math.PI / 180, DRAG_SENSITIVITY = .65 * DEG;
+let dragQuat, dragEuler, idleQuat, yAxis;
+let automaticMorph = !reducedMotion, wireState = false;
+
+/* orthographic, fitted to the model's radius - same rig as the front-page
+   desk tidy. A perspective lens makes a long object loom and foreshorten as it
+   sweeps past the camera, which reads as a wobble rather than a turntable. */
+let modelWorldRadius = 0;
+/* the fit is to the bounding SPHERE, which for something as long and thin as a
+   gun is far bigger than its silhouette at any angle - so it can sit tighter in
+   the frame than the front page's compact model does */
+const modelCameraDistance = 4, modelViewportTarget = 1.3, modelOutlineScale = 1.012;
+const fitModelCamera = () => {
+  if (!THREE || !camera || !modelWorldRadius) return;
+  const aspect = camera.aspect || 1;
+  const safeRadius = modelWorldRadius * modelOutlineScale;
+  const verticalHalfExtent = safeRadius / modelViewportTarget / Math.min(1, aspect);
+  const horizontalHalfExtent = verticalHalfExtent * aspect;
+  camera.left = -horizontalHalfExtent;
+  camera.right = horizontalHalfExtent;
+  camera.top = verticalHalfExtent;
+  camera.bottom = -verticalHalfExtent;
+  camera.position.z = modelCameraDistance;
+  camera.updateProjectionMatrix();
+};
+
+syncModelTheme = () => {
+  if (!opaqueMaterial) return;
+  const dark = desk.classList.contains("dark");
+  // the material colour stays white: anything else would tint the STL's own
+  // vertex colours, which are the whole point of showing this model
+  opaqueMaterial.emissive.setHex(dark ? 0x0a1c24 : 0x000000);
+  opaqueMaterial.emissiveIntensity = dark ? .22 : 0;
+  opaqueMaterial.metalness = dark ? .3 : .16;
+  opaqueMaterial.roughness = dark ? .46 : .56;
+  if (clearMaterial) {
+    // glassy rather than milky: a metallic sheen here would white out the
+    // embossing that the transparency exists to reveal
+    clearMaterial.emissive.setHex(0x000000);
+    clearMaterial.emissiveIntensity = 0;
+    clearMaterial.metalness = .04;
+    clearMaterial.roughness = .3;
+  }
+  if (renderer) renderer.toneMappingExposure = dark ? 1.2 : 1;
+};
+
+/* a bright neutral facet is a translucent moulding; a saturated one is not */
+const isClearColour = (r, g, b) => {
+  const min = Math.min(r, g, b);
+  return min > .68 && (Math.max(r, g, b) - min) < .1;
+};
+
+const splitByColour = (geometry) => {
+  const position = geometry.getAttribute("position");
+  const normal = geometry.getAttribute("normal");
+  const colour = geometry.getAttribute("color");
+  if (!colour) return { opaque: geometry, clear: null };
+  const buckets = { opaque: [], clear: [] };
+  for (let face = 0; face < position.count / 3; face++) {
+    const vertex = face * 3;
+    const bucket = isClearColour(colour.getX(vertex), colour.getY(vertex), colour.getZ(vertex)) ? "clear" : "opaque";
+    buckets[bucket].push(face);
+  }
+  const build = (faces) => {
+    const p = new Float32Array(faces.length * 9);
+    const n = new Float32Array(faces.length * 9);
+    const c = new Float32Array(faces.length * 9);
+    faces.forEach((face, index) => {
+      for (let corner = 0; corner < 3; corner++) {
+        const from = face * 3 + corner, to = (index * 3 + corner) * 3;
+        p[to] = position.getX(from); p[to + 1] = position.getY(from); p[to + 2] = position.getZ(from);
+        n[to] = normal.getX(from);   n[to + 1] = normal.getY(from);   n[to + 2] = normal.getZ(from);
+        c[to] = colour.getX(from);   c[to + 1] = colour.getY(from);   c[to + 2] = colour.getZ(from);
+      }
+    });
+    const out = new THREE.BufferGeometry();
+    out.setAttribute("position", new THREE.BufferAttribute(p, 3));
+    out.setAttribute("normal", new THREE.BufferAttribute(n, 3));
+    out.setAttribute("color", new THREE.BufferAttribute(c, 3));
+    return out;
+  };
+  return {
+    opaque: buckets.opaque.length ? build(buckets.opaque) : null,
+    clear: buckets.clear.length ? build(buckets.clear) : null
+  };
+};
+
+const frame = (time) => {
+  const delta = Math.min(time - lastFrame, 32);
+  lastFrame = time;
+  if (root) {
+    if (!dragging && !reducedMotion && !userRotated) {
+      // post-multiply: spins about the model's own vertical, clockwise from above
+      idleQuat.setFromAxisAngle(yAxis, -delta * .012 * DEG);
+      root.quaternion.multiply(idleQuat);
+    }
+    wireMix += (wireTarget - wireMix) * Math.min(1, delta * .0024);
+    const solid = .25 + .71 * (1 - wireMix) * (1 - wireMix);
+    opaqueMaterial.opacity = solid;
+    if (clearMaterial) clearMaterial.opacity = solid * .1;
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+};
+
+const loadModel = async () => {
+  try {
+    const [threeModule, loaderModule] = await Promise.all([
+      import("./files/three.module.min.js"),
+      import("./files/STLLoader.js")
+    ]);
+    THREE = threeModule;
+
+    const canvas = modelShell.querySelector("canvas");
+    renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+    scene = new THREE.Scene();
+    camera = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 20);
+    camera.aspect = 1;
+    camera.position.set(0, 0, modelCameraDistance);
+
+    // near-neutral key: the tinted rig used elsewhere on the site would pull
+    // the yellow body towards mint
+    const keyLight = new THREE.DirectionalLight(0xffffff, 2.7);
+    keyLight.position.set(3, 4, 5);
+    const fillLight = new THREE.DirectionalLight(0x9fd8ff, 1.25);
+    fillLight.position.set(-4, 1, 2);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x24323d, 2.1), keyLight, fillLight);
+
+    const resize = () => {
+      const bounds = modelShell.getBoundingClientRect();
+      const width = Math.max(1, Math.round(bounds.width));
+      const height = Math.max(1, Math.round(bounds.height));
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      fitModelCamera();
+    };
+    new ResizeObserver(resize).observe(modelShell);
+    resize();
+
+    const loader = new loaderModule.STLLoader();
+    const geometry = await loader.loadAsync("./files/hero-shot.stl", (progress) => {
+      if (!progress.total) return;
+      const percent = Math.min(99, Math.round(progress.loaded / progress.total * 100));
+      modelStatus.textContent = `Loading hero_shot / ${percent}%`;
+    });
+    geometry.rotateX(-Math.PI / 2);
+    // that alone leaves the muzzle pointing down; swing it round to point
+    // right. The spin axis is unchanged - still the vertical.
+    geometry.rotateZ(Math.PI / 2);
+    geometry.center();
+    geometry.computeVertexNormals();
+    geometry.computeBoundingSphere();
+
+    const shared = {
+      vertexColors: true, color: 0xffffff, side: THREE.DoubleSide, transparent: true,
+      polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1
+    };
+    opaqueMaterial = new THREE.MeshStandardMaterial({ ...shared, opacity: .96 });
+    clearMaterial = new THREE.MeshStandardMaterial({ ...shared, opacity: .23, depthWrite: false });
+
+    const parts = splitByColour(geometry);
+    root = new THREE.Group();
+    if (parts.opaque) root.add(new THREE.Mesh(parts.opaque, opaqueMaterial));
+    if (parts.clear) {
+      const clearMesh = new THREE.Mesh(parts.clear, clearMaterial);
+      clearMesh.renderOrder = 1; // drawn after whatever sits inside it
+      root.add(clearMesh);
+    }
+
+    const fittedScale = 1.104 / Math.max(geometry.boundingSphere.radius, .001);
+    root.scale.setScalar(fittedScale);
+    modelWorldRadius = geometry.boundingSphere.radius * fittedScale;
+    fitModelCamera();
+    dragQuat = new THREE.Quaternion();
+    dragEuler = new THREE.Euler(0, 0, 0, "XYZ");
+    idleQuat = new THREE.Quaternion();
+    yAxis = new THREE.Vector3(0, 1, 0);
+    root.quaternion.setFromEuler(new THREE.Euler(30 * DEG, 0, 0, "XYZ"));
+    scene.add(root);
+
+    modelStatus.remove();
+    modelShell.dataset.ready = "true";
+    syncModelTheme();
+
+    modelShell.addEventListener("pointerdown", (event) => {
+      // the ENLARGE control sits inside the plate; pressing it must not also
+      // start a rotation (same guard the front page uses)
+      if (event.target.closest("button")) return;
+      dragging = true;
+      userRotated = true;
+      lastX = event.clientX;
+      lastY = event.clientY;
+      modelShell.setPointerCapture(event.pointerId);
+    });
+    modelShell.addEventListener("pointermove", (event) => {
+      if (!dragging) return;
+      // pre-multiply: the increment is about the camera's axes, not the
+      // model's, so dragging always moves the model the way the cursor goes
+      dragEuler.set((event.clientY - lastY) * DRAG_SENSITIVITY, (event.clientX - lastX) * DRAG_SENSITIVITY, 0, "XYZ");
+      dragQuat.setFromEuler(dragEuler);
+      root.quaternion.premultiply(dragQuat);
+      lastX = event.clientX;
+      lastY = event.clientY;
+    });
+    modelShell.addEventListener("pointerup", () => { dragging = false; });
+    modelShell.addEventListener("pointercancel", () => { dragging = false; });
+    if (window.matchMedia("(hover:none)").matches) {
+      const hint = modelShell.querySelector(".drag-hint");
+      if (hint) hint.innerHTML = "<i></i>SWIPE TO ROTATE";
+    }
+    requestAnimationFrame(frame);
+  } catch (error) {
+    modelShell.dataset.ready = "pending";
+    if (modelStatus.isConnected) modelStatus.textContent = "hero_shot.stl / unavailable";
+    console.warn("Hero Shot viewer unavailable", error);
+  }
+};
+
+const modelObserver = new IntersectionObserver((entries, observer) => {
+  if (!entries.some((entry) => entry.isIntersecting)) return;
+  observer.disconnect();
+  loadModel();
+}, { rootMargin: "700px" });
+modelObserver.observe(modelShell);
+
+const modeButtons = [...document.querySelectorAll("#modes [data-model-mode]")];
+modeButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const mode = button.dataset.modelMode;
+    automaticMorph = !reducedMotion && mode === "auto";
+    modelShell.dataset.mode = mode;
+    if (mode === "solid") { wireState = false; wireTarget = 0; }
+    if (mode === "wire") { wireState = true; wireTarget = 1; }
+    if (reducedMotion) wireMix = wireTarget;
+    modeButtons.forEach((item) => item.classList.toggle("active", item === button));
+  });
+});
+if (!reducedMotion) {
+  window.setInterval(() => {
+    if (!automaticMorph) return;
+    wireState = !wireState;
+    wireTarget = wireState ? 1 : 0;
+  }, 6200);
+}
+
+/* ---------- sheet viewer ---------- */
+const viewer = document.getElementById("viewer");
+const viewerStage = document.getElementById("viewer-stage");
+const viewerTitle = document.getElementById("viewer-title");
+const closeViewer = () => {
+  restoreModel();
+  viewer.removeAttribute("open");
+  viewerStage.replaceChildren();
+};
+document.getElementById("viewer-close").addEventListener("click", closeViewer);
+viewer.addEventListener("click", (event) => { if (event.target === viewer) closeViewer(); });
+document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeViewer(); });
+/* the model keeps its live WebGL context: the whole plate is moved into the
+   viewer and put back on close, rather than re-rendered */
+const modelHome = modelShell.parentElement;
+const modelExpand = document.getElementById("model-expand");
+modelExpand.addEventListener("click", () => {
+  viewerTitle.textContent = "HERO SHOT / SECTIONED MODEL";
+  viewerStage.replaceChildren(modelShell);
+  viewer.setAttribute("open", "");
+  modelExpand.style.display = "none";
+});
+const restoreModel = () => {
+  if (modelShell.parentElement === viewerStage) {
+    modelHome.insertBefore(modelShell, modelHome.firstChild);
+    modelExpand.style.display = "";
+  }
+};
+
+document.querySelectorAll("button.pl").forEach((plate) => {
+  plate.addEventListener("click", () => {
+    // a plate carrying a real image has no .mark to read a label from, so fall
+    // back to its caption and then to the alt text
+    const caption = plate.closest("figure")?.querySelector("figcaption span")?.textContent;
+    const label = plate.querySelector(".mark b")?.textContent;
+    const alt = plate.querySelector("img")?.getAttribute("alt");
+    viewerTitle.textContent = (label && caption) ? label + " / " + caption : (caption || label || alt || "SHEET");
+    const shown = document.createElement("div");
+    shown.className = plate.className.replace("pl ", "pl ");
+    shown.innerHTML = plate.innerHTML;
+    viewerStage.replaceChildren(shown);
+    viewer.setAttribute("open", "");
+  });
+});
+
+/* ---------- hidden signal player ---------- */
+const music = document.getElementById("music");
+const musicFront = music.querySelector(".music-front");
+const musicBack = music.querySelector(".music-back");
+const musicClose = music.querySelector(".music-close");
+const musicAudio = music.querySelector(".playlist-audio");
+const compact = window.matchMedia("(max-width:1180px)");
+let musicPlaying = false;
+
+const updateMusicPin = () => {
+  const inUse = musicPlaying || music.classList.contains("open");
+  music.classList.toggle("pinned", compact.matches && inUse);
+  const flowing = compact.matches && !inUse;
+  music.style.transform = flowing ? "translateY(" + -Math.round(window.scrollY) + "px)" : "";
+};
+window.addEventListener("scroll", updateMusicPin, { passive: true });
+window.addEventListener("resize", updateMusicPin);
+compact.addEventListener("change", updateMusicPin);
+musicAudio.addEventListener("play", () => { musicPlaying = true; updateMusicPin(); });
+musicAudio.addEventListener("pause", () => { musicPlaying = false; updateMusicPin(); });
+
+const setMusicOpen = (open) => {
+  music.classList.toggle("open", open);
+  musicFront.inert = open;
+  musicFront.setAttribute("aria-hidden", String(open));
+  musicBack.inert = !open;
+  musicBack.setAttribute("aria-hidden", String(!open));
+  updateMusicPin();
+  try { (open ? musicClose : musicFront).focus({ preventScroll: true }); } catch {}
+};
+try {
+  const [{ createPlaylistPlayer }, { attachMusicContinuity }] = await Promise.all([
+    import("./files/playlist-player.js?v=4"),
+    import("./files/music-continuity.js"),
+  ]);
+  const tracks = [
+    { title: "Track 01", artist: "Ether", src: "./files/audio/track-01.mp3" },
+    { title: "Track 02", artist: "Ether", src: "./files/audio/track-02.mp3" },
+    { title: "Track 03", artist: "Ether", src: "./files/audio/track-03.mp3" }
+  ];
+  const player = createPlaylistPlayer({ root: music, onOpenChange: setMusicOpen, tracks });
+  attachMusicContinuity({ player, audio: musicAudio, tracks });
+} catch (error) {
+  console.warn("Playlist unavailable", error);
+}
+
+applyTheme(localStorage.getItem(THEME_KEY) ? localStorage.getItem(THEME_KEY) === "dark" : systemDark.matches);
+updateMusicPin();
+</script>
+</body>
+</html>
