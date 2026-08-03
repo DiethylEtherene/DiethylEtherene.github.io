@@ -220,13 +220,20 @@ a.pl.game:hover .mark b{color:var(--pink)}
    alignment. Guarded - unqualified, a fixed column here collapses the copy in
    the single-column layouts. */
 @media (min-width:1181px){
-  #e02{grid-template-columns:minmax(0,1fr) 500px}
+  /* The gun's profile is about 1.8:1, so a square plate crops it at both ends.
+     The plate column reaches further left and the model box goes landscape to
+     match the silhouette - the entry keeps its two-column shape. */
+  #e02{grid-template-columns:minmax(0,1fr) 560px}
   #e02 .plate{display:grid;grid-template-columns:118px minmax(0,1fr);gap:12px 14px;align-content:start}
-  #e02 .plate>.pl.model{grid-column:2;grid-row:1 / span 2}
+  /* fixed height, width follows the column: wider than the square plate it
+     replaces, exactly as tall */
+  #e02 .plate>.pl.model{grid-column:2;grid-row:1 / span 2;aspect-ratio:auto;height:368px}
   #e02 .plate>.modes{grid-column:1;grid-row:1;flex-direction:column;align-self:start;gap:8px}
   #e02 .plate>.modes button{flex:0 0 auto;min-height:32px}
   #e02 .plate>.pl-rail{grid-column:1;grid-row:2;align-self:start;flex-direction:column;
     align-items:flex-start;justify-content:flex-start;gap:6px;padding:10px;min-height:0;line-height:1.5}
+  /* the lightbox honours the same landscape framing */
+  .viewer .vstage .pl.model{aspect-ratio:7/5;height:auto;width:min(100%,calc((100vh - 150px) * 7 / 5))}
 }
 
 /* onward */
@@ -271,9 +278,9 @@ a.pl.game:hover .mark b{color:var(--pink)}
   .sheet{gap:18px}
   .entry{padding:24px 0 26px}
   .entry h2{flex-basis:100%;font-size:22px}
-  .plate{max-width:none}
-  /* left full-bleed, the square model box eats the whole phone screen */
-  .pl.model{max-width:290px}
+  /* the model box runs the full column like every other block, so its side
+     margins match the page gutter rather than leaving a gap on the right */
+  .plate,.pl.model{max-width:none}
   /* the restricted marker carries no image, so it needs no image-sized box */
   #e04 .pl.sealed{aspect-ratio:2/1}
   .prose{font-size:14.4px;line-height:1.64}
@@ -623,10 +630,12 @@ let automaticMorph = !reducedMotion, wireState = false;
    desk tidy. A perspective lens makes a long object loom and foreshorten as it
    sweeps past the camera, which reads as a wobble rather than a turntable. */
 let modelWorldRadius = 0;
-/* the fit is to the bounding SPHERE, which for something as long and thin as a
-   gun is far bigger than its silhouette at any angle - so it can sit tighter in
-   the frame than the front page's compact model does */
-const modelCameraDistance = 4, modelViewportTarget = 1.3, modelOutlineScale = 1.012;
+/* The fit is to the bounding SPHERE so the model never clips whatever way it
+   is turned - but that sphere spans the gun's 528mm length while its profile
+   is only 294mm tall, so a sphere-tight fit leaves it marooned in the middle
+   of a wide frame. Framing to roughly the profile height instead: the rest
+   pose fills the plate, and only a near-vertical pitch reaches the edges. */
+const modelCameraDistance = 4, modelViewportTarget = 1.1, modelOutlineScale = 1.012;
 const fitModelCamera = () => {
   if (!THREE || !camera || !modelWorldRadius) return;
   const aspect = camera.aspect || 1;
