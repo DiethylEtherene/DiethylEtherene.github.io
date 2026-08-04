@@ -793,7 +793,11 @@ const loadModel = async () => {
     };
     opaqueMaterial = new THREE.MeshStandardMaterial({ ...shared, opacity: .96 });
     clearMaterial = new THREE.MeshStandardMaterial({ ...shared, opacity: .23, depthWrite: false });
-    wireMaterial = new THREE.LineBasicMaterial({ color: 0xff2b8d, transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+    /* depthTest:false so every edge draws, including the ones on the far side.
+       Left depth-tested, the lines and the transparent body get sorted against
+       each other and the far edges appear or vanish depending on the angle. */
+    wireMaterial = new THREE.LineBasicMaterial({ color: 0xff2b8d, transparent: true, opacity: 0,
+      depthWrite: false, depthTest: false, toneMapped: false });
 
     const parts = splitByColour(geometry);
     root = new THREE.Group();
@@ -805,7 +809,9 @@ const loadModel = async () => {
     }
     // feature edges only (26 deg), not every triangle - this is the expensive
     // part of the load on a 247k-triangle mesh
-    root.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 26), wireMaterial));
+    const wireMesh = new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 26), wireMaterial);
+    wireMesh.renderOrder = 2; // drawn last, over both the body and the mouldings
+    root.add(wireMesh);
 
     const fittedScale = 1.104 / Math.max(geometry.boundingSphere.radius, .001);
     root.scale.setScalar(fittedScale);
