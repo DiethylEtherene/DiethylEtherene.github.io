@@ -671,10 +671,13 @@ syncModelTheme = () => {
   if (renderer) renderer.toneMappingExposure = dark ? 1.2 : 1;
 };
 
-/* a bright neutral facet is a translucent moulding; a saturated one is not */
+/* A bright neutral facet is a translucent moulding; a saturated one is not.
+   NB these arrive LINEAR, not sRGB - the loader converts. The tank's #cecece
+   reads as .615 here, not .806, so a threshold set in sRGB terms misses it
+   entirely and the cartridge renders solid. Mid grey (.229) stays opaque. */
 const isClearColour = (r, g, b) => {
   const min = Math.min(r, g, b);
-  return min > .68 && (Math.max(r, g, b) - min) < .1;
+  return min > .45 && (Math.max(r, g, b) - min) < .1;
 };
 
 const splitByColour = (geometry) => {
@@ -724,7 +727,7 @@ const frame = (time) => {
     wireMix += (wireTarget - wireMix) * Math.min(1, delta * .0024);
     const solid = .25 + .71 * (1 - wireMix) * (1 - wireMix);
     opaqueMaterial.opacity = solid;
-    if (clearMaterial) clearMaterial.opacity = solid * .1;
+    if (clearMaterial) clearMaterial.opacity = solid * .22;
     // full strength: the edges are the point of wire mode
     wireMaterial.opacity = wireMix;
     renderer.render(scene, camera);
