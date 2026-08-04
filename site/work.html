@@ -614,7 +614,7 @@ systemDark.addEventListener("change", (event) => {
    The STL is 12MB, so it is only fetched once the entry nears the viewport. */
 const modelShell = document.getElementById("model-shell");
 const modelStatus = modelShell.querySelector(".model-status");
-let renderer, scene, camera, root, opaqueMaterial, clearMaterial, THREE;
+let renderer, scene, camera, root, opaqueMaterial, clearMaterial, wireMaterial, THREE;
 let wireMix = 0, wireTarget = 0;
 let dragging = false, lastX = 0, lastY = 0, lastFrame = performance.now();
 /* Orientation is held as a quaternion rather than a pair of Euler angles.
@@ -651,7 +651,7 @@ const fitModelCamera = () => {
 };
 
 syncModelTheme = () => {
-  if (!opaqueMaterial) return;
+  if (!opaqueMaterial || !wireMaterial) return;
   const dark = desk.classList.contains("dark");
   // the material colour stays white: anything else would tint the STL's own
   // vertex colours, which are the whole point of showing this model
@@ -667,6 +667,7 @@ syncModelTheme = () => {
     clearMaterial.metalness = .04;
     clearMaterial.roughness = .3;
   }
+  wireMaterial.color.setHex(dark ? 0x52dcff : 0xff2b8d);
   if (renderer) renderer.toneMappingExposure = dark ? 1.2 : 1;
 };
 
@@ -724,6 +725,8 @@ const frame = (time) => {
     const solid = .25 + .71 * (1 - wireMix) * (1 - wireMix);
     opaqueMaterial.opacity = solid;
     if (clearMaterial) clearMaterial.opacity = solid * .1;
+    // full strength: the edges are the point of wire mode
+    wireMaterial.opacity = wireMix;
     renderer.render(scene, camera);
   }
   requestAnimationFrame(frame);
@@ -790,6 +793,7 @@ const loadModel = async () => {
     };
     opaqueMaterial = new THREE.MeshStandardMaterial({ ...shared, opacity: .96 });
     clearMaterial = new THREE.MeshStandardMaterial({ ...shared, opacity: .23, depthWrite: false });
+    wireMaterial = new THREE.LineBasicMaterial({ color: 0xff2b8d, transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
 
     const parts = splitByColour(geometry);
     root = new THREE.Group();
@@ -799,6 +803,9 @@ const loadModel = async () => {
       clearMesh.renderOrder = 1; // drawn after whatever sits inside it
       root.add(clearMesh);
     }
+    // feature edges only (26 deg), not every triangle - this is the expensive
+    // part of the load on a 247k-triangle mesh
+    root.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 26), wireMaterial));
 
     const fittedScale = 1.104 / Math.max(geometry.boundingSphere.radius, .001);
     root.scale.setScalar(fittedScale);
