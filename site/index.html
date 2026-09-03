@@ -58,20 +58,6 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .vignette{position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:none}
 .desk.dark .vignette{box-shadow:inset 0 0 160px rgba(0,0,0,.75)}
 
-.deco{position:absolute;inset:0;pointer-events:none;z-index:2}
-.deco i.corner{position:absolute;width:13px;height:13px;opacity:.7}
-.deco i.tl{left:14px;top:14px;border-left:1px solid var(--cyan);border-top:1px solid var(--cyan)}
-.deco i.tr{right:14px;top:14px;border-right:1px solid var(--cyan);border-top:1px solid var(--cyan)}
-.deco i.bl{left:14px;bottom:14px;border-left:1px solid var(--cyan);border-bottom:1px solid var(--cyan)}
-.deco i.br{right:14px;bottom:14px;border-right:1px solid var(--cyan);border-bottom:1px solid var(--cyan)}
-.deco span.mark{position:absolute;font-size:9px;letter-spacing:.2em;color:var(--muted);opacity:.6}
-.deco .hatch{position:absolute;right:352px;top:78px;font-size:9px;letter-spacing:.2em;color:var(--muted);opacity:.8}
-.deco .ticks{position:absolute;right:346px;bottom:96px;display:flex;flex-direction:column;gap:5px;align-items:flex-end}
-.deco .ticks i{display:block;height:1px;background:var(--line)}
-.deco .ticks i:nth-child(1){width:26px}
-.deco .ticks i:nth-child(2){width:16px;background:var(--pink);opacity:.7}
-.deco .ticks i:nth-child(3){width:34px}
-
 /* header */
 .top{position:relative;z-index:3;flex:0 0 56px;display:flex;align-items:center;justify-content:space-between;
   gap:24px;padding:0 0 0 var(--rail);border-bottom:1px solid var(--rule);font-size:11px;letter-spacing:.16em}
@@ -109,7 +95,6 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .cols{flex:1 1 auto;display:grid;grid-template-columns:500px minmax(0,1fr) 330px;grid-template-rows:minmax(0,1fr);min-width:0}
 
 .intro{display:flex;flex-direction:column;gap:40px;padding:60px var(--gutter) 268px}
-.eyebrow{font-size:9.5px;letter-spacing:.24em;color:var(--pink);margin-bottom:18px}
 .name{position:relative;margin:0;font-size:clamp(64px,7.6vw,110px);line-height:.82;letter-spacing:-.055em}
 .name .ghost{position:absolute;top:0;left:0;pointer-events:none}
 .name .g1{color:var(--pink);opacity:.28;transform:translate(-3px,2px)}
@@ -145,26 +130,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   gap:22px;padding:36px 20px 48px}
 .stage:active{cursor:grabbing}
 .stage>*:not(.ascii-layer){position:relative;z-index:1}
-.stage .caption{display:flex;gap:14px;align-items:center;font-size:9.5px;letter-spacing:.2em;color:var(--cyan);
-  transform:translate(var(--model-shift),-36px)}
-.stage .caption i{display:block;width:26px;height:1px;background:var(--cyan)}
 .reticle{position:relative;display:grid;place-items:center;width:430px;height:430px;max-width:100%;transform:translateX(var(--model-shift))}
-.reticle .ring{position:absolute;width:470px;height:470px;border-radius:50%;
-  border:2px dashed rgba(13,126,166,.42);animation:spin 26s linear infinite}
-.desk.dark .reticle .ring{border-color:rgba(82,220,255,.35)}
-.reticle .ring b{position:absolute;left:calc(50% - 5.5px);top:-5.5px;display:block;width:11px;height:11px;border-radius:50%;background:var(--pink)}
-.desk.dark .reticle .ring b{background:var(--mint);box-shadow:0 0 10px var(--mint)}
-.reticle .ring2{position:absolute;width:406px;height:406px;border-radius:50%;
-  border:2px dotted rgba(255,43,141,.4);animation:spin 17s linear infinite reverse}
-.reticle .ring2 b{position:absolute;left:calc(50% - 4.5px);top:-4.5px;display:block;width:9px;height:9px;
-  border-radius:50%;background:var(--cyan)}
-.desk.dark .reticle .ring2 b{box-shadow:0 0 8px var(--cyan)}
-.reticle .cx{position:absolute;left:0;right:0;top:50%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(13,126,166,.42),transparent)}
-.reticle .cy{position:absolute;top:0;bottom:0;left:50%;width:1px;
-  background:linear-gradient(rgba(13,126,166,.42),transparent 70%)}
-.desk.dark .reticle .cx{background:linear-gradient(90deg,transparent,rgba(82,220,255,.5),transparent)}
-.desk.dark .reticle .cy{background:linear-gradient(rgba(82,220,255,.5),transparent 70%)}
 .slot{position:relative;width:336px;height:336px;max-width:82vw;max-height:82vw;
   border:1px solid var(--cyan);background:var(--slot);display:grid;place-items:center;
   touch-action:none;cursor:grab}
@@ -175,8 +141,6 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .slot .b2{right:-1px;top:-1px;border-right:2px solid var(--mint);border-top:2px solid var(--mint)}
 .slot .b3{left:-1px;bottom:-1px;border-left:2px solid var(--mint);border-bottom:2px solid var(--mint)}
 .slot .b4{right:-1px;bottom:-1px;border-right:2px solid var(--mint);border-bottom:2px solid var(--mint)}
-.slot .dim{position:absolute;left:0;top:-22px;font-size:9px;letter-spacing:.18em;color:var(--muted)}
-.slot .scale{position:absolute;right:-52px;top:50%;transform:translateY(-50%);font-size:9px;letter-spacing:.18em;color:var(--muted)}
 .slot .drag-hint{position:absolute;left:50%;bottom:-30px;transform:translateX(-50%);display:flex;align-items:center;
   gap:8px;padding:5px 10px;border:1px solid var(--line);background:var(--hint-bg);backdrop-filter:blur(3px);
   font-size:9px;letter-spacing:.2em;color:var(--pink);white-space:nowrap;pointer-events:none}
@@ -193,12 +157,8 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .desk.dark .modes button.active{color:#060d14;box-shadow:0 0 14px rgba(255,60,159,.4)}
 
 /* index */
-.index{border-left:1px solid var(--rule);display:grid;grid-template-rows:auto repeat(4,1fr)}
+.index{border-left:1px solid var(--rule);display:grid;grid-template-rows:repeat(4,1fr)}
 .desk.dark .index{border-left-color:var(--line)}
-.index .head{display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:44px;
-  border-bottom:1px solid var(--rule);font-size:9.5px;letter-spacing:.22em;color:var(--muted)}
-.desk.dark .index .head{border-bottom-color:var(--line)}
-.index .head b{color:var(--pink);font-weight:400}
 .row{position:relative;display:flex;flex-direction:column;justify-content:center;gap:10px;padding:0 24px;
   border-bottom:1px solid var(--line);transition:background .16s}
 .row:last-child{border-bottom:0}
@@ -224,9 +184,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .foot nav a{display:flex;align-items:center;padding:0 18px;border-left:1px solid var(--line);color:var(--ink)}
 .foot nav a:first-child{border-left:0}
 .foot nav a:last-child{border-right:1px solid var(--line)}
-.ticker{flex:1 1 auto;overflow:hidden;display:flex;align-items:center;padding-right:24px;color:var(--muted)}
-.ticker span{display:flex;gap:44px;white-space:nowrap;animation:marquee 26s linear infinite}
-.ticker b{color:var(--mint);font-weight:400}
+.foot-note{margin-left:auto;display:flex;align-items:center;padding-right:var(--gutter);color:var(--muted);white-space:nowrap}
 
 /* mobile menu (phones + tablets on the one-screen layout) */
 .menu{display:none;flex-direction:column;align-items:flex-end;gap:12px;position:relative}
@@ -255,26 +213,6 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 
 /* music easter egg */
 .music-easter{position:absolute;left:116px;bottom:100px;z-index:4}
-.music-trinkets{position:absolute;left:0;bottom:96px;display:flex;align-items:flex-end;gap:22px;pointer-events:none;
-  transition:transform .42s cubic-bezier(.16,1,.3,1)}
-.music-easter.open .music-trinkets{transform:translateY(-36px)}
-.radar{position:relative;display:block;width:54px;height:54px;border:1px solid var(--line);border-radius:50%;overflow:hidden}
-.radar i{position:absolute;display:block;background:var(--line)}
-.radar .r1{inset:12px;border:1px solid var(--line);border-radius:50%;background:none}
-.radar .sweep{left:50%;top:50%;width:26px;height:1px;transform-origin:0 0;
-  background:linear-gradient(90deg,var(--cyan),transparent);animation:spin 3.4s linear infinite}
-.radar .v{left:50%;top:6px;width:1px;height:42px}
-.radar .h{left:6px;top:50%;width:42px;height:1px}
-.bars{display:flex;align-items:flex-end;gap:4px;height:40px}
-.bars i{display:block;width:3px;background:var(--cyan);opacity:.75;transform-origin:bottom;animation:bars 1.5s ease-in-out infinite}
-.bars i:nth-child(1){height:40%}
-.bars i:nth-child(2){height:70%;animation-duration:1.15s;animation-delay:.2s}
-.bars i:nth-child(3){height:55%;background:var(--pink);opacity:.8;animation-duration:1.7s;animation-delay:.05s}
-.bars i:nth-child(4){height:85%;opacity:.65;animation-duration:1.3s;animation-delay:.32s}
-.bars i:nth-child(5){height:50%;opacity:.6;animation-duration:1.9s;animation-delay:.12s}
-.sensor{font-size:9px;line-height:1.7;letter-spacing:.18em;color:var(--muted)}
-.sensor b{color:var(--pink);font-weight:400}
-
 .music-front,.music-back{position:absolute;left:0;bottom:0;transform-origin:0 100%;
   transition:opacity .26s ease,transform .42s cubic-bezier(.16,1,.3,1)}
 .music-front{display:grid;place-items:center;width:62px;height:62px;padding:0;border:1px solid var(--line);
@@ -312,9 +250,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 .music-easter.has-error .music-eyebrow{color:var(--pink)}
 
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes bars{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
 @keyframes blink{0%,72%{opacity:1}76%,84%{opacity:.25}88%,100%{opacity:1}}
-@keyframes marquee{to{transform:translateX(-50%)}}
 
 @media (max-width:1500px){
   .cols{grid-template-columns:minmax(360px,34vw) minmax(0,1fr) 300px}
@@ -471,7 +407,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   .menu{display:flex}
   .menu-note{display:flex}
   .index{display:none}
-  /* float the theme toggle + menu button up to the IDENTITY.LOCKED line */
+  /* float the theme toggle + menu button up to the name line */
   .intro>div:first-child{position:relative}
   .menu{position:absolute;top:-11px;right:0}
 
@@ -568,24 +504,12 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
   <i class="scanlines" aria-hidden="true"></i>
   <i class="vignette" aria-hidden="true"></i>
 
-  <div class="deco" aria-hidden="true">
-    <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
-    <span class="mark" style="left:640px;top:120px">+</span>
-    <span class="mark" style="left:1010px;top:210px;opacity:.55">+</span>
-    <span class="mark" style="left:700px;top:640px;opacity:.55">+</span>
-    <span class="mark" style="left:1046px;top:604px;color:var(--pink);opacity:.6">&times;</span>
-    <span class="hatch">&#9585;&#9585;&#9585;</span>
-    <span class="ticks"><i></i><i></i><i></i></span>
-  </div>
-
   <header class="top">
     <span class="who"><b>ASTERIA_WANG</b><span>DESIGN ENGINEERING / IMPERIAL</span></span>
     <span class="readouts">
-      <span class="sys">SYS &#9679; OK</span>
-      <span class="tz">UTC+8</span>
       <span class="status"><i></i>OPEN TO INTERNSHIPS</span>
       <button type="button" class="theme-toggle" aria-pressed="false" aria-label="Switch colour theme">
-        <span class="theme-toggle-label">THEME // LIGHT</span>
+        <span class="theme-toggle-label">LIGHT</span>
         <i><b></b></i>
       </button>
     </span>
@@ -593,7 +517,6 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 
   <div class="body">
     <div class="side" aria-hidden="true">
-      <span class="build">ASTERIA_OS // BUILD 2026.07</span>
       <span class="marks"><i></i><i></i><i></i><i></i></span>
       <span class="geo">N 51.49&deg; / W 0.17&deg;</span>
     </div>
@@ -601,7 +524,6 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
     <div class="cols">
       <section class="intro">
         <div>
-          <div class="eyebrow">&#9656; IDENTITY.LOCKED</div>
           <div class="name-row">
             <h1 class="name" style="font-family:Helvetica,Arial,sans-serif">
               <span class="ghost g1" aria-hidden="true">Asteria<br>Wang</span>
@@ -610,7 +532,7 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
             </h1>
             <div class="menu" id="menu" data-open="false">
               <button type="button" class="theme-toggle menu-theme" aria-pressed="false" aria-label="Switch colour theme">
-                <span class="theme-toggle-label">THEME // LIGHT</span>
+                <span class="theme-toggle-label">LIGHT</span>
                 <i><b></b></i>
               </button>
               <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="menu-panel" aria-label="Open section menu">
@@ -618,7 +540,6 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
                 <span>MENU</span>
               </button>
               <div class="menu-panel" id="menu-panel" hidden>
-                <div class="menu-head"><span>NAV.INDEX</span><b>04</b></div>
                 <a href="./work.html"><span>[01]</span><em>Selected work</em></a>
                 <a href="#academic"><span>[02]</span><em>Academic</em></a>
                 <a href="#illustration"><span>[03]</span><em>Illustration</em></a>
@@ -648,18 +569,11 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
 
       <section class="stage" id="stage">
         <div class="ascii-layer" aria-hidden="true"><canvas class="ascii-portrait-canvas"></canvas></div>
-        <div class="caption"><i></i>ASCII_NAUTICAL / LIVE<i></i></div>
         <div class="reticle">
-          <i class="ring"><b></b></i>
-          <i class="ring2"><b></b></i>
-          <i class="cx"></i>
-          <i class="cy"></i>
           <div class="slot" id="model-shell" data-mode="auto" data-ready="loading" role="img" aria-label="Interactive 3D model of Asteria's desk tidy">
             <canvas aria-hidden="true"></canvas>
             <span class="model-status">Loading desk_tidy / 0%</span>
             <i class="bracket b1"></i><i class="bracket b2"></i><i class="bracket b3"></i><i class="bracket b4"></i>
-            <span class="dim">320.00</span>
-            <span class="scale">1:1</span>
             <span class="drag-hint"><i></i>DRAG TO ROTATE</span>
           </div>
         </div>
@@ -671,7 +585,6 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
       </section>
 
       <nav class="index" aria-label="Sections">
-        <div class="head"><span>NAV.INDEX</span><b>04</b></div>
         <a class="row" href="./work.html"><span class="meta"><span>[01] 04 ITEMS</span><span class="go">&#8599;</span></span><span class="title" style="font-family:Helvetica,Arial,sans-serif">Selected work</span></a>
         <a class="row" href="#academic"><span class="meta"><span>[02] 06 ITEMS</span><span class="go">&#8599;</span></span><span class="title" style="font-family:Helvetica,Arial,sans-serif">Academic</span></a>
         <a class="row" href="#illustration"><span class="meta"><span>[03] MANY</span><span class="go">&#8599;</span></span><span class="title" style="font-family:Helvetica,Arial,sans-serif">Illustration</span></a>
@@ -687,18 +600,10 @@ body{background:#e8eef1;font-family:Helvetica,Arial,sans-serif;overflow:hidden}
       <a href="./cv.html">CV</a>
       <a href="./play.html">PLAY</a>
     </nav>
-    <span class="ticker" aria-hidden="true"><span>
-      <span>NOW.PLAYING / HIDDEN SIGNAL &mdash; <b>TRACK 01 &mdash; ETHER</b> &middot; ASCII_NAUTICAL RENDERED LOCALLY &middot; DESK_TIDY.STL &middot; OPEN TO INTERNSHIPS</span>
-      <span>NOW.PLAYING / HIDDEN SIGNAL &mdash; <b>TRACK 01 &mdash; ETHER</b> &middot; ASCII_NAUTICAL RENDERED LOCALLY &middot; DESK_TIDY.STL &middot; OPEN TO INTERNSHIPS</span>
-    </span></span>
+    <span class="foot-note">&copy; 2026 Asteria Wang</span>
   </footer>
 
   <div class="music-easter" id="music">
-    <div class="music-trinkets" aria-hidden="true">
-      <span class="radar"><i class="r1"></i><i class="sweep"></i><i class="v"></i><i class="h"></i></span>
-      <span class="bars"><i></i><i></i><i></i><i></i><i></i></span>
-      <span class="sensor">0x2F1A&nbsp;&nbsp;&#9679;&#9679;&#9675;&#9675;<br>SENSOR&nbsp;/&nbsp;IDLE<br><b>NO&nbsp;SIGNAL&nbsp;LOSS</b></span>
-    </div>
     <button type="button" class="music-front" aria-label="Reveal hidden playlist">
       <span class="disc"><i></i><b></b></span>
       <span class="tag">SIGNAL_?</span>
@@ -751,7 +656,7 @@ const applyTheme = (dark) => {
   themeButtons.forEach((button) => {
     button.setAttribute("aria-pressed", String(dark));
     const label = button.querySelector(".theme-toggle-label");
-    if (label) label.textContent = dark ? "THEME // DARK" : "THEME // LIGHT";
+    if (label) label.textContent = dark ? "DARK" : "LIGHT";
   });
   asciiController.setTheme(dark ? "dark" : "light");
   updateModelTheme();
