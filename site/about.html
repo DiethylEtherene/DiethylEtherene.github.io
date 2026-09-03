@@ -19,7 +19,11 @@
 
 .about{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,27%);gap:16px 30px;align-items:stretch;
   grid-template-areas:"head aside" "main aside" "main contact";
-  grid-template-rows:auto minmax(0,1fr) min-content;flex:1 1 auto;min-height:0}
+  grid-template-rows:auto 1fr min-content;flex:1 0 auto}
+/* flex-shrink 0 throughout this layout: the boxes grow to fill a tall screen
+   (the one-page fit at 900px), but must never shrink below their own content —
+   on a 720px laptop that overflow used to land TRANSMIT on top of JUMP.TO.
+   The sheet scrolls instead. */
 .about .head{grid-area:head;display:flex;flex-direction:column;gap:16px;min-width:0}
 .about .main{grid-area:main;display:flex;flex-direction:column;gap:16px;min-width:0}
 .about .aside{grid-area:aside;min-width:0;display:flex;flex-direction:column;gap:16px}
@@ -43,9 +47,9 @@ h1 .real{position:relative}
 .strip .v em{font-style:normal;color:var(--cyan)}
 
 /* numbered dossier blocks — they stretch to eat the leftover column height */
-.blocks{display:flex;flex-direction:column;border-top:1px solid var(--line);flex:1 1 auto;min-height:0}
+.blocks{display:flex;flex-direction:column;border-top:1px solid var(--line);flex:1 0 auto}
 .block{display:grid;grid-template-columns:56px minmax(0,1fr);gap:0 16px;padding:15px 0;
-  align-content:center;flex:1 1 auto;border-bottom:1px solid var(--line)}
+  align-content:center;flex:1 0 auto;border-bottom:1px solid var(--line)}
 .block .n{font-size:9.5px;letter-spacing:.2em;color:var(--pink);padding-top:4px}
 .block h2{margin:0 0 7px;font-size:11px;letter-spacing:.22em;font-weight:400;color:var(--muted)}
 .block p{margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14.2px;line-height:1.62;
@@ -95,7 +99,7 @@ h1 .real{position:relative}
 .reach b{color:var(--pink);font-weight:400}
 
 /* jump index — fills the slack under the portrait */
-.jump{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;border:1px solid var(--line);
+.jump{display:flex;flex-direction:column;flex:1 0 auto;border:1px solid var(--line);
   background:var(--panel)}
 .jump .jhead{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:30px;
   padding:0 12px;border-bottom:1px solid var(--line);font-size:9px;letter-spacing:.2em;color:var(--muted)}
