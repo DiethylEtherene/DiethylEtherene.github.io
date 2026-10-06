@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Selected work — Asteria Wang. Four featured design engineering projects, 2024–2026.">
+<meta name="description" content="Selected work — Asteria Wang. Five featured design engineering projects, 2024–2026.">
 <meta name="theme-color" content="#e8eef1" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#060d14" media="(prefers-color-scheme: dark)">
 <title>Work / Asteria Wang</title>
@@ -79,6 +79,7 @@ h1 .real{position:relative}
   background:var(--btn);font-size:9px;letter-spacing:.18em;color:var(--cyan)}
 .action:hover{border-color:var(--pink);color:var(--pink)}
 .action[hidden]{display:none}
+a.pl-rail{color:var(--muted)}
 a.pl-rail:hover{border-color:var(--cyan)}
 a.pl-rail:hover b{color:var(--pink)}
 
@@ -142,6 +143,8 @@ a.pl-rail:hover b{color:var(--pink)}
    two columns are proportioned to end level rather than stretched */
 @media (min-width:861px){
   #e03.entry.wide{grid-template-columns:minmax(0,1fr) minmax(0,3.8fr)}
+  /* 05 carries a link rail under its sheet, so a touch wider than 3fr ends level with three thumbs */
+  #e05.entry.wide{grid-template-columns:minmax(0,1fr) minmax(0,3.15fr)}
 }
 /* the copy runs full width here, so it sets in two columns rather than
    leaving half the row empty next to a 74ch measure */
@@ -156,6 +159,9 @@ a.pl-rail:hover b{color:var(--pink)}
   font-size:8.5px;letter-spacing:.18em;color:var(--muted)}
 .frame figcaption b{font-weight:400;color:var(--cyan)}
 .pl.a3{aspect-ratio:297/210}
+/* phone screenshots: letterboxed in the sheet, not cropped to a landscape slice; taken out of
+   flow so the tall intrinsic image cannot push the frame past its aspect ratio */
+.pl.a3.phone img{position:absolute;inset:0;object-fit:contain}
 button.pl{padding:0;font:inherit;color:inherit;width:100%;cursor:zoom-in}
 button.pl:hover{border-color:var(--cyan)}
 button.pl:hover .mark b{color:var(--pink)}
@@ -303,7 +309,7 @@ a.pl.game:hover .mark b{color:var(--pink)}
       <em>/ SELECTED</em>
     </div>
     <div class="readouts">
-      <span class="status"><i></i><span>04 ON FILE</span></span>
+      <span class="status"><i></i><span>05 ON FILE</span></span>
       <button type="button" class="theme-toggle" aria-label="Toggle colour scheme">
         <i aria-hidden="true"><b></b></i><span class="theme-label">DARK</span>
       </button>
@@ -331,7 +337,7 @@ a.pl.game:hover .mark b{color:var(--pink)}
             <span class="real">Selected work</span>
           </h1>
           <div class="strip">
-            <div><span class="k">ITEMS</span><span class="v">04 <em>/ selected</em></span></div>
+            <div><span class="k">ITEMS</span><span class="v">05 <em>/ selected</em></span></div>
             <div><span class="k">SPAN</span><span class="v">2024 &mdash; 2026</span></div>
             <div><span class="k">TOOLS</span><span class="v">Fusion 360 <em>&middot; 3D print</em></span></div>
           </div>
@@ -526,6 +532,67 @@ a.pl.game:hover .mark b{color:var(--pink)}
             </div>
           </article>
 
+          <article class="entry wide" id="e05">
+            <div class="rec-head">
+              <span class="n">[05]</span>
+              <h2>Food with Asu &mdash; a cookbook from saved videos</h2>
+              <span class="stamp">SEP &ndash; OCT 2026<i aria-hidden="true"></i><b>PERSONAL</b></span>
+            </div>
+
+            <ul class="tags">
+              <li>PRODUCT DESIGN</li><li>AI-ASSISTED BUILD</li><li>WEB APP</li>
+            </ul>
+
+            <div class="rec-body">
+              <p class="prose">My partner and I had saved over a hundred recipe videos across Instagram and Douyin and cooked almost none of them. The recipes were trapped in captions and comment threads, half of them in Chinese, with no quantities and no way to plan a week or write a shopping list. So I turned the saves into a working cookbook: every dish has quantities, steps and a photo pulled from the video, and the two of us share one live weekly planner, shopping list and pantry.</p>
+              <p class="prose">I designed it and directed the build with Claude Code &mdash; Claude wrote the code, I set the direction and made the design calls &mdash; then tested every version by actually cooking from it. That was where the real design work happened. Toggling meal prep wiped the planned week, so the planner got an undo and now never overwrites unless asked. The prep grid overflowed on a phone propped by the hob. Timers buried in step text were useless mid-stir, so any time in a step became tap-to-start. Similar saves ended up as near-duplicates, so they now stack into one card with a quick/slow toggle.</p>
+            </div>
+
+            <div class="rec-foot">
+              <span class="outcome">&#9673; IN WEEKLY USE &mdash; 105 RECIPES, 2 COOKS</span>
+            </div>
+
+            <div class="plate">
+              <button type="button" class="pl a3">
+                <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                <img src="./files/work/foodwithasu-planner.jpg" alt="Food with Asu weekly planner: lunches and dinners for the week with portion counts and move, swap, reroll and lock controls on each meal" loading="lazy" decoding="async">
+              </button>
+              <a class="pl-rail" href="https://diethyletherene.github.io/food-with-asu/" target="_blank" rel="noreferrer"><span>LIVE BUILD</span><b>OPEN THE COOKBOOK &#8599;</b></a>
+            </div>
+
+            <div class="frames">
+              <figure class="frame">
+                <button type="button" class="pl a3 phone">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/foodwithasu-cook-mode.jpg" alt="Cook mode on a phone: step 3 of 6 for butter chicken, with two timers running at the bottom of the screen" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>COOK MODE &middot; TIMERS</span><b>PHONE</b></figcaption>
+              </figure>
+              <figure class="frame">
+                <button type="button" class="pl a3">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/foodwithasu-fridge.jpg" alt="What can we make? ingredient picker, with prawns starred as a must-use item and recipes ranked by what is already in" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>WHAT CAN WE MAKE</span><b>DESKTOP</b></figcaption>
+              </figure>
+              <figure class="frame">
+                <button type="button" class="pl a3">
+                  <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
+                  <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
+                  <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                  <img src="./files/work/foodwithasu-shopping.jpg" alt="Shopping list grouped by aisle, each item showing which planned meal needs it, with a 0 of 59 progress count" loading="lazy" decoding="async">
+                </button>
+                <figcaption><span>SHOPPING &middot; BY AISLE</span><b>DESKTOP</b></figcaption>
+              </figure>
+            </div>
+          </article>
+
         </div>
 
         <div class="onward">
@@ -541,8 +608,8 @@ a.pl.game:hover .mark b{color:var(--pink)}
   <footer class="foot">
     <span class="signal"><i aria-hidden="true"></i>SIGNAL_?</span>
     <span class="ticker" aria-hidden="true"><span>
-      <span>SELECTED.WORK &middot; <b>CLEANSHIFT / HERO SHOT / ACE / ENTIA</b> &middot; FUSION 360 &middot; 3D PRINTED &middot; OPEN TO INTERNSHIPS</span>
-      <span>SELECTED.WORK &middot; <b>CLEANSHIFT / HERO SHOT / ACE / ENTIA</b> &middot; FUSION 360 &middot; 3D PRINTED &middot; OPEN TO INTERNSHIPS</span>
+      <span>SELECTED.WORK &middot; <b>CLEANSHIFT / HERO SHOT / ACE / ENTIA / FOOD WITH ASU</b> &middot; FUSION 360 &middot; 3D PRINTED &middot; OPEN TO INTERNSHIPS</span>
+      <span>SELECTED.WORK &middot; <b>CLEANSHIFT / HERO SHOT / ACE / ENTIA / FOOD WITH ASU</b> &middot; FUSION 360 &middot; 3D PRINTED &middot; OPEN TO INTERNSHIPS</span>
     </span></span>
 
     <div class="music-easter" id="music">
