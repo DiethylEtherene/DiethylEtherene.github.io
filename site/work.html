@@ -191,6 +191,22 @@ a.pl.game:hover{border-color:var(--pink)}
 a.pl.game:hover .mark b{color:var(--pink)}
 .pl.game{aspect-ratio:16/9;border-color:var(--cyan)}
 .pl.game .mark b{color:var(--mint)}
+/* the game runs in place: the start mark is a button, and on press the plate
+   fills with the build itself (same origin, so it just works) */
+button.game-start{background:none;border:0;font:inherit;cursor:pointer;padding:18px 24px}
+button.game-start:hover b{color:var(--pink)}
+.pl.game iframe{position:absolute;inset:0;z-index:3;width:100%;height:100%;border:0;background:#1b1e24}
+.pl.game.playing{border-color:var(--pink)}
+.pl.game.playing .game-start,.pl.game.playing>.cross{display:none}
+/* the rail under the box carries the outbound link, and once the game is
+   running, a fullscreen control - kept out of the box so it never sits on
+   top of the game's own buttons */
+.game-rail{gap:14px}
+.game-rail a{display:flex;flex:1 1 auto;align-items:center;justify-content:space-between;gap:10px;min-width:0;color:inherit}
+.game-rail a:hover b{color:var(--pink)}
+.game-rail button{flex:0 0 auto;min-height:28px;padding:0 0 0 12px;border:0;border-left:1px solid var(--line);
+  background:none;font:inherit;letter-spacing:inherit;color:var(--cyan);cursor:pointer}
+.game-rail button:hover{color:var(--pink)}
 
 /* 02 — model viewer slot, same pattern as the front page */
 .pl.model{aspect-ratio:1/1;border-color:var(--cyan);touch-action:none;cursor:grab}
@@ -263,6 +279,8 @@ a.pl.game:hover .mark b{color:var(--pink)}
   .entry.wide .rec-body{display:flex;columns:auto}
   .entry.wide .plate{max-width:420px;height:auto}
   .plate{max-width:280px}
+  /* 16:9 at a phone's width is too small to play in, so a live game goes tall */
+  .pl.game.playing{aspect-ratio:auto;height:min(72vh,620px)}
   .pl.model{max-width:280px}
   .entry .stamp{width:100%}
 }
@@ -460,12 +478,16 @@ a.pl.game:hover .mark b{color:var(--pink)}
             </div>
 
             <div class="plate">
-              <a class="pl game" href="https://diethyletherene.github.io/Asu-s-guide-to-the-ACE-workshop/" target="_blank" rel="noreferrer">
+              <div class="pl game" id="ace-game">
                 <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
                 <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
                 <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
-                <span class="mark"><b>&#9673; PLAYABLE BUILD</b><span>OPEN THE GAME &#8599;</span></span>
-              </a>
+                <button type="button" class="mark game-start"><b>&#9673; PLAYABLE BUILD</b><span>PLAY IT HERE &#9654;</span></button>
+              </div>
+              <div class="pl-rail game-rail">
+                <a href="https://diethyletherene.github.io/Asu-s-guide-to-the-ACE-workshop/" target="_blank" rel="noreferrer"><span>ACE WORKSHOP GAME</span><b>OPEN IN A NEW TAB &#8599;</b></a>
+                <button type="button" class="game-full" hidden>FULLSCREEN &#8599;</button>
+              </div>
               <div class="pl-links">
                 <a href="./files/work/ace-discovery-report.pdf" target="_blank" rel="noreferrer"><span>DISCOVERY REPORT</span><b>PDF &#8599;</b></a>
                 <a href="./files/work/ace-delivery-report.pdf" target="_blank" rel="noreferrer"><span>DELIVERY REPORT</span><b>PDF &#8599;</b></a>
@@ -957,6 +979,33 @@ if (!reducedMotion) {
     wireState = !wireState;
     wireTarget = wireState ? 1 : 0;
   }, 6200);
+}
+
+/* ---------- ACE game, played in place (entry 03) ---------- */
+const gamePlate = document.getElementById("ace-game");
+if (gamePlate) {
+  const GAME_URL = "https://diethyletherene.github.io/Asu-s-guide-to-the-ACE-workshop/";
+  const gameStart = gamePlate.querySelector(".game-start");
+  const gameFull = gamePlate.parentElement.querySelector(".game-full");
+  let gameFrame = null;
+  // nothing is fetched until someone asks to play: the build is its own page
+  // with its own assets, and most visitors only read past it
+  gameStart.addEventListener("click", () => {
+    if (gameFrame) return;
+    gameFrame = document.createElement("iframe");
+    gameFrame.src = GAME_URL;
+    gameFrame.title = "Asu's guide to the ACE workshop - playable build";
+    gameFrame.setAttribute("allow", "fullscreen");
+    gameFrame.setAttribute("allowfullscreen", "");
+    gameFrame.addEventListener("load", () => { try { gameFrame.focus(); } catch {} }, { once: true });
+    gamePlate.append(gameFrame);
+    gamePlate.classList.add("playing");
+    gameFull.hidden = false;
+  });
+  gameFull.addEventListener("click", () => {
+    const go = gameFrame && (gameFrame.requestFullscreen || gameFrame.webkitRequestFullscreen);
+    if (go) go.call(gameFrame);
+  });
 }
 
 /* ---------- sheet viewer ---------- */
