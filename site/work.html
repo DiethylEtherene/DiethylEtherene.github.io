@@ -193,13 +193,20 @@ a.pl.game:hover .mark b{color:var(--pink)}
 .pl.game .mark b{color:var(--mint)}
 /* the game runs in place: the start mark is a button, and on press the plate
    fills with the build itself (same origin, so it just works) */
-button.game-start{background:none;border:0;font:inherit;cursor:pointer;padding:18px 24px}
+/* the build's own title screen sits behind the mark, in whichever theme the
+   page is in; the mark gets a panel so it still reads over the picture */
+.pl.game .game-shot{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;opacity:.78;transition:opacity .25s}
+.pl.game:hover .game-shot{opacity:1}
+.desk.dark .game-shot.light,.desk:not(.dark) .game-shot.dark{display:none}
+button.game-start{border:1px solid var(--line);background:var(--hint-bg);backdrop-filter:blur(6px);
+  font:inherit;cursor:pointer;padding:16px 24px}
+button.game-start:hover{border-color:var(--cyan)}
 button.game-start:hover b{color:var(--pink)}
 /* the build is laid out for a desktop browser; on a phone the mark says so */
 .game-note{display:none;font-style:normal;margin-top:6px;color:var(--pink)}
 .pl.game iframe{position:absolute;inset:0;z-index:3;width:100%;height:100%;border:0;background:#1b1e24}
 .pl.game.playing{border-color:var(--pink)}
-.pl.game.playing .game-start,.pl.game.playing>.cross{display:none}
+.pl.game.playing .game-start,.pl.game.playing>.cross,.pl.game.playing .game-shot{display:none}
 /* the rail under the box carries the outbound link, and once the game is
    running, a fullscreen control - kept out of the box so it never sits on
    top of the game's own buttons */
@@ -485,6 +492,8 @@ button.game-start:hover b{color:var(--pink)}
                 <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
                 <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
                 <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
+                <img class="game-shot dark" src="./files/work/ace-game-dark.jpg" alt="" loading="lazy" decoding="async">
+                <img class="game-shot light" src="./files/work/ace-game-light.jpg" alt="" loading="lazy" decoding="async">
                 <button type="button" class="mark game-start"><b>&#9673; PLAYABLE BUILD</b><span>PLAY IT HERE &#9654;</span><em class="game-note">WORKS BEST ON A COMPUTER</em></button>
               </div>
               <div class="pl-rail game-rail">
