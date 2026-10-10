@@ -198,12 +198,15 @@ a.pl.game:hover .mark b{color:var(--pink)}
 .pl.game .game-shot{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;opacity:.78;transition:opacity .25s}
 .pl.game:hover .game-shot{opacity:1}
 .desk.dark .game-shot.light,.desk:not(.dark) .game-shot.dark{display:none}
-button.game-start{border:1px solid var(--line);background:var(--hint-bg);backdrop-filter:blur(6px);
-  font:inherit;cursor:pointer;padding:16px 24px}
-button.game-start:hover{border-color:var(--cyan)}
-button.game-start:hover b{color:var(--pink)}
+.pl.game .game-start{gap:10px;padding:30px 46px;border:1px solid var(--cyan);background:var(--hint-bg);
+  backdrop-filter:blur(6px);font:inherit;cursor:pointer;transition:border-color .2s,transform .2s}
+.pl.game .game-start b{font-size:13px;letter-spacing:.22em}
+.pl.game .game-start span{font-size:11px;letter-spacing:.24em;color:var(--ink)}
+.desk.dark .pl.game .game-start{box-shadow:0 0 28px rgba(82,220,255,.18)}
+.pl.game .game-start:hover{border-color:var(--pink);transform:scale(1.03)}
+.pl.game .game-start:hover b{color:var(--pink)}
 /* the build is laid out for a desktop browser; on a phone the mark says so */
-.game-note{display:none;font-style:normal;margin-top:6px;color:var(--pink)}
+.pl.game .game-note{display:none;font-style:normal;margin-top:4px;font-size:8.5px;letter-spacing:.2em;color:var(--pink)}
 .pl.game iframe{position:absolute;inset:0;z-index:3;width:100%;height:100%;border:0;background:#1b1e24}
 .pl.game.playing{border-color:var(--pink)}
 .pl.game.playing .game-start,.pl.game.playing>.cross,.pl.game.playing .game-shot{display:none}
@@ -290,7 +293,8 @@ button.game-start:hover b{color:var(--pink)}
   .plate{max-width:280px}
   /* 16:9 at a phone's width is too small to play in, so a live game goes tall */
   .pl.game.playing{aspect-ratio:auto;height:min(72vh,620px)}
-  .game-note{display:block}
+  .pl.game .game-start{padding:22px 28px}
+  .pl.game .game-note{display:block}
   .pl.model{max-width:280px}
   .entry .stamp{width:100%}
 }
@@ -494,7 +498,7 @@ button.game-start:hover b{color:var(--pink)}
                 <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
                 <img class="game-shot dark" src="./files/work/ace-game-dark.jpg" alt="" loading="lazy" decoding="async">
                 <img class="game-shot light" src="./files/work/ace-game-light.jpg" alt="" loading="lazy" decoding="async">
-                <button type="button" class="mark game-start"><b>&#9673; PLAYABLE BUILD</b><span>PLAY IT HERE &#9654;</span><em class="game-note">WORKS BEST ON A COMPUTER</em></button>
+                <button type="button" class="mark game-start"><b>&#9673; PLAYABLE BUILD</b><span>CLICK TO PLAY &#9654;</span><em class="game-note">WORKS BEST ON A COMPUTER</em></button>
               </div>
               <div class="pl-rail game-rail">
                 <a href="https://diethyletherene.github.io/Asu-s-guide-to-the-ACE-workshop/" target="_blank" rel="noreferrer"><span>ACE WORKSHOP GAME</span><b>OPEN IN A NEW TAB &#8599;</b></a>
