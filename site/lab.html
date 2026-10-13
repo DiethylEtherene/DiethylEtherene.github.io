@@ -291,12 +291,12 @@ a.pl.game:hover .mark b{color:var(--pink)}
             </ul>
 
             <div class="rec-body">
-              <p class="prose">My partner and I had saved over a hundred recipe videos across Instagram and Douyin and cooked almost none of them. The recipes were trapped in captions and comment threads, half of them in Chinese, with no quantities and no way to plan a week or write a shopping list. So I turned the saves into a working cookbook: every dish has quantities, steps and a photo pulled from the video, and the two of us share one live weekly planner, shopping list and pantry.</p>
-              <p class="prose">I designed it and directed the build with Claude Code &mdash; Claude wrote the code, I set the direction and made the design calls &mdash; then tested every version by actually cooking from it. That was where the real design work happened. Toggling meal prep wiped the planned week, so the planner got an undo and now never overwrites unless asked. The prep grid overflowed on a phone propped by the hob. Timers buried in step text were useless mid-stir, so any time in a step became tap-to-start. Similar saves ended up as near-duplicates, so they now stack into one card with a quick/slow toggle.</p>
+              <p class="prose">My partner and I had saved over a hundred recipe videos across Instagram and Douyin and cooked almost none of them. The recipes were trapped in captions and comment threads, half of them in Chinese, with no quantities and no way to plan a week. Food with Asu turns them into a cookbook we actually cook from. Every dish has quantities, steps, tap-to-start timers and a nutrition estimate; the planner suggests a week around a health goal and flags the days that run low on fibre or high on salt; the shopping list knows what&rsquo;s already in the cupboard. Paste a recipe link and it reads the caption into a recipe, swapping sponsored ingredients for supermarket ones. Anyone can use it: start a kitchen, share the code, and every phone in the house shows the same plan, live.</p>
+              <p class="prose">I designed it and directed the build with Claude Code &mdash; Claude wrote the code, I set the direction and made the design calls &mdash; and tested every version by cooking from it. Underneath it&rsquo;s a single-page app on this site and a small Cloudflare backend that syncs each kitchen and doubles as a Claude connector, so Claude can read a link, write a recipe or plan the week straight into the app from a chat. Most of the design work came from using it. Toggling meal prep wiped the planned week, so the planner got an undo and never overwrites unless asked. Timers buried in step text were useless mid-stir, so any time in a step became tap-to-start. Saved recipes kept &lsquo;vanishing&rsquo; because they were quietly stacking onto similar dishes, so stacks now look like stacks.</p>
             </div>
 
             <div class="rec-foot">
-              <span class="outcome">&#9673; IN WEEKLY USE &mdash; 105 RECIPES, 2 COOKS</span>
+              <span class="outcome">&#9673; IN WEEKLY USE &mdash; 119 RECIPES &middot; LIVE SYNC &middot; CLAUDE CONNECTOR</span>
             </div>
 
             <div class="plate">
@@ -329,13 +329,13 @@ a.pl.game:hover .mark b{color:var(--pink)}
                 <figcaption><span>WHAT CAN WE MAKE</span><b>DESKTOP</b></figcaption>
               </figure>
               <figure class="frame">
-                <button type="button" class="pl a3">
+                <button type="button" class="pl a3 phone">
                   <i class="cross cx" aria-hidden="true"></i><i class="cross cy" aria-hidden="true"></i>
                   <i class="bk b1" aria-hidden="true"></i><i class="bk b2" aria-hidden="true"></i>
                   <i class="bk b3" aria-hidden="true"></i><i class="bk b4" aria-hidden="true"></i>
-                  <img src="./files/work/foodwithasu-shopping.jpg" alt="Shopping list grouped by aisle, each item showing which planned meals need it and linking to Waitrose and Sainsbury&rsquo;s, with a 0 of 59 progress count" loading="lazy" decoding="async">
+                  <img src="./files/work/foodwithasu-nutrition.jpg" alt="A recipe on a phone with Ingredients, Method and Nutrition tabs; the nutrition tab shows energy, protein, carbs, fat, fibre, sugars and salt per portion with UK traffic-light colours" loading="lazy" decoding="async">
                 </button>
-                <figcaption><span>SHOPPING &middot; BY AISLE</span><b>DESKTOP</b></figcaption>
+                <figcaption><span>NUTRITION &middot; PER PORTION</span><b>PHONE</b></figcaption>
               </figure>
             </div>
           </article>
